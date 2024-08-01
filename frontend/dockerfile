@@ -1,0 +1,16 @@
+FROM php:7.4-apache
+
+# ติดตั้ง dependencies ที่จำเป็น
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    && docker-php-ext-install zip
+
+# เปิดใช้งาน mod_rewrite สำหรับ Apache
+RUN a2enmod rewrite
+
+# คัดลอกไฟล์แอปพลิเคชัน CodeIgniter
+COPY . /var/www/html
+
+# ตั้งค่าสิทธิ์ที่เหมาะสม
+RUN chown -R www-data:www-data /var/www/html
