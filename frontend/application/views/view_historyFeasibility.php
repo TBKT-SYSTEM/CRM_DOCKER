@@ -1,16 +1,16 @@
-<title>CRM | Feasibility Form</title>
+<title>CRM | Feasibility List</title>
 <div class="container-fluid">
     <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
         <div class="card-body px-4 py-3">
             <div class="row align-items-center">
                 <div class="col-9">
-                    <h4 class="fw-semibold mb-8">Feasibility Form</h4>
+                    <h4 class="fw-semibold mb-8">Feasibility List</h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a class="text-muted text-decoration-none" href="<?php echo base_url() ?>">Requirement Form</a>
+                                <a class="text-muted text-decoration-none" href="<?php echo base_url() ?>">History Form</a>
                             </li>
-                            <li class="breadcrumb-item" aria-current="page">Feasibility Form</li>
+                            <li class="breadcrumb-item" aria-current="page">Feasibility List</li>
                         </ol>
                     </nav>
                 </div>
@@ -37,11 +37,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-5 text-end">
+                            <!-- <div class="col-md-5 text-end">
                                 <button type="button" class="btn bg-primary-subtle text-primary" data-bs-toggle="modal" data-bs-target="#mdlRegister">
                                     <i class="ti ti-Feasibility-plus me-2"></i> Add Feasibility
                                 </button>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="row border" style="padding: 15px;">
                             <div class="table-responsive">
@@ -50,12 +50,14 @@
                                         <!-- start row -->
                                         <tr>
                                             <th>No.</th>
-                                            <th>Costomer</th>
-                                            <th>Part No.</th>
-                                            <th>Issue Date</th>
-                                            <th>Issue By</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th>Feasibility No</th>
+                                            <th>Date (Issue date)</th>
+                                            <th>Customer</th>
+                                            <th>Part Number</th>
+                                            <th>Part Name</th>
+                                            <th>Model</th>
+                                            <th>Score</th>
+                                            <th>RFQ No.</th>
                                         </tr>
                                         <!-- end row -->
                                     </thead>
@@ -333,6 +335,7 @@
 </div>
 
 <script>
+    
     function previewPDF() {
 
         $('#table_inner tr').each(function() {
@@ -372,8 +375,6 @@
             $('#mdlEdits').modal('hide');
         });
     }
-
-
 
     async function addFeasibility() {
         event.preventDefault();
@@ -725,115 +726,115 @@
         $("#view_pdf_content").html(link_img);
     }
 
-    $(document).ready(function() {
-        if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
-            $('#tblFeasibility').DataTable().destroy();
-        }
-        var dataTable = $('#tblFeasibility').DataTable({
-            ajax: {
-                url: API_URL + 'feasibility/table'
-            },
-            columnDefs: [{
-                searchable: true,
-                orderable: false,
-                targets: 0,
-            }, ],
-            bSort: false,
-            order: [
-                [1, 'asc']
-            ],
-            columns: [{
-                    className: 'text-center',
-                    data: 'if_id'
-                },
-                {
-                    className: 'text-center',
-                    data: 'if_customer',
-                },
-                {
-                    className: 'text-center',
-                    data: 'if_part_no'
-                },
-                // {
-                //     className: 'text-center',
-                //     data:'if_import_tran',
-                //     "render": function (data, type, row){
-                //         if (type === 'display'){
-                //             if(row.if_import_tran == 1){
-                //                 disp = 'Oversea';
-                //             }else{
-                //                 disp = 'Domestic';
-                //             }
-                //         }
-                //         return disp;
-                //     }
-                // },
-                {
-                    className: 'text-center',
-                    data: 'update_date'
-                },
-                {
-                    className: 'text-center',
-                    data: 'update_by',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            if (row.update_by != "") {
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + row.update_by + '.jpg';
-                                if (!is_cached(img_ok)) {
-                                    img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
-                                }
-                                disp = '<div class="d-flex align-items-center">' +
-                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
-                                    '<div class="ms-3">' +
-                                    '<div class="user-meta-info">' +
-                                    '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
-                                    '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
-                                    '</div></div></div>';
-                            } else {
-                                disp = "";
-                            }
-                        }
-                        return disp;
-                    },
-                },
-                {
-                    className: 'text-center',
-                    data: 'if_id',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            if (row.if_status) {
-                                disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            } else {
-                                disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
-                            }
-                        }
-                        return disp;
-                    }
-                },
-                {
-                    className: 'text-center',
-                    data: 'if_id',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            disp = '<button type="button" onclick="editModal(\'' + row.if_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
-                                '<i class="ti ti-pencil me-1"></i> Edit </button>';
-                        }
-                        return disp;
-                    }
-                }
-            ]
-        });
-        dataTable.on('order.dt search.dt', function() {
-            let i = 1;
-            dataTable.cells(null, 0, {
-                search: 'applied',
-                order: 'applied'
-            }).every(function(cell) {
-                this.data(i++);
-            });
-        }).draw();
-        setInterval(function() {
-            dataTable.ajax.reload(null, false);
-        }, 1000);
-    });
+    // $(document).ready(function() {
+    //     if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
+    //         $('#tblFeasibility').DataTable().destroy();
+    //     }
+    //     var dataTable = $('#tblFeasibility').DataTable({
+    //         ajax: {
+    //             url: API_URL + 'feasibility/table'
+    //         },
+    //         columnDefs: [{
+    //             searchable: true,
+    //             orderable: false,
+    //             targets: 0,
+    //         }, ],
+    //         bSort: false,
+    //         order: [
+    //             [1, 'asc']
+    //         ],
+    //         columns: [{
+    //                 className: 'text-center',
+    //                 data: 'if_id'
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'if_customer',
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'if_part_no'
+    //             },
+    //             // {
+    //             //     className: 'text-center',
+    //             //     data:'if_import_tran',
+    //             //     "render": function (data, type, row){
+    //             //         if (type === 'display'){
+    //             //             if(row.if_import_tran == 1){
+    //             //                 disp = 'Oversea';
+    //             //             }else{
+    //             //                 disp = 'Domestic';
+    //             //             }
+    //             //         }
+    //             //         return disp;
+    //             //     }
+    //             // },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'update_date'
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'update_by',
+    //                 "render": function(data, type, row) {
+    //                     if (type === 'display') {
+    //                         if (row.update_by != "") {
+    //                             let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + row.update_by + '.jpg';
+    //                             if (!is_cached(img_ok)) {
+    //                                 img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
+    //                             }
+    //                             disp = '<div class="d-flex align-items-center">' +
+    //                                 '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+    //                                 '<div class="ms-3">' +
+    //                                 '<div class="user-meta-info">' +
+    //                                 '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
+    //                                 '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
+    //                                 '</div></div></div>';
+    //                         } else {
+    //                             disp = "";
+    //                         }
+    //                     }
+    //                     return disp;
+    //                 },
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'if_id',
+    //                 "render": function(data, type, row) {
+    //                     if (type === 'display') {
+    //                         if (row.if_status) {
+    //                             disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+    //                         } else {
+    //                             disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+    //                         }
+    //                     }
+    //                     return disp;
+    //                 }
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'if_id',
+    //                 "render": function(data, type, row) {
+    //                     if (type === 'display') {
+    //                         disp = '<button type="button" onclick="editModal(\'' + row.if_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
+    //                             '<i class="ti ti-pencil me-1"></i> Edit </button>';
+    //                     }
+    //                     return disp;
+    //                 }
+    //             }
+    //         ]
+    //     });
+    //     dataTable.on('order.dt search.dt', function() {
+    //         let i = 1;
+    //         dataTable.cells(null, 0, {
+    //             search: 'applied',
+    //             order: 'applied'
+    //         }).every(function(cell) {
+    //             this.data(i++);
+    //         });
+    //     }).draw();
+    //     setInterval(function() {
+    //         dataTable.ajax.reload(null, false);
+    //     }, 1000);
+    // });
 </script>
