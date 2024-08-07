@@ -73,6 +73,9 @@ func Routy() {
 	router.PUT("/feasibility/update", UpdateFeasibility)
 	router.PUT("/feasibility/change_status", ChangeFeasibilityStatus)
 
+	router.GET("/feasibilityHistory/table", ListFeasibilityTableHistory)
+	router.GET("/feasibilityHistory/tableDate/:date", ListFeasibilityTableHistoryDate)
+
 	router.GET("/manage_feasibility/table/:id", ListManageFeasibilityTable)
 	router.PUT("/manage_feasibility/scoring", UpdateFeasibilityScore)
 	router.PUT("/manage_feasibility/commenting", UpdateFeasibilityComment)

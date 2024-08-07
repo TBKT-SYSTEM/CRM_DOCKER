@@ -37,11 +37,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- <div class="col-md-5 text-end">
-                                <button type="button" class="btn bg-primary-subtle text-primary" data-bs-toggle="modal" data-bs-target="#mdlRegister">
-                                    <i class="ti ti-Feasibility-plus me-2"></i> Add Feasibility
+                            <div class="col-md-5 text-end">
+                                <input type="date" onchange="dateChange()" class="btn border" style="margin-right: 15px;" id="dateInput">
+                                <button type="button" onclick="findAll()" class="btn btn-outline-secondary">
+                                    <i class="ti ti-search me-2 fs-5"></i> Find ALL
                                 </button>
-                            </div> -->
+                            </div>
                         </div>
                         <div class="row border" style="padding: 15px;">
                             <div class="table-responsive">
@@ -53,7 +54,7 @@
                                             <th>Feasibility No</th>
                                             <th>Date (Issue date)</th>
                                             <th>Customer</th>
-                                            <th>Part Number</th>
+                                            <th>Part No</th>
                                             <th>Part Name</th>
                                             <th>Model</th>
                                             <th>Score</th>
@@ -335,11 +336,15 @@
 </div>
 
 <script>
-    
-    function previewPDF() {
+    document.addEventListener('DOMContentLoaded', function() {
+        var dateInput = document.getElementById('dateInput');
+        var today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    });
 
+    function previewPDF() {
         $('#table_inner tr').each(function() {
-                $(this).css('background-color', 'white');
+            $(this).css('background-color', 'white');
         });
 
         const {
@@ -726,115 +731,276 @@
         $("#view_pdf_content").html(link_img);
     }
 
-    // $(document).ready(function() {
-    //     if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
-    //         $('#tblFeasibility').DataTable().destroy();
-    //     }
-    //     var dataTable = $('#tblFeasibility').DataTable({
-    //         ajax: {
-    //             url: API_URL + 'feasibility/table'
-    //         },
-    //         columnDefs: [{
-    //             searchable: true,
-    //             orderable: false,
-    //             targets: 0,
-    //         }, ],
-    //         bSort: false,
-    //         order: [
-    //             [1, 'asc']
-    //         ],
-    //         columns: [{
-    //                 className: 'text-center',
-    //                 data: 'if_id'
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'if_customer',
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'if_part_no'
-    //             },
-    //             // {
-    //             //     className: 'text-center',
-    //             //     data:'if_import_tran',
-    //             //     "render": function (data, type, row){
-    //             //         if (type === 'display'){
-    //             //             if(row.if_import_tran == 1){
-    //             //                 disp = 'Oversea';
-    //             //             }else{
-    //             //                 disp = 'Domestic';
-    //             //             }
-    //             //         }
-    //             //         return disp;
-    //             //     }
-    //             // },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'update_date'
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'update_by',
-    //                 "render": function(data, type, row) {
-    //                     if (type === 'display') {
-    //                         if (row.update_by != "") {
-    //                             let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + row.update_by + '.jpg';
-    //                             if (!is_cached(img_ok)) {
-    //                                 img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
-    //                             }
-    //                             disp = '<div class="d-flex align-items-center">' +
-    //                                 '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
-    //                                 '<div class="ms-3">' +
-    //                                 '<div class="user-meta-info">' +
-    //                                 '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
-    //                                 '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
-    //                                 '</div></div></div>';
-    //                         } else {
-    //                             disp = "";
-    //                         }
-    //                     }
-    //                     return disp;
-    //                 },
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'if_id',
-    //                 "render": function(data, type, row) {
-    //                     if (type === 'display') {
-    //                         if (row.if_status) {
-    //                             disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-    //                         } else {
-    //                             disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
-    //                         }
-    //                     }
-    //                     return disp;
-    //                 }
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'if_id',
-    //                 "render": function(data, type, row) {
-    //                     if (type === 'display') {
-    //                         disp = '<button type="button" onclick="editModal(\'' + row.if_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
-    //                             '<i class="ti ti-pencil me-1"></i> Edit </button>';
-    //                     }
-    //                     return disp;
-    //                 }
-    //             }
-    //         ]
-    //     });
-    //     dataTable.on('order.dt search.dt', function() {
-    //         let i = 1;
-    //         dataTable.cells(null, 0, {
-    //             search: 'applied',
-    //             order: 'applied'
-    //         }).every(function(cell) {
-    //             this.data(i++);
-    //         });
-    //     }).draw();
-    //     setInterval(function() {
-    //         dataTable.ajax.reload(null, false);
-    //     }, 1000);
-    // });
+    $(document).ready(function() {
+        if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
+            $('#tblFeasibility').DataTable().destroy();
+        }
+        var dataTable = $('#tblFeasibility').DataTable({
+            scrollX: true,
+            ajax: {
+                url: API_URL + 'feasibilityHistory/table'
+            },
+            columnDefs: [{
+                scrollX: true,
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
+            bSort: false,
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    className: 'text-center',
+                    data: 'if_id'
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'if_ref',
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'if_created_date',
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_customer',
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_part_no'
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_part_name'
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'mrt_name'
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_score',
+                    "render": function(data, type, row) {
+                        let score = row.if_score;
+                        // parseInt(score);
+                        if (score == '') {
+                            score = '<button type="" class="btn btn-danger">' +
+                                '<i class="ti ti-mood-confuzed me-1"></i> 0 </button>';
+                        } else if (parseInt(score) >= 0 && parseInt(score) <= 69) {
+                            score = '<button type="" class="btn btn-danger">' +
+                                '<i class="ti ti-mood-sad me-1"></i>' + score + '</button>';
+                        } else if (parseInt(score) >= 70 && parseInt(score) <= 89) {
+                            score = '<button type="" class="btn btn-warning">' +
+                                '<i class="ti ti-mood-empty me-1"></i>' + score + '</button>';
+                        } else if (parseInt(score) >= 90) {
+                            score = '<button type="" class="btn btn-success">' +
+                                '<i class="ti ti-mood-happy me-1"></i>' + score + '</button>';
+                        }
+                        return score;
+                    }
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'if_ref',
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
+            let i = 1;
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
+                this.data(i++);
+            });
+        }).draw();
+        setInterval(function() {
+            dataTable.ajax.reload(null, false);
+        }, 600000);
+    });
+
+    function dateChange() {
+        if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
+            $('#tblFeasibility').DataTable().destroy();
+        }
+        var dataTable = $('#tblFeasibility').DataTable({
+            scrollX: true,
+            ajax: {
+                url: API_URL + 'feasibilityHistory/tableDate/' + $('#dateInput').val()
+            },
+            columnDefs: [{
+                scrollX: true,
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
+            bSort: false,
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    className: 'text-center',
+                    data: 'if_id'
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'if_ref',
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'if_created_date',
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_customer',
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_part_no'
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_part_name'
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'mrt_name'
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_score',
+                    "render": function(data, type, row) {
+                        let score = row.if_score;
+                        // parseInt(score);
+                        if (score == '') {
+                            score = '<button type="" class="btn btn-danger">' +
+                                '<i class="ti ti-mood-confuzed me-1"></i> 0 </button>';
+                        } else if (parseInt(score) >= 0 && parseInt(score) <= 69) {
+                            score = '<button type="" class="btn btn-danger">' +
+                                '<i class="ti ti-mood-sad me-1"></i>' + score + '</button>';
+                        } else if (parseInt(score) >= 70 && parseInt(score) <= 89) {
+                            score = '<button type="" class="btn btn-warning">' +
+                                '<i class="ti ti-mood-empty me-1"></i>' + score + '</button>';
+                        } else if (parseInt(score) >= 90) {
+                            score = '<button type="" class="btn btn-success">' +
+                                '<i class="ti ti-mood-happy me-1"></i>' + score + '</button>';
+                        }
+                        return score;
+                    }
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'if_ref',
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
+            let i = 1;
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
+                this.data(i++);
+            });
+        }).draw();
+        setInterval(function() {
+            dataTable.ajax.reload(null, false);
+        }, 600000);
+
+    }
+
+    function findAll() {
+        var dateInput = document.getElementById('dateInput');
+        var today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+
+        if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
+            $('#tblFeasibility').DataTable().destroy();
+        }
+        var dataTable = $('#tblFeasibility').DataTable({
+            scrollX: true,
+            ajax: {
+                url: API_URL + 'feasibilityHistory/table'
+            },
+            columnDefs: [{
+                scrollX: true,
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
+            bSort: false,
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    className: 'text-center',
+                    data: 'if_id'
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'if_ref',
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'if_created_date',
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_customer',
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_part_no'
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_part_name'
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'mrt_name'
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_score',
+                    "render": function(data, type, row) {
+                        let score = row.if_score;
+                        // parseInt(score);
+                        if (score == '') {
+                            score = '<button type="" class="btn btn-danger">' +
+                                '<i class="ti ti-mood-confuzed me-1"></i> 0 </button>';
+                        } else if (parseInt(score) >= 0 && parseInt(score) <= 69) {
+                            score = '<button type="" class="btn btn-danger">' +
+                                '<i class="ti ti-mood-sad me-1"></i>' + score + '</button>';
+                        } else if (parseInt(score) >= 70 && parseInt(score) <= 89) {
+                            score = '<button type="" class="btn btn-warning">' +
+                                '<i class="ti ti-mood-empty me-1"></i>' + score + '</button>';
+                        } else if (parseInt(score) >= 90) {
+                            score = '<button type="" class="btn btn-success">' +
+                                '<i class="ti ti-mood-happy me-1"></i>' + score + '</button>';
+                        }
+                        return score;
+                    }
+                },
+                {
+                    className: 'text-center text-wrap',
+                    data: 'if_ref',
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
+            let i = 1;
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
+                this.data(i++);
+            });
+        }).draw();
+        setInterval(function() {
+            dataTable.ajax.reload(null, false);
+        }, 600000);
+
+    }
 </script>

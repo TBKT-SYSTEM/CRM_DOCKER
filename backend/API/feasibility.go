@@ -233,6 +233,7 @@ func ListFeasibilityTable(c *gin.Context) {
 	objData.Data = objFeasibilityList
 	c.IndentedJSON(http.StatusOK, objData)
 }
+
 func ListFeasibility(c *gin.Context) {
 	var objFeasibility Feasibility
 	iId := c.Param("id")
@@ -354,4 +355,116 @@ func ChangeFeasibilityStatus(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+}
+
+// Feasibility History --------------------------
+func ListFeasibilityTableHistory(c *gin.Context) {
+	var objFeasibilityList []FeasibilityHistory
+	objListFeasibility, err := db.Query("SELECT inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, inf.if_part_no, inf.if_part_name, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name, SUM(ifcp.ifcp_score) AS Score FROM info_feasibility AS inf LEFT JOIN sys_user AS su ON inf.update_by = su.su_emp_code LEFT JOIN mst_requirement_type AS mrt ON mrt.mrt_id = inf.mrt_id LEFT JOIN info_feasibility_consern_point AS ifcp ON inf.if_id = ifcp.if_id GROUP BY inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, inf.if_part_no, inf.if_part_name, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name ORDER BY inf.if_id")
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	defer objListFeasibility.Close()
+	for objListFeasibility.Next() {
+		var objFeasibility FeasibilityHistory
+		var strUserFname sql.NullString
+		var strUserLname sql.NullString
+		var strUserImgPath sql.NullString
+		var strUserImgName sql.NullString
+		var intScore sql.NullString
+		err := objListFeasibility.Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_created_date, &objFeasibility.If_customer, &objFeasibility.If_part_no, &objFeasibility.If_part_name, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName, &intScore)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+		if strUserFname.Valid {
+			objFeasibility.Su_fname = strUserFname.String
+		}
+		if strUserLname.Valid {
+			objFeasibility.Su_lname = strUserLname.String
+		}
+		if strUserImgPath.Valid {
+			objFeasibility.Su_img_path = strUserImgPath.String
+		}
+		if strUserImgName.Valid {
+			objFeasibility.Su_img_name = strUserImgName.String
+		}
+		if intScore.Valid {
+			objFeasibility.If_score = intScore.String
+		}
+
+		objFeasibilityList = append(objFeasibilityList, objFeasibility)
+	}
+	err = objListFeasibility.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	var objData FeasibilityDataHistory
+	objData.Data = objFeasibilityList
+	c.IndentedJSON(http.StatusOK, objData)
+}
+
+func ListFeasibilityTableHistoryDate(c *gin.Context) {
+	var objFeasibilityList []FeasibilityHistory
+	date := c.Param("date")
+	objListFeasibility, err := db.Query("SELECT inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, inf.if_part_no, inf.if_part_name, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name, SUM(ifcp.ifcp_score) AS Score FROM info_feasibility AS inf LEFT JOIN sys_user AS su ON inf.update_by = su.su_emp_code LEFT JOIN mst_requirement_type AS mrt ON mrt.mrt_id = inf.mrt_id LEFT JOIN info_feasibility_consern_point AS ifcp ON inf.if_id = ifcp.if_id WHERE DATE(inf.create_date) = ? GROUP BY inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, inf.if_part_no, inf.if_part_name, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name ORDER BY inf.if_id", date)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	defer objListFeasibility.Close()
+	for objListFeasibility.Next() {
+		var objFeasibility FeasibilityHistory
+		var strUserFname sql.NullString
+		var strUserLname sql.NullString
+		var strUserImgPath sql.NullString
+		var strUserImgName sql.NullString
+		var intScore sql.NullString
+		err := objListFeasibility.Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_created_date, &objFeasibility.If_customer, &objFeasibility.If_part_no, &objFeasibility.If_part_name, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName, &intScore)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+		if strUserFname.Valid {
+			objFeasibility.Su_fname = strUserFname.String
+		}
+		if strUserLname.Valid {
+			objFeasibility.Su_lname = strUserLname.String
+		}
+		if strUserImgPath.Valid {
+			objFeasibility.Su_img_path = strUserImgPath.String
+		}
+		if strUserImgName.Valid {
+			objFeasibility.Su_img_name = strUserImgName.String
+		}
+		if intScore.Valid {
+			objFeasibility.If_score = intScore.String
+		}
+
+		objFeasibilityList = append(objFeasibilityList, objFeasibility)
+	}
+	err = objListFeasibility.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	var objData FeasibilityDataHistory
+	objData.Data = objFeasibilityList
+	c.IndentedJSON(http.StatusOK, objData)
 }

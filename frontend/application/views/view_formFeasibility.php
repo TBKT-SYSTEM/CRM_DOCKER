@@ -54,7 +54,7 @@
                                             <th>Part No.</th>
                                             <th>Issue Date</th>
                                             <th>Issue By</th>
-                                            <th>Status</th>
+                                            <!-- <th>Status</th> -->
                                             <th>Action</th>
                                         </tr>
                                         <!-- end row -->
@@ -84,63 +84,99 @@
             </div>
             <div class="modal-body">
                 <form id="add_form" name="add_form">
-                    <div class="container-fluid">
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpDate" class="form-label fw-semibold">Date</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpDate" name="create_date" placeholder="Date" value="<?php echo date('Y/m/d'); ?>" disabled>
-                                <span class="form_error"></span>
+                    <div class="card">
+                        <div class="card-body">
+                            <ul class="nav nav-pills nav-fill" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#navpill-111" role="tab" aria-selected="true">
+                                        <span>Feasibility Detail</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#navpill-222" role="tab" aria-selected="false" tabindex="-1">
+                                        <span>Part No</span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="row">
+                                <div class="tab-content mt-2">
+                                    <div class="tab-pane p-3 active show" id="navpill-111" role="tabpanel">
+                                        <div class="container-fluid">
+                                            <div class="mb-3 row align-items-center">
+                                                <label for="inpDate" class="form-label fw-semibold">Date</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" id="inpDate" name="create_date" placeholder="Date" value="<?php echo date('Y/m/d'); ?>" disabled>
+                                                    <span class="form_error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 row align-items-center">
+                                                <label for="inpCustomer" class="form-label fw-semibold">Customer</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" id="inpCustomer" name="if_customer" placeholder="Customer">
+                                                    <span class="form_error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 row align-items-center">
+                                                <label for="inpImportFrom" class="form-label fw-semibold">Import From</label>
+                                                <div class="col-sm-9">
+                                                    <select name="if_import_tran" id="selImport" class="form-control">
+                                                        <option value="" disabled selected>Import From</option>
+                                                        <option value="1">Oversea</option>
+                                                        <option value="2">Domestic</option>
+                                                    </select>
+                                                    <span class="form_error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 row align-items-center">
+                                                <label for="selRequirement" class="form-label fw-semibold">Requirement</label>
+                                                <div class="col-sm-9">
+                                                    <select name="mrt_id" id="selRequirement" class="form-control">
+                                                        <option value="" disabled selected>Choose Requirement</option>
+                                                        <?php
+                                                        $option_mrt = $this->ManageBackend->list_option("option/list_mrt");
+                                                        foreach ($option_mrt as $op_mrt) {
+                                                            echo '<option value="' . $op_mrt['mrt_id'] . '">' . $op_mrt['mrt_name'] . '</option>';
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                    <span class="form_error"></span>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" id="add_if_ref" name="if_ref">
+                                            <span class="form_error"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane p-3" id="navpill-222" role="tabpanel">
+                                        <div id="tab-2" style="display: block;">
+                                            <div class="row border" style="padding: 15px;">
+                                                <div class="container-fluid">
+                                                    <div class="mb-3 row align-items-center">
+                                                        <label for="inpQtyPartNo" class="form-label fw-semibold">Select Quantity</label>
+                                                        <div class="col-sm-9">
+                                                            <select class="form-control" onchange="changePartNo()" id="inpQtyPartNo" name="if_qty_part_no" placeholder="Part No.">
+                                                                <option value="" selected> Please Select Quantity ...</option>
+                                                                <option value="1">1</option>
+                                                                <option value="2">2</option>
+                                                                <option value="3">3</option>
+                                                                <option value="4">4</option>
+                                                                <option value="5">5</option>
+                                                            </select>
+                                                            <span class="form_error"></span>
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div id="form-part-no">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpCustomer" class="form-label fw-semibold">Customer</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpCustomer" name="if_customer" placeholder="Customer">
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpImportFrom" class="form-label fw-semibold">Import From</label>
-                            <div class="col-sm-9">
-                                <select name="if_import_tran" id="selImport" class="form-control">
-                                    <option value="" disabled selected>Import From</option>
-                                    <option value="1">Oversea</option>
-                                    <option value="2">Domestic</option>
-                                </select>
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpPartNo" class="form-label fw-semibold">Part No.</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpPartNo" name="if_part_no" placeholder="Part No.">
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpPartName" class="form-label fw-semibold">Part Name</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpPartName" name="if_part_name" placeholder="Part Name">
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="selRequirement" class="form-label fw-semibold">Requirement</label>
-                            <div class="col-sm-9">
-                                <select name="mrt_id" id="selRequirement" class="form-control">
-                                    <option value="" disabled selected>Choose Requirement</option>
-                                    <?php
-                                    $option_mrt = $this->ManageBackend->list_option("option/list_mrt");
-                                    foreach ($option_mrt as $op_mrt) {
-                                        echo '<option value="' . $op_mrt['mrt_id'] . '">' . $op_mrt['mrt_name'] . '</option>';
-                                    }
-                                    ?>
-                                </select>
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <input type="hidden" id="add_if_ref" name="if_ref">
-                        <span class="form_error"></span>
                     </div>
             </div>
             <div class="modal-footer">
@@ -336,7 +372,7 @@
     function previewPDF() {
 
         $('#table_inner tr').each(function() {
-                $(this).css('background-color', 'white');
+            $(this).css('background-color', 'white');
         });
 
         const {
@@ -400,6 +436,8 @@
                     add_form["create_date"] = getTimeNow();
                     add_form["if_duedate"] = getTimeNow().substring(0, 10) + " 11:59:59";
                     add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                    console.log(add_form);
+                    return;
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
@@ -725,7 +763,33 @@
         $("#view_pdf_content").html(link_img);
     }
 
+    function changePartNo() {
+        var inpQtyPart = $('#inpQtyPartNo');
+        // alert(inpQtyPart.val());
+        var html = '';
+        for (var i = 0; i < inpQtyPart.val(); i++) {
+            var i_plus_1 = i + 1;
+            html += '<div class="mb-3 row align-items-center">' +
+                '<label for="inpPartNo' + i + '" class="form-label fw-semibold">Part No (' + i_plus_1 + ')</label>' +
+                '<div class="col-sm-9">' +
+                '<input type="text" class="form-control" id="inpPartNo' + i + '" name="if_part_no[]" placeholder="Part No.">' +
+                '<span class="form_error"></span>' +
+                '</div>' +
+                '</div>' +
+                '<div class="mb-3 row align-items-center">' +
+                '<label for="inpPartName' + i + '" class="form-label fw-semibold">Part Name (' + i_plus_1 + ')</label>' +
+                '<div class="col-sm-9">' +
+                '<input type="text" class="form-control" id="inpPartName' + i + '" name="if_part_name[]" placeholder="Part Name">' +
+                '<span class="form_error"></span>' +
+                '</div>' +
+                '</div>' +
+                '<hr>';
+        }
+        $('#form-part-no').html(html);
+    }
+
     $(document).ready(function() {
+
         if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
             $('#tblFeasibility').DataTable().destroy();
         }
@@ -776,9 +840,10 @@
                     className: 'text-center',
                     data: 'update_by',
                     "render": function(data, type, row) {
+                        let emp_code = row.update_by.substring(2, 7);
                         if (type === 'display') {
                             if (row.update_by != "") {
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + row.update_by + '.jpg';
+                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
                                 if (!is_cached(img_ok)) {
                                     img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
                                 }
@@ -796,20 +861,20 @@
                         return disp;
                     },
                 },
-                {
-                    className: 'text-center',
-                    data: 'if_id',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            if (row.if_status) {
-                                disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            } else {
-                                disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
-                            }
-                        }
-                        return disp;
-                    }
-                },
+                // {
+                //     className: 'text-center',
+                //     data: 'if_id',
+                //     "render": function(data, type, row) {
+                //         if (type === 'display') {
+                //             if (row.if_status) {
+                //                 disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+                //             } else {
+                //                 disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                //             }
+                //         }
+                //         return disp;
+                //     }
+                // },
                 {
                     className: 'text-center',
                     data: 'if_id',
@@ -834,6 +899,6 @@
         }).draw();
         setInterval(function() {
             dataTable.ajax.reload(null, false);
-        }, 1000);
+        }, 600000);
     });
 </script>

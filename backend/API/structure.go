@@ -267,6 +267,25 @@ type FeasibilityTable struct {
 	Su_img_path    string `json:"su_img_path"`
 	Su_img_name    string `json:"su_img_name"`
 }
+
+type FeasibilityDataHistory struct {
+	Data []FeasibilityHistory `json:"data"`
+}
+
+type FeasibilityHistory struct {
+	If_id           int    `json:"if_id"`
+	If_ref          string `json:"if_ref"`
+	If_created_date string `json:"if_created_date"`
+	If_customer     string `json:"if_customer"`
+	If_part_no      string `json:"if_part_no"`
+	If_part_name    string `json:"if_part_name"`
+	Mrt_name        string `json:"mrt_name"`
+	Su_fname        string `json:"su_fname"`
+	Su_lname        string `json:"su_lname"`
+	Su_img_path     string `json:"su_img_path"`
+	Su_img_name     string `json:"su_img_name"`
+	If_score        string `json:"if_score"`
+}
 type Feasibility struct {
 	If_id          int    `json:"if_id"`
 	If_ref         string `json:"if_ref"`
