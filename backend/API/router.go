@@ -111,6 +111,7 @@ func Routy() {
 	router.GET("/view/feas_score/:id", ListConsiderationScore)
 	router.GET("/view/in_dept", ListIncharge)
 	router.GET("/view/scorable/:if/:sd", ListInchargeScorable)
+	router.GET("/view/partno/:id", ListPartNoById)
 
 	router.GET("/notify", LineNotify)
 	router.POST("/email/userdata", EmailUserData)

@@ -674,6 +674,50 @@ func ListInchargeTable(c *gin.Context) {
 	objData.Data = objConsiderInchargeList
 	c.IndentedJSON(http.StatusOK, objData)
 }
+
+func ListPartNoById(c *gin.Context) {
+	// log.Println("List Part No By Id : ", c.Param("id"))
+	var objPartNoList []GetPartNoById
+	objListPartNo, err := db.Query("SELECT ifpn_id, ifpn_part_no, ifpn_part_name FROM `info_feasibility_part_no` WHERE if_id = ?", c.Param("id"))
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	defer objListPartNo.Close()
+	for objListPartNo.Next() {
+		var objPartNo GetPartNoById
+		var strPartNo sql.NullString
+		var strPartName sql.NullString
+		err := objListPartNo.Scan(&objPartNo.Ifpn_id, &objPartNo.PartNo, &objPartNo.PartName)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+		if strPartNo.Valid {
+			objPartNo.PartNo = strPartNo.String
+		}
+		if strPartName.Valid {
+			objPartNo.PartName = strPartName.String
+		}
+
+		objPartNoList = append(objPartNoList, objPartNo)
+	}
+	err = objListPartNo.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	var objData GetPartNoByIdData
+	objData.Data = objPartNoList
+	c.IndentedJSON(http.StatusOK, objData)
+}
 func InchargeIsUnique(c *gin.Context) {
 	var objInchargeData ConsiderIncharge
 	if err := c.BindJSON(&objInchargeData); err != nil {
@@ -1507,11 +1551,26 @@ func EmailUserData(c *gin.Context) {
 }
 
 // other ---------------------------
-func CountConsideration() (ConsiderationCount, error) {
-	var objConsider ConsiderationCount
-	err := db.QueryRow("SELECT COUNT(mc_id) AS mc_count FROM `mst_consideration` WHERE mc_status=1").Scan(&objConsider.Mc_count)
+func CountConsideration() ([]ConsiderationCount, error) {
+	var objConsider []ConsiderationCount
+	rows, err := db.Query("SELECT mc_id FROM `mst_consideration` WHERE mc_status=1")
 	if err != nil {
-		return ConsiderationCount{}, err
+		return nil, err
 	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var consider ConsiderationCount
+		if err := rows.Scan(&consider.Mc_id); err != nil {
+			return nil, err
+		}
+		objConsider = append(objConsider, consider)
+	}
+
+	// Check for any error during the iteration
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return objConsider, nil
 }

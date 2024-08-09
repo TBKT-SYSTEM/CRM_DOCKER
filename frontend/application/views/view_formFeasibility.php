@@ -154,21 +154,15 @@
                                                     <div class="mb-3 row align-items-center">
                                                         <label for="inpQtyPartNo" class="form-label fw-semibold">Select Quantity</label>
                                                         <div class="col-sm-9">
-                                                            <select class="form-control" onchange="changePartNo()" id="inpQtyPartNo" name="if_qty_part_no" placeholder="Part No.">
-                                                                <option value="" selected> Please Select Quantity ...</option>
-                                                                <option value="1">1</option>
-                                                                <option value="2">2</option>
-                                                                <option value="3">3</option>
-                                                                <option value="4">4</option>
-                                                                <option value="5">5</option>
-                                                            </select>
+                                                            <input type="number" class="form-control" onchange="changePartNo()" id="inpQtyPartNo" name="if_qty_part_no" max="20" min="1" placeholder="Part No."></input>
                                                             <span class="form_error"></span>
                                                         </div>
                                                     </div>
                                                     <hr>
-                                                    <div id="form-part-no">
+                                                    <div id="form_part_no" name="form_part_no">
 
                                                     </div>
+                                                    <span class="form_error"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -191,6 +185,7 @@
         </div>
     </div>
 </div>
+
 <!-- Modal for edit Feasibility -->
 <div class="modal fade" id="mdlEdits" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -236,12 +231,12 @@
                             <tr>
                                 <th colspan="2"><label for="editPartNo" class="form-label fw-semibold">Part No.</label></th>
                                 <th colspan="8" class="b-bottom">
-                                    <input type="text" class="border-transparent" id="editPartNo" name="if_part_no" placeholder="Part No.">
+                                    <input type="text" class="border-transparent" id="editPartNo" name="if_part_no" placeholder="Part No." disabled>
                                     <span class="form_error"></span>
                                 </th>
                                 <th colspan="2"><label for="editPartName" class="form-label fw-semibold">Part Name</label></th>
                                 <th colspan="8" class="b-bottom">
-                                    <input type="text" class="border-transparent" id="editPartName" name="if_part_name" placeholder="Part Name">
+                                    <input type="text" class="border-transparent" id="editPartName" name="if_part_name" placeholder="Part Name" disabled>
                                     <span class="form_error"></span>
                                 </th>
                             </tr>
@@ -356,6 +351,41 @@
         </div>
     </div>
 </div>
+<!-- Modal for View Feasibility Group Part No-->
+<div class="modal fade" id="mdlPartNo" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center">
+                <h4 class="modal-title" id="myLargeModalLabel">
+                    <i class="ti ti-layout-list me-1"></i> Part No.
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;" id="tblPartNo">
+                    <thead class="fw-semibold">
+                        <tr>
+                            <th>No.</th>
+                            <th>Part No.</th>
+                            <th>Part Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyPartNo">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal">
+                    Close
+                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for View Feasibility -->
 <div class="modal" id="view_pdf_file">
     <div class="modal-dialog modal-xl mt-3 mb-0">
         <div class="modal-content">
@@ -409,12 +439,10 @@
         });
     }
 
-
-
     async function addFeasibility() {
         event.preventDefault();
         let chk = await Feasibility_validate("add");
-        // console.log(chk);
+        // console.log('check =>',chk);
         if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -428,16 +456,23 @@
                 if (result.isConfirmed) {
                     var add_form = {};
                     $('#add_form').serializeArray().forEach(function(item) {
+
                         if (item.name == 'if_import_tran' || item.name == 'mrt_id') {
                             item.value = parseInt(item.value)
                         }
+
+                        if (item.name == 'if_part_no[]' || item.name == 'if_part_name[]') {
+                            return;
+                        }
+
                         add_form[item.name] = item.value;
                     })
                     add_form["create_date"] = getTimeNow();
                     add_form["if_duedate"] = getTimeNow().substring(0, 10) + " 11:59:59";
                     add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-                    console.log(add_form);
-                    return;
+                    add_form["update_date"] = getTimeNow();
+                    add_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                    add_form["if_group_part"] = chk;
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
@@ -606,11 +641,36 @@
     // modal --------------------------------------
     function editModal(id) {
         event.preventDefault();
+        var partNo = "";
+        var partName = "";
         $('#if_id').val(id);
         $.ajax({
             type: 'get',
             url: API_URL + 'feasibility/' + id,
-            success: function(result) {
+            success: async function(result) {
+                await $.ajax({
+                    type: 'GET',
+                    url: API_URL + 'view/partno/' + id,
+                    success: function(result) {
+                        // console.log(result);
+                        let data = result.data;
+                        if (data.length > 0) {
+                            for (let i = 0; i < data.length; i++) {
+                                partNo += data[i].partNo;
+                                partName += data[i].partName;
+
+                                // Add a comma if it's not the last item
+                                if (i < data.length - 1) {
+                                    partNo += ", ";
+                                    partName += ", ";
+                                }
+                            }
+                        } else {
+                            partNo = "";
+                            partName = "";
+                        }
+                    }
+                });
                 $('#editRef').val(result.if_ref);
                 $('#editDate').val(result.create_date.substring(0, 10));
                 $('#editDuedate').val(result.if_duedate.substring(0, 10));
@@ -619,12 +679,160 @@
                     '<option value="1" ' + ((result.if_import_tran == 1) ? 'selected' : '') + '>Oversea</option>' +
                     '<option value="2" ' + ((result.if_import_tran == 2) ? 'selected' : '') + '>Domestic</option>';
                 $('#editImportFrom').html(importText);
-                $('#editPartNo').val(result.if_part_no);
-                $('#editPartName').val(result.if_part_name);
+                $('#editPartNo').val(partNo);
+                $('#editPartName').val(partName);
                 listRequirement(result.mrt_id);
                 viewFeasibility(id);
             }
         })
+    }
+
+    async function editPartNo(id) {
+        event.preventDefault();
+        var partNo = $('#' + id).val();
+        var partName = $('#' + id).closest('tr').find('input').last().val();
+
+        console.log("Part No:", partNo);
+        console.log("Part Name:", partName);
+
+        let data = []
+        data.push({"partNo": partNo});
+        data.push({"partName": partName});
+
+        console.log(data);
+
+        var chk = await edit_partno(data);
+        if (chk) {
+
+        } else {
+            console.log("end");
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                return;
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    url: API_URL + 'feasibility/insert',
+                    data: JSON.stringify(add_form),
+                    success: function(data) {
+                        if (data.Error != "null" || data.Error != "") {
+                            Swal.fire({
+                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Feasibility success!</p>",
+                                icon: 'success',
+                                showClass: {
+                                    popup: 'animate__animated animate__fadeInDown'
+                                },
+                                hideClass: {
+                                    popup: 'animate__animated animate__fadeOutUp'
+                                }
+                            })
+                            $('#mdlRegister').close();
+                        } else {
+                            Swal.fire({
+                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Feasibility!</p>",
+                                icon: 'error',
+                                showClass: {
+                                    popup: 'animate__animated animate__fadeInDown'
+                                },
+                                hideClass: {
+                                    popup: 'animate__animated animate__fadeOutUp'
+                                }
+                            })
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
+                    }
+                })
+            }
+        })
+
+    }
+
+    function modalPartno(id) {
+        event.preventDefault();
+        if ($.fn.DataTable.isDataTable('#tblPartNo')) {
+            $('#tblPartNo').DataTable().destroy();
+        }
+        var dataTable = $('#tblPartNo').DataTable({
+            ajax: {
+                url: API_URL + 'view/partno/' + id,
+            },
+            autoWidth: false,
+            columnDefs: [{
+                    searchable: false,
+                    orderable: false,
+                    targets: 0,
+                },
+                {
+
+                    targets: 0,
+                    width: "10%",
+                },
+                {
+                    targets: 3,
+                    width: "15%",
+                }
+            ],
+            bSort: false,
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    className: 'text-center',
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return meta.row + 1;
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'partNo',
+                    "render": function(data, type, row) {
+                        return "<input type='text' class='form-control' id='" + row.ifpn_id + "' value='" + data + "'>"
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'partName',
+                    "render": function(data, type, row) {
+                        return "<input type='text' class='form-control' id='" + row.ifpn_id + "' value='" + data + "'>"
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'ifpn_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<button type="button" onclick="editPartNo(\'' + row.ifpn_id + '\')" class="btn btn btn-outline-warning">' +
+                                '<i class="ti ti-pencil fw-semibold"></i></button>';
+                        }
+                        return disp;
+                    }
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
+            let i = 1;
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
+                this.data(i++);
+            });
+        }).draw();
     }
 
     function listRequirement(id) {
@@ -747,6 +955,19 @@
         }
     }
 
+    async function get_partById(id) {
+        try {
+            var result = await $.ajax({
+                type: 'GET',
+                url: API_URL + "view/partno/" + id,
+            });
+            return result;
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
+    }
+
     function view_pdf_file(link) {
         event.preventDefault();
         $('#view_pdf_file').fadeIn(500).modal('show');
@@ -764,8 +985,20 @@
     }
 
     function changePartNo() {
+        var maxPartNo = parseInt(inpQtyPartNo.getAttribute('max'), 10);
         var inpQtyPart = $('#inpQtyPartNo');
-        // alert(inpQtyPart.val());
+
+        if (inpQtyPartNo.value > maxPartNo) {
+            inpQtyPartNo.value = 0;
+            let err = document.getElementById('inpQtyPartNo');
+            form_err(err, "*Please Enter Quentity 1-20");
+            return false;
+        }
+
+        if (inpQtyPart.length && inpQtyPart.val() !== "") {
+            inpQtyPart[0].style.border = "1px solid #d1d3e2";
+            inpQtyPart[0].nextElementSibling.style.display = "none";
+        }
         var html = '';
         for (var i = 0; i < inpQtyPart.val(); i++) {
             var i_plus_1 = i + 1;
@@ -785,11 +1018,10 @@
                 '</div>' +
                 '<hr>';
         }
-        $('#form-part-no').html(html);
+        $('#form_part_no').html(html);
     }
 
     $(document).ready(function() {
-
         if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
             $('#tblFeasibility').DataTable().destroy();
         }
@@ -816,25 +1048,15 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'if_part_no'
+                    data: 'if_id',
+                    "render": function(data, type, row) {
+                        return '<button type="button" onclick="modalPartno(\'' + row.if_id + '\')" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#mdlPartNo">' +
+                            '<i class="ti ti-search fw-semibold fs-5"></i></button>';
+                    }
                 },
-                // {
-                //     className: 'text-center',
-                //     data:'if_import_tran',
-                //     "render": function (data, type, row){
-                //         if (type === 'display'){
-                //             if(row.if_import_tran == 1){
-                //                 disp = 'Oversea';
-                //             }else{
-                //                 disp = 'Domestic';
-                //             }
-                //         }
-                //         return disp;
-                //     }
-                // },
                 {
                     className: 'text-center',
-                    data: 'update_date'
+                    data: 'create_date'
                 },
                 {
                     className: 'text-center',
@@ -861,20 +1083,6 @@
                         return disp;
                     },
                 },
-                // {
-                //     className: 'text-center',
-                //     data: 'if_id',
-                //     "render": function(data, type, row) {
-                //         if (type === 'display') {
-                //             if (row.if_status) {
-                //                 disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                //             } else {
-                //                 disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
-                //             }
-                //         }
-                //         return disp;
-                //     }
-                // },
                 {
                     className: 'text-center',
                     data: 'if_id',

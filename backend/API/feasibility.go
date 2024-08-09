@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -185,7 +186,7 @@ func ListFeasibilityTable(c *gin.Context) {
 		var strUpdateDate sql.NullString
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
-		err := objListFeasibility.Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.If_part_no, &objFeasibility.If_part_name, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
+		err := objListFeasibility.Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -235,14 +236,14 @@ func ListFeasibilityTable(c *gin.Context) {
 }
 
 func ListFeasibility(c *gin.Context) {
-	var objFeasibility Feasibility
+	var objFeasibility Feasibility1
 	iId := c.Param("id")
 	var strDuedate sql.NullString
 	var strCreateDate sql.NullString
 	var strUpdateDate sql.NullString
 	var strCreateBy sql.NullString
 	var strUpdateBy sql.NullString
-	err := db.QueryRow("SELECT * FROM `info_feasibility` WHERE if_id= ?", iId).Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.If_part_no, &objFeasibility.If_part_name, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
+	err := db.QueryRow("SELECT * FROM `info_feasibility` WHERE if_id= ?", iId).Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -266,6 +267,7 @@ func ListFeasibility(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, objFeasibility)
 }
+
 func FeasibilityLastid(c *gin.Context) {
 	var objLastId GetLastID
 	err := db.QueryRow("SELECT COUNT(if_id) AS last_id FROM info_feasibility").Scan(&objLastId.Last_id)
@@ -278,12 +280,14 @@ func FeasibilityLastid(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, objLastId)
 }
 func InsertFeasibility(c *gin.Context) {
-	var objFeasibility Feasibility
+	var objFeasibility Feasibility1
+
 	if err := c.BindJSON(&objFeasibility); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("INSERT INTO info_feasibility(if_ref,if_customer,if_import_tran,if_part_no,if_part_name,mrt_id,if_duedate,create_date,create_by) VALUES(?,?,?,?,?,?,?,?,?)", objFeasibility.If_ref, objFeasibility.If_customer, objFeasibility.If_import_tran, objFeasibility.If_part_no, objFeasibility.If_part_name, objFeasibility.Mrt_id, objFeasibility.If_duedate, objFeasibility.Create_date, objFeasibility.Create_by)
+
+	objResult, err := db.Exec("INSERT INTO info_feasibility(if_ref,if_customer,if_import_tran,mrt_id,if_duedate,create_date,update_date,create_by,update_by) VALUES(?,?,?,?,?,?,?,?,?)", objFeasibility.If_ref, objFeasibility.If_customer, objFeasibility.If_import_tran, objFeasibility.Mrt_id, objFeasibility.If_duedate, objFeasibility.Create_date, objFeasibility.Update_date, objFeasibility.Create_by, objFeasibility.Update_by)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
@@ -298,32 +302,90 @@ func InsertFeasibility(c *gin.Context) {
 			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 			return
 		}
-		var sql string = "INSERT INTO info_feasibility_consern_point (if_id, mc_id) VALUES "
-		for i := 1; i <= objConsiderationCount.Mc_count; i++ {
-			sql += fmt.Sprintf("(%d,%d)", objLastId, i)
-			if i != objConsiderationCount.Mc_count {
-				sql += ","
-			}
+
+		var sql string = "INSERT INTO info_feasibility_consern_point (if_id, mc_id, create_date, update_date, create_by, update_by) VALUES "
+		values := []string{}
+
+		for _, consideration := range objConsiderationCount {
+			value := fmt.Sprintf("(%d, %d, '%s', '%s', '%s', '%s')",
+				objLastId,
+				consideration.Mc_id,
+				objFeasibility.Create_date,
+				objFeasibility.Update_date,
+				objFeasibility.Create_by,
+				objFeasibility.Update_by)
+			values = append(values, value)
 		}
+
+		sql += strings.Join(values, ",")
+
 		objResult, err := db.Exec(sql)
 		if err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{
 				"Error": err.Error(),
 			})
 			return
 		}
+
 		iMaxId, err := objResult.LastInsertId()
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
 			})
 			return
+		} else {
+			var sql string = "INSERT INTO info_feasibility_part_no (if_id, ifpn_part_no, ifpn_part_name, ifpn_status, create_date, update_date, create_by, update_by) VALUES "
+			values := []string{}
+
+			for i, part_current := range objFeasibility.If_group_part {
+				var partNo, partName string
+				for key, value := range part_current {
+					if key == "partNo"+fmt.Sprint(i+1) {
+						partNo = value
+					} else if key == "partName"+fmt.Sprint(i+1) {
+						partName = value
+					}
+				}
+				value := fmt.Sprintf("(%d, '%s', '%s', %d, '%s', '%s', '%s', '%s')",
+					objLastId,
+					partNo,
+					partName,
+					1,
+					objFeasibility.Create_date,
+					objFeasibility.Update_date,
+					objFeasibility.Create_by,
+					objFeasibility.Update_by)
+				values = append(values, value)
+			}
+
+			// Combine the SQL statement with the values
+			sql += strings.Join(values, ",")
+
+			objResult, err := db.Exec(sql)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{
+					"Error": err.Error(),
+				})
+				return
+			}
+
+			iMaxPartId, err := objResult.LastInsertId()
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{
+					"Error": err.Error(),
+				})
+				return
+			} else {
+				c.IndentedJSON(http.StatusOK, gin.H{
+					"insertID":           iMaxId,
+					"insertPartID":       iMaxPartId,
+					"TotalConsideration": len(objConsiderationCount),
+					"Error":              nil,
+				})
+			}
+
 		}
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"insertID": iMaxId,
-			"lastID":   objConsiderationCount.Mc_count + int(iMaxId) - 1,
-			"Error":    nil,
-		})
+
 	}
 }
 func UpdateFeasibility(c *gin.Context) {
@@ -360,7 +422,7 @@ func ChangeFeasibilityStatus(c *gin.Context) {
 // Feasibility History --------------------------
 func ListFeasibilityTableHistory(c *gin.Context) {
 	var objFeasibilityList []FeasibilityHistory
-	objListFeasibility, err := db.Query("SELECT inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, inf.if_part_no, inf.if_part_name, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name, SUM(ifcp.ifcp_score) AS Score FROM info_feasibility AS inf LEFT JOIN sys_user AS su ON inf.update_by = su.su_emp_code LEFT JOIN mst_requirement_type AS mrt ON mrt.mrt_id = inf.mrt_id LEFT JOIN info_feasibility_consern_point AS ifcp ON inf.if_id = ifcp.if_id GROUP BY inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, inf.if_part_no, inf.if_part_name, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name ORDER BY inf.if_id")
+	objListFeasibility, err := db.Query("SELECT inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name, SUM(ifcp.ifcp_score) AS Score FROM info_feasibility AS inf LEFT JOIN sys_user AS su ON inf.update_by = su.su_emp_code LEFT JOIN mst_requirement_type AS mrt ON mrt.mrt_id = inf.mrt_id LEFT JOIN info_feasibility_consern_point AS ifcp ON inf.if_id = ifcp.if_id GROUP BY inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name ORDER BY inf.if_id")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -375,7 +437,7 @@ func ListFeasibilityTableHistory(c *gin.Context) {
 		var strUserImgPath sql.NullString
 		var strUserImgName sql.NullString
 		var intScore sql.NullString
-		err := objListFeasibility.Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_created_date, &objFeasibility.If_customer, &objFeasibility.If_part_no, &objFeasibility.If_part_name, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName, &intScore)
+		err := objListFeasibility.Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_created_date, &objFeasibility.If_customer, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName, &intScore)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -416,7 +478,7 @@ func ListFeasibilityTableHistory(c *gin.Context) {
 func ListFeasibilityTableHistoryDate(c *gin.Context) {
 	var objFeasibilityList []FeasibilityHistory
 	date := c.Param("date")
-	objListFeasibility, err := db.Query("SELECT inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, inf.if_part_no, inf.if_part_name, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name, SUM(ifcp.ifcp_score) AS Score FROM info_feasibility AS inf LEFT JOIN sys_user AS su ON inf.update_by = su.su_emp_code LEFT JOIN mst_requirement_type AS mrt ON mrt.mrt_id = inf.mrt_id LEFT JOIN info_feasibility_consern_point AS ifcp ON inf.if_id = ifcp.if_id WHERE DATE(inf.create_date) = ? GROUP BY inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, inf.if_part_no, inf.if_part_name, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name ORDER BY inf.if_id", date)
+	objListFeasibility, err := db.Query("SELECT inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name, SUM(ifcp.ifcp_score) AS Score FROM info_feasibility AS inf LEFT JOIN sys_user AS su ON inf.update_by = su.su_emp_code LEFT JOIN mst_requirement_type AS mrt ON mrt.mrt_id = inf.mrt_id LEFT JOIN info_feasibility_consern_point AS ifcp ON inf.if_id = ifcp.if_id WHERE DATE(inf.create_date) = ? GROUP BY inf.if_id, inf.if_ref, inf.create_date, inf.if_customer, mrt.mrt_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name ORDER BY inf.if_id", date)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -431,7 +493,7 @@ func ListFeasibilityTableHistoryDate(c *gin.Context) {
 		var strUserImgPath sql.NullString
 		var strUserImgName sql.NullString
 		var intScore sql.NullString
-		err := objListFeasibility.Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_created_date, &objFeasibility.If_customer, &objFeasibility.If_part_no, &objFeasibility.If_part_name, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName, &intScore)
+		err := objListFeasibility.Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_created_date, &objFeasibility.If_customer, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName, &intScore)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
