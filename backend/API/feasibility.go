@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,7 @@ import (
 func ListManageFeasibilityTable(c *gin.Context) {
 	var objFeasibilityList []ManageFeasibilityTable
 	iId := c.Param("id")
-	objListFeas, err := db.Query("SELECT ifcp.*, inf.if_customer, inf.if_part_no, inf.if_part_name, inf.if_duedate, sd.sd_id, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name FROM "+
+	objListFeas, err := db.Query("SELECT ifcp.*, inf.if_customer, inf.if_duedate, sd.sd_id, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name FROM "+
 		"`info_feasibility_consern_point` AS ifcp "+
 		"LEFT JOIN info_feasibility AS inf ON ifcp.if_id = inf.if_id "+
 		"LEFT JOIN mst_consideration AS mc ON ifcp.mc_id = mc.mc_id "+
@@ -42,7 +43,7 @@ func ListManageFeasibilityTable(c *gin.Context) {
 		var strComment sql.NullString
 		var strFile_name sql.NullString
 		var strFile_path sql.NullString
-		err := objListFeas.Scan(&objFeasibility.Ifcp_id, &objFeasibility.If_id, &objFeasibility.Mc_id, &fScore, &strComment, &strFile_name, &strFile_path, &objFeasibility.Ifcp_submit, &objFeasibility.Ifcp_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy, &objFeasibility.If_customer, &objFeasibility.If_part_no, &objFeasibility.If_part_name, &objFeasibility.If_duedate, &objFeasibility.Sd_id, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
+		err := objListFeas.Scan(&objFeasibility.Ifcp_id, &objFeasibility.If_id, &objFeasibility.Mc_id, &fScore, &strComment, &strFile_name, &strFile_path, &objFeasibility.Ifcp_submit, &objFeasibility.Ifcp_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy, &objFeasibility.If_customer, &objFeasibility.If_duedate, &objFeasibility.Sd_id, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -388,13 +389,55 @@ func InsertFeasibility(c *gin.Context) {
 
 	}
 }
+func UpdatePartNoFeasibility(c *gin.Context) {
+
+	var rawData []map[string]interface{}
+
+	if err := c.BindJSON(&rawData); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var partNo, partName, update_date, update_by string
+	var ifpnID int
+
+	for _, item := range rawData {
+		if value, ok := item["ifpn_id"].(string); ok {
+			ifpnID, _ = strconv.Atoi(value)
+		}
+		if value, ok := item["partNo"].(string); ok {
+			partNo = value
+		}
+		if value, ok := item["partName"].(string); ok {
+			partName = value
+		}
+		if value, ok := item["update_date"].(string); ok {
+			update_date = value
+		}
+		if value, ok := item["update_by"].(string); ok {
+			update_by = value
+		}
+	}
+
+	if partNo == "" || partName == "" || ifpnID == 0 {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Incomplete data"})
+		return
+	}
+	objResult, err := db.Exec("Update info_feasibility_part_no SET ifpn_part_no = ?, ifpn_part_name = ?, update_date = ?, update_by = ? WHERE ifpn_id = ?", partNo, partName, update_date, update_by, ifpnID)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+}
 func UpdateFeasibility(c *gin.Context) {
 	var objFeasibility Feasibility
 	if err := c.BindJSON(&objFeasibility); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update info_feasibility SET if_customer = ?, if_import_tran = ?, if_part_no = ?, if_part_name = ?, mrt_id = ?, if_duedate=?,  update_date = ?, update_by = ? WHERE if_id = ?", objFeasibility.If_customer, objFeasibility.If_import_tran, objFeasibility.If_part_no, objFeasibility.If_part_name, objFeasibility.Mrt_id, objFeasibility.If_duedate, objFeasibility.Update_date, objFeasibility.Update_by, objFeasibility.If_id)
+	objResult, err := db.Exec("Update info_feasibility SET if_customer = ?, if_import_tran = ?, mrt_id = ?, if_duedate=?,  update_date = ?, update_by = ? WHERE if_id = ?", objFeasibility.If_customer, objFeasibility.If_import_tran, objFeasibility.Mrt_id, objFeasibility.If_duedate, objFeasibility.Update_date, objFeasibility.Update_by, objFeasibility.If_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),

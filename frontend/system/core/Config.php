@@ -106,6 +106,7 @@ class CI_Config {
 			else
 			{
 				$base_url = 'http://localhost/';
+				// $base_url = 'http://192.168.161.219/CRM/';
 			}
 
 			$this->set_item('base_url', $base_url);

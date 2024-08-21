@@ -91,6 +91,17 @@ type UserSession struct {
 	Spg_name    string `json:"spg_name"`
 }
 
+type Signature struct {
+	Su_id         int    `json:"su_id"`
+	Snt_file_name string `json:"snt_file_name"`
+	Snt_file_path string `json:"snt_file_path"`
+	Snt_status    int    `json:"snt_status"`
+	Create_date   string `json:"create_date"`
+	Update_date   string `json:"update_date"`
+	Create_by     string `json:"create_by"`
+	Update_by     string `json:"update_by"`
+}
+
 type PermissionGroupData struct {
 	Data []PermissionGroupTable `json:"data"`
 }
@@ -315,7 +326,6 @@ type Feasibility1 struct {
 
 type GroupPartNo struct {
 	Ifpn_id  int    `json:"ifpn_id"`
-	If_id    int    `json:"if_id"`
 	PartNo   string `json:"partNo"`
 	PartName string `json:"partName"`
 }

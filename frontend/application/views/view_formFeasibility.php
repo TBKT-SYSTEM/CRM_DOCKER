@@ -362,19 +362,21 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <table class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;" id="tblPartNo">
-                    <thead class="fw-semibold">
-                        <tr>
-                            <th>No.</th>
-                            <th>Part No.</th>
-                            <th>Part Name</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodyPartNo">
+                <form id="edit_part" name="edit_part">
+                    <table class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;" id="tblPartNo">
+                        <thead class="fw-semibold">
+                            <tr>
+                                <th>No.</th>
+                                <th>Part No.</th>
+                                <th>Part Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyPartNo">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="reset" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal">
@@ -691,74 +693,83 @@
         event.preventDefault();
         var partNo = $('#' + id).val();
         var partName = $('#' + id).closest('tr').find('input').last().val();
+        var partNoInput = $('#' + id).closest('tr').find('input[name="partNo"]');
+        var partNameInput = $('#' + id).closest('tr').find('input[name="partName"]');
 
-        console.log("Part No:", partNo);
-        console.log("Part Name:", partName);
+        let partData = []
+        partData.push({
+            "ifpn_id": id
+        });
+        partData.push({
+            "partNo": partNo
+        });
+        partData.push({
+            "partName": partName
+        });
+        partData.push({
+            "update_date": getTimeNow()
+        });
+        partData.push({
+            "update_by": "<?php echo $this->session->userdata('sessUsr') ?>"
+        });
 
-        let data = []
-        data.push({"partNo": partNo});
-        data.push({"partName": partName});
-
-        console.log(data);
-
-        var chk = await edit_partno(data);
+        var chk = await edit_partno(partData);
         if (chk) {
-
-        } else {
-            console.log("end");
-            return;
-        }
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                return;
-                $.ajax({
-                    type: 'POST',
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    url: API_URL + 'feasibility/insert',
-                    data: JSON.stringify(add_form),
-                    success: function(data) {
-                        if (data.Error != "null" || data.Error != "") {
-                            Swal.fire({
-                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Feasibility success!</p>",
-                                icon: 'success',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                            $('#mdlRegister').close();
-                        } else {
-                            Swal.fire({
-                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Feasibility!</p>",
-                                icon: 'error',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                        }
-                    },
-                    error: function(err) {
-                        console.log(err);
+            if (chk == "err_prtNo") {
+                form_err(partNoInput.get(0), "*Please Enter Part No.");
+            } else {
+                form_ok(partNoInput.get(0));
+                if (chk == "err_prtName") {
+                    form_err(partNameInput.get(0), "*Please Enter Part Name.");
+                } else {
+                    if (chk == "ok") {
+                        form_ok(partNameInput.get(0));
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    type: 'PUT',
+                                    dataType: 'json',
+                                    contentType: 'application/json',
+                                    url: API_URL + 'feasibility/update_partno',
+                                    data: JSON.stringify(partData),
+                                    success: function(data) {
+                                        console.log(data);
+                                        if (data != false) {
+                                            Swal.fire({
+                                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Part No. success!</p>",
+                                                icon: 'success',
+                                                showClass: {
+                                                    popup: 'animate__animated animate__fadeInDown'
+                                                }
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Part No.!</p>",
+                                                icon: 'error',
+                                                showClass: {
+                                                    popup: 'animate__animated animate__fadeInDown'
+                                                }
+                                            })
+                                        }
+                                    },
+                                    error: function(err) {
+                                        console.log(err);
+                                    }
+                                })
+                            }
+                        })
                     }
-                })
+                }
             }
-        })
-
+        }
     }
 
     function modalPartno(id) {
@@ -801,14 +812,20 @@
                     className: 'text-center',
                     data: 'partNo',
                     "render": function(data, type, row) {
-                        return "<input type='text' class='form-control' id='" + row.ifpn_id + "' value='" + data + "'>"
+                        return "<div>" +
+                            "<input type='text' class='form-control' id='" + row.ifpn_id + "' value='" + data + "' name='partNo'>" +
+                            '<span class="form_error"></span>' +
+                            "</div>"
                     }
                 },
                 {
                     className: 'text-center',
                     data: 'partName',
                     "render": function(data, type, row) {
-                        return "<input type='text' class='form-control' id='" + row.ifpn_id + "' value='" + data + "'>"
+                        return "<div>" +
+                            "<input type='text' class='form-control' id='" + row.ifpn_id + "' value='" + data + "' name='partName'>" +
+                            '<span class="form_error"></span>' +
+                            "</div>"
                     }
                 },
                 {
@@ -906,7 +923,7 @@
                 var innum = false;
                 $.each(value.incharge, function(inkey, inval) {
                     if (innum) {
-                        table_text += '/';
+                        table_text += ', ';
                     };
                     table_text += inval.sd_name;
                     innum = true;

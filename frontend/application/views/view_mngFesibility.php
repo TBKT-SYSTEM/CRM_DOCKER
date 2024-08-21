@@ -58,7 +58,7 @@
                                             <th>No.</th>
                                             <th>Costomer</th>
                                             <th>Part No.</th>
-                                            <th>Updated Date</th>
+                                            <th>Issue Date</th>
                                             <th>Updated By</th>
                                             <th>Action</th>
                                         </tr>
@@ -251,6 +251,39 @@
         </div>
     </div>
 </div>
+<!-- Modal for View Feasibility Group Part No-->
+<div class="modal fade" id="mdlPartNo" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center">
+                <h4 class="modal-title" id="myLargeModalLabel">
+                    <i class="ti ti-layout-list me-1"></i> Part No.
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;" id="tblPartNo">
+                    <thead class="fw-semibold">
+                        <tr>
+                            <th>No.</th>
+                            <th>Part No.</th>
+                            <th>Part Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyPartNo">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal">
+                    Close
+                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     function previewPDF() {
@@ -285,6 +318,52 @@
             const url = URL.createObjectURL(pdfBlob);
             window.open(url);;
         });
+    }
+
+    function modalPartno(id) {
+        event.preventDefault();
+        if ($.fn.DataTable.isDataTable('#tblPartNo')) {
+            $('#tblPartNo').DataTable().destroy();
+        }
+        var dataTable = $('#tblPartNo').DataTable({
+            ajax: {
+                url: API_URL + 'view/partno/' + id,
+            },
+            columnDefs: [{
+                searchable: false,
+                orderable: false,
+                targets: 0,
+            }, ],
+            bSort: false,
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    className: 'text-center',
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return meta.row + 1;
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'partNo',
+                },
+                {
+                    className: 'text-center',
+                    data: 'partName',
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
+            let i = 1;
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
+                this.data(i++);
+            });
+        }).draw();
     }
 
     function submitScoring() {
@@ -483,11 +562,36 @@
     // modal --------------------------------------
     function editModal(id) {
         event.preventDefault();
+        var partNo = "";
+        var partName = "";
         $('#if_id').val(id);
         $.ajax({
             type: 'get',
             url: API_URL + 'feasibility/' + id,
-            success: function(result) {
+            success: async function(result) {
+                await $.ajax({
+                    type: 'GET',
+                    url: API_URL + 'view/partno/' + id,
+                    success: function(result) {
+                        // console.log(result);
+                        let data = result.data;
+                        if (data.length > 0) {
+                            for (let i = 0; i < data.length; i++) {
+                                partNo += data[i].partNo;
+                                partName += data[i].partName;
+
+                                // Add a comma if it's not the last item
+                                if (i < data.length - 1) {
+                                    partNo += ", ";
+                                    partName += ", ";
+                                }
+                            }
+                        } else {
+                            partNo = "";
+                            partName = "";
+                        }
+                    }
+                });
                 $('#editRef').val(result.if_ref);
                 $('#editDate').val(result.create_date.substring(0, 10));
                 $('#editDuedate').val(result.if_duedate.substring(0, 10));
@@ -496,8 +600,8 @@
                     '<option value="1" ' + ((result.if_import_tran == 1) ? 'selected' : '') + '>Oversea</option>' +
                     '<option value="2" ' + ((result.if_import_tran == 2) ? 'selected' : '') + '>Domestic</option>';
                 $('#editImportFrom').html(importText);
-                $('#editPartNo').val(result.if_part_no);
-                $('#editPartName').val(result.if_part_name);
+                $('#editPartNo').val(partNo);
+                $('#editPartName').val(partName);
                 listRequirement(result.mrt_id);
                 viewFeasibility(id);
             }
@@ -585,7 +689,7 @@
                 var innum = false;
                 $.each(value.incharge, function(inkey, inval) {
                     if (innum) {
-                        table_text += '/';
+                        table_text += ', ';
                     };
                     table_text += inval.sd_name;
                     innum = true;
@@ -703,11 +807,15 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'if_part_no'
+                    data: 'if_id',
+                    "render": function(data, type, row) {
+                        return '<button type="button" onclick="modalPartno(\'' + row.if_id + '\')" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#mdlPartNo">' +
+                            '<i class="ti ti-search fw-semibold fs-5"></i></button>';
+                    }
                 },
                 {
                     className: 'text-center',
-                    data: 'update_date'
+                    data: 'create_date'
                 },
                 {
                     className: 'text-center',
@@ -757,6 +865,6 @@
         }).draw();
         setInterval(function() {
             dataTable.ajax.reload(null, false);
-        }, 1000);
+        }, 600000);
     });
 </script>

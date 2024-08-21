@@ -40,7 +40,8 @@ class Dashboard extends CI_Controller {
     }
 	public function index() {
         $this->another_chart_js = "<script src='" . base_url() . "assets/js/dashboard.js'></script>";
-
+		$this->another_js = "<script src='" . base_url() . "assets/libs/datatables.net/js/jquery.dataTables.min.js'></script>";
+		$this->another_js .= "<script src='" . base_url() . "assets/js/datatable/datatable-basic.init.js'></script>";
 		$this->ManageBackend->chkLogout();
         $this->render_view('view_dashboard');
 

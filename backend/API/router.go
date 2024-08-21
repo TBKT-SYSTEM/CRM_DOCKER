@@ -22,6 +22,7 @@ func Routy() {
 	router.PUT("/user/change_status", ChangeUserStatus)
 	router.PUT("/setting/user", SettingUser)
 	router.PUT("/setting/password", SettingPassword)
+	router.POST("/update/signature", UpdateSignature)
 
 	router.GET("/spg_table", ListSpgTable)
 	router.POST("/spg_table/insert", InsertSpg)
@@ -71,6 +72,7 @@ func Routy() {
 	router.GET("/feasibility/last_id", FeasibilityLastid)
 	router.POST("/feasibility/insert", InsertFeasibility)
 	router.PUT("/feasibility/update", UpdateFeasibility)
+	router.PUT("/feasibility/update_partno", UpdatePartNoFeasibility)
 	router.PUT("/feasibility/change_status", ChangeFeasibilityStatus)
 
 	router.GET("/feasibilityHistory/table", ListFeasibilityTableHistory)

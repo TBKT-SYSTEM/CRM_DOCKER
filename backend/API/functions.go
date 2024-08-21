@@ -678,7 +678,7 @@ func ListInchargeTable(c *gin.Context) {
 func ListPartNoById(c *gin.Context) {
 	// log.Println("List Part No By Id : ", c.Param("id"))
 	var objPartNoList []GetPartNoById
-	objListPartNo, err := db.Query("SELECT ifpn_id, ifpn_part_no, ifpn_part_name FROM `info_feasibility_part_no` WHERE if_id = ?", c.Param("id"))
+	objListPartNo, err := db.Query("SELECT ifpn_id, ifpn_part_no, ifpn_part_name FROM `info_feasibility_part_no` WHERE if_id = ? AND ifpn_status = 1", c.Param("id"))
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
