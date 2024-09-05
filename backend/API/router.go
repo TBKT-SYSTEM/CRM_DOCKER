@@ -16,6 +16,7 @@ func Routy() {
 
 	router.GET("/user/:id", ListUserById)
 	router.GET("/user/table", ListUserTable)
+	router.GET("/user/table2", ListUserTable2)
 	router.POST("/user/emp_code_unique", UserIsUnique)
 	router.POST("/user/insert", InsertUser)
 	router.PUT("/user/update", UpdateUser)
