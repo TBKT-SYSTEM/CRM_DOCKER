@@ -772,9 +772,16 @@ progress {
 
 .img-fluid {
     max-width: 100%;
-  height: 70px;
-  width: 70px;
-  object-fit: cover ;
+    height: 70px;
+    width: 70px;
+    object-fit: cover;
+}
+
+.img-fluid-status {
+    max-width: 100%;
+    height: 60px;
+    width: 60px;
+    object-fit: cover;
 }
 
 .img-thumbnail {
@@ -12472,7 +12479,7 @@ fieldset:disabled .btn {
 .rounded-circle {
     border-radius: 50% !important;
     /* width: 35px; */
-    
+
 }
 
 .rounded-pill {
@@ -24980,10 +24987,12 @@ a:hover .h1 {
     width: 2.25rem;
     background-color: #fff
 }
+
 .timeline .timeline-point-primary {
     background-color: #696cff !important;
     box-shadow: 0 0 0 .1875rem rgba(105, 108, 255, .16);
 }
+
 .timeline .timeline-item .timeline-point {
     position: absolute;
     left: 0;
@@ -25464,6 +25473,7 @@ html:not([dir=rtl]) .timeline-item {
 .timeline .timeline-item-primary .timeline-event {
     background-color: rgba(105, 108, 255, .1);
 }
+
 .timeline .timeline-item-primary .timeline-event:before {
     border-left-color: rgba(105, 108, 255, .1) !important;
     border-right-color: rgba(105, 108, 255, .1) !important;
@@ -25473,6 +25483,7 @@ html:not([dir=rtl]) .timeline-item {
     --bs-text-opacity: 1;
     color: #a1acb8 !important;
 }
+
 .accordion-button {
     position: relative;
     display: flex;
@@ -25488,6 +25499,7 @@ html:not([dir=rtl]) .timeline-item {
     overflow-anchor: none;
     transition: var(--bs-accordion-transition);
 }
+
 .accordion-button::after {
     flex-shrink: 0;
     width: var(--bs-accordion-btn-icon-width);

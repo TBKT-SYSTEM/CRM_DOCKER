@@ -91,6 +91,17 @@ type UserSession struct {
 	Spg_name    string `json:"spg_name"`
 }
 
+type Signature struct {
+	Su_id         int    `json:"su_id"`
+	Snt_file_name string `json:"snt_file_name"`
+	Snt_file_path string `json:"snt_file_path"`
+	Snt_status    int    `json:"snt_status"`
+	Create_date   string `json:"create_date"`
+	Update_date   string `json:"update_date"`
+	Create_by     string `json:"create_by"`
+	Update_by     string `json:"update_by"`
+}
+
 type PermissionGroupData struct {
 	Data []PermissionGroupTable `json:"data"`
 }
@@ -252,8 +263,6 @@ type FeasibilityTable struct {
 	If_ref         string `json:"if_ref"`
 	If_customer    string `json:"if_customer"`
 	If_import_tran int    `json:"if_import_tran"`
-	If_part_no     string `json:"if_part_no"`
-	If_part_name   string `json:"if_part_name"`
 	Mrt_id         int    `json:"mrt_id"`
 	If_duedate     string `json:"if_duedate"`
 	If_status      int    `json:"if_status"`
@@ -266,6 +275,23 @@ type FeasibilityTable struct {
 	Su_lname       string `json:"su_lname"`
 	Su_img_path    string `json:"su_img_path"`
 	Su_img_name    string `json:"su_img_name"`
+}
+
+type FeasibilityDataHistory struct {
+	Data []FeasibilityHistory `json:"data"`
+}
+
+type FeasibilityHistory struct {
+	If_id           int    `json:"if_id"`
+	If_ref          string `json:"if_ref"`
+	If_created_date string `json:"if_created_date"`
+	If_customer     string `json:"if_customer"`
+	Mrt_name        string `json:"mrt_name"`
+	Su_fname        string `json:"su_fname"`
+	Su_lname        string `json:"su_lname"`
+	Su_img_path     string `json:"su_img_path"`
+	Su_img_name     string `json:"su_img_name"`
+	If_score        string `json:"if_score"`
 }
 type Feasibility struct {
 	If_id          int    `json:"if_id"`
@@ -282,6 +308,28 @@ type Feasibility struct {
 	Create_by      string `json:"create_by"`
 	Update_by      string `json:"update_by"`
 }
+
+type Feasibility1 struct {
+	If_id          int                 `json:"if_id"`
+	If_ref         string              `json:"if_ref"`
+	If_customer    string              `json:"if_customer"`
+	If_import_tran int                 `json:"if_import_tran"`
+	If_group_part  []map[string]string `json:"if_group_part"`
+	Mrt_id         int                 `json:"mrt_id"`
+	If_duedate     string              `json:"if_duedate"`
+	If_status      int                 `json:"if_status"`
+	Create_date    string              `json:"create_date"`
+	Update_date    string              `json:"update_date"`
+	Create_by      string              `json:"create_by"`
+	Update_by      string              `json:"update_by"`
+}
+
+type GroupPartNo struct {
+	Ifpn_id  int    `json:"ifpn_id"`
+	PartNo   string `json:"partNo"`
+	PartName string `json:"partName"`
+}
+
 type GetLastID struct {
 	Last_id int `json:"last_id"`
 }
@@ -436,8 +484,9 @@ type Consideration struct {
 	Update_by   string  `json:"update_by"`
 }
 type ConsiderationCount struct {
-	Mc_count int `json:"mc_count"`
+	Mc_id int `json:"mc_id"`
 }
+
 type ConsiderInchargeData struct {
 	Data []ConsiderInchargeTable `json:"data"`
 }
@@ -467,6 +516,16 @@ type ConsiderIncharge struct {
 	Create_by   string `json:"create_by"`
 	Update_by   string `json:"update_by"`
 }
+
+type GetPartNoByIdData struct {
+	Data []GetPartNoById `json:"data"`
+}
+type GetPartNoById struct {
+	Ifpn_id  int    `json:"ifpn_id"`
+	PartNo   string `json:"partNo"`
+	PartName string `json:"partName"`
+}
+
 type ViewFeasibilityScore struct {
 	Mc_id          int     `json:"mc_id"`
 	Mc_title       string  `json:"mc_title"`

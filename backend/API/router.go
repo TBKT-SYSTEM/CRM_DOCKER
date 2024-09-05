@@ -23,6 +23,7 @@ func Routy() {
 	router.PUT("/user/change_status", ChangeUserStatus)
 	router.PUT("/setting/user", SettingUser)
 	router.PUT("/setting/password", SettingPassword)
+	router.POST("/update/signature", UpdateSignature)
 
 	router.GET("/spg_table", ListSpgTable)
 	router.POST("/spg_table/insert", InsertSpg)
@@ -72,7 +73,11 @@ func Routy() {
 	router.GET("/feasibility/last_id", FeasibilityLastid)
 	router.POST("/feasibility/insert", InsertFeasibility)
 	router.PUT("/feasibility/update", UpdateFeasibility)
+	router.PUT("/feasibility/update_partno", UpdatePartNoFeasibility)
 	router.PUT("/feasibility/change_status", ChangeFeasibilityStatus)
+
+	router.GET("/feasibilityHistory/table", ListFeasibilityTableHistory)
+	router.GET("/feasibilityHistory/tableDate/:date", ListFeasibilityTableHistoryDate)
 
 	router.GET("/manage_feasibility/table/:id", ListManageFeasibilityTable)
 	router.PUT("/manage_feasibility/scoring", UpdateFeasibilityScore)
@@ -109,6 +114,7 @@ func Routy() {
 	router.GET("/view/feas_score/:id", ListConsiderationScore)
 	router.GET("/view/in_dept", ListIncharge)
 	router.GET("/view/scorable/:if/:sd", ListInchargeScorable)
+	router.GET("/view/partno/:id", ListPartNoById)
 
 	router.GET("/notify", LineNotify)
 	router.POST("/email/userdata", EmailUserData)

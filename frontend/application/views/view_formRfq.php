@@ -38,7 +38,7 @@
                                 </div>
                             </div>
                             <div class="col-md-5 text-end">
-                                <button type="button" class="btn bg-primary-subtle text-primary" data-bs-toggle="modal" data-bs-target="#mdlRegister">
+                                <button type="button" class="btn bg-primary-subtle text-primary" data-bs-toggle="modal" data-bs-target="" style="cursor:not-allowed">
                                     <i class=""></i> Add RFQ
                                 </button>
                             </div>
@@ -50,16 +50,21 @@
                                         <!-- start row -->
                                         <tr>
                                             <th>No.</th>
-                                            <th>Costomer</th>
-                                            <th>Part No.</th>
+                                            <th class="text-center">Topic</th>
+                                            <!-- <th>Part No.</th>
                                             <th>Updated Date</th>
                                             <th>Updated By</th>
-                                            <th>Status</th>
+                                            <th>Status</th> -->
                                             <th>Action</th>
                                         </tr>
                                         <!-- end row -->
                                     </thead>
                                     <tbody>
+                                        <tr>
+                                            <td class="text-center col-1">1</td>
+                                            <td class="text-center" style="font-weight: bold;">Tutorial RFQ Form</td>
+                                            <td class="text-center col-2"><button type="button" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits"><i class="ti ti-pencil me-1"></i> View </button></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -752,339 +757,339 @@
 
 
 
-    async function addFeasibility() {
-        event.preventDefault();
-        let chk = await Feasibility_validate("add");
-        // console.log(chk);
-        if (chk) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var add_form = {};
-                    $('#add_form').serializeArray().forEach(function(item) {
-                        if (item.name == 'if_import_tran' || item.name == 'mrt_id') {
-                            item.value = parseInt(item.value)
-                        }
-                        add_form[item.name] = item.value;
-                    })
-                    add_form["create_date"] = getTimeNow();
-                    add_form["if_duedate"] = getTimeNow().substring(0, 10) + " 11:59:59";
-                    add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+    // async function addFeasibility() {
+    //     event.preventDefault();
+    //     let chk = await Feasibility_validate("add");
+    //     // console.log(chk);
+    //     if (chk) {
+    //         Swal.fire({
+    //             title: 'Are you sure?',
+    //             text: "You won't be able to revert this!",
+    //             icon: 'warning',
+    //             showCancelButton: true,
+    //             confirmButtonColor: '#3085d6',
+    //             cancelButtonColor: '#d33',
+    //             confirmButtonText: 'Yes'
+    //         }).then((result) => {
+    //             if (result.isConfirmed) {
+    //                 var add_form = {};
+    //                 $('#add_form').serializeArray().forEach(function(item) {
+    //                     if (item.name == 'if_import_tran' || item.name == 'mrt_id') {
+    //                         item.value = parseInt(item.value)
+    //                     }
+    //                     add_form[item.name] = item.value;
+    //                 })
+    //                 add_form["create_date"] = getTimeNow();
+    //                 add_form["if_duedate"] = getTimeNow().substring(0, 10) + " 11:59:59";
+    //                 add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
 
-                    $.ajax({
-                        type: 'POST',
-                        dataType: 'json',
-                        contentType: 'application/json',
-                        url: API_URL + 'feasibility/insert',
-                        data: JSON.stringify(add_form),
-                        success: function(data) {
-                            if (data.Error != "null" || data.Error != "") {
-                                Swal.fire({
-                                    html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Feasibility success!</p>",
-                                    icon: 'success',
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown'
-                                    },
-                                    hideClass: {
-                                        popup: 'animate__animated animate__fadeOutUp'
-                                    }
-                                })
-                            } else {
-                                Swal.fire({
-                                    html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Feasibility!</p>",
-                                    icon: 'error',
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown'
-                                    },
-                                    hideClass: {
-                                        popup: 'animate__animated animate__fadeOutUp'
-                                    }
-                                })
-                            }
-                        },
-                        error: function(err) {
-                            console.log(err);
-                        }
-                    })
-                }
-            })
-        }
-    }
+    //                 $.ajax({
+    //                     type: 'POST',
+    //                     dataType: 'json',
+    //                     contentType: 'application/json',
+    //                     url: API_URL + 'feasibility/insert',
+    //                     data: JSON.stringify(add_form),
+    //                     success: function(data) {
+    //                         if (data.Error != "null" || data.Error != "") {
+    //                             Swal.fire({
+    //                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Feasibility success!</p>",
+    //                                 icon: 'success',
+    //                                 showClass: {
+    //                                     popup: 'animate__animated animate__fadeInDown'
+    //                                 },
+    //                                 hideClass: {
+    //                                     popup: 'animate__animated animate__fadeOutUp'
+    //                                 }
+    //                             })
+    //                         } else {
+    //                             Swal.fire({
+    //                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Feasibility!</p>",
+    //                                 icon: 'error',
+    //                                 showClass: {
+    //                                     popup: 'animate__animated animate__fadeInDown'
+    //                                 },
+    //                                 hideClass: {
+    //                                     popup: 'animate__animated animate__fadeOutUp'
+    //                                 }
+    //                             })
+    //                         }
+    //                     },
+    //                     error: function(err) {
+    //                         console.log(err);
+    //                     }
+    //                 })
+    //             }
+    //         })
+    //     }
+    // }
 
-    async function editFeasibility() {
-        event.preventDefault();
-        let chk = await Feasibility_validate("edit");
-        if (chk) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var edit_form = {};
-                    $('#edit_form').serializeArray().forEach(function(item) {
-                        if (item.name == 'if_import_tran' || item.name == 'mrt_id' || item.name == 'if_id') {
-                            item.value = parseInt(item.value)
-                        }
-                        edit_form[item.name] = item.value;
-                    })
-                    edit_form["if_duedate"] += " 11:59:59";
-                    edit_form["update_date"] = getTimeNow();
-                    edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+    // async function editFeasibility() {
+    //     event.preventDefault();
+    //     let chk = await Feasibility_validate("edit");
+    //     if (chk) {
+    //         Swal.fire({
+    //             title: 'Are you sure?',
+    //             text: "You won't be able to revert this!",
+    //             icon: 'warning',
+    //             showCancelButton: true,
+    //             confirmButtonColor: '#3085d6',
+    //             cancelButtonColor: '#d33',
+    //             confirmButtonText: 'Yes'
+    //         }).then((result) => {
+    //             if (result.isConfirmed) {
+    //                 var edit_form = {};
+    //                 $('#edit_form').serializeArray().forEach(function(item) {
+    //                     if (item.name == 'if_import_tran' || item.name == 'mrt_id' || item.name == 'if_id') {
+    //                         item.value = parseInt(item.value)
+    //                     }
+    //                     edit_form[item.name] = item.value;
+    //                 })
+    //                 edit_form["if_duedate"] += " 11:59:59";
+    //                 edit_form["update_date"] = getTimeNow();
+    //                 edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
 
-                    $.ajax({
-                        type: 'PUT',
-                        dataType: 'json',
-                        contentType: 'application/json',
-                        url: API_URL + 'feasibility/update',
-                        data: JSON.stringify(edit_form),
-                        success: function(data) {
-                            if (data != false) {
-                                Swal.fire({
-                                    html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Feasibility success!</p>",
-                                    icon: 'success',
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown'
-                                    }
-                                })
-                            } else {
-                                Swal.fire({
-                                    html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Feasibility!</p>",
-                                    icon: 'error',
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown'
-                                    }
-                                })
-                            }
-                        },
-                        error: function(err) {
-                            console.log(err)
-                        }
-                    })
-                }
-            })
-        }
-    }
+    //                 $.ajax({
+    //                     type: 'PUT',
+    //                     dataType: 'json',
+    //                     contentType: 'application/json',
+    //                     url: API_URL + 'feasibility/update',
+    //                     data: JSON.stringify(edit_form),
+    //                     success: function(data) {
+    //                         if (data != false) {
+    //                             Swal.fire({
+    //                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Feasibility success!</p>",
+    //                                 icon: 'success',
+    //                                 showClass: {
+    //                                     popup: 'animate__animated animate__fadeInDown'
+    //                                 }
+    //                             })
+    //                         } else {
+    //                             Swal.fire({
+    //                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Feasibility!</p>",
+    //                                 icon: 'error',
+    //                                 showClass: {
+    //                                     popup: 'animate__animated animate__fadeInDown'
+    //                                 }
+    //                             })
+    //                         }
+    //                     },
+    //                     error: function(err) {
+    //                         console.log(err)
+    //                     }
+    //                 })
+    //             }
+    //         })
+    //     }
+    // }
 
-    function change_status(id, status) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var status_form = {};
-                status_form["if_id"] = id;
-                status_form["if_status"] = status;
-                $.ajax({
-                    type: 'PUT',
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    url: API_URL + 'feasibility/change_status',
-                    data: JSON.stringify(status_form),
-                    success: function(data) {
-                        // console.log(data);
-                        if (data != false) {
-                            Swal.fire({
-                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status Feasibility success!</p>",
-                                icon: 'success',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                        } else {
-                            Swal.fire({
-                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status Feasibility!</p>",
-                                icon: 'error',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                        }
-                    },
-                    error: function(err) {
-                        console.log(err);
-                    }
-                })
-            }
-        })
-    }
+    // function change_status(id, status) {
+    //     Swal.fire({
+    //         title: 'Are you sure?',
+    //         text: "You won't be able to revert this!",
+    //         icon: 'warning',
+    //         showCancelButton: true,
+    //         confirmButtonColor: '#3085d6',
+    //         cancelButtonColor: '#d33',
+    //         confirmButtonText: 'Yes'
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             var status_form = {};
+    //             status_form["if_id"] = id;
+    //             status_form["if_status"] = status;
+    //             $.ajax({
+    //                 type: 'PUT',
+    //                 dataType: 'json',
+    //                 contentType: 'application/json',
+    //                 url: API_URL + 'feasibility/change_status',
+    //                 data: JSON.stringify(status_form),
+    //                 success: function(data) {
+    //                     // console.log(data);
+    //                     if (data != false) {
+    //                         Swal.fire({
+    //                             html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status Feasibility success!</p>",
+    //                             icon: 'success',
+    //                             showClass: {
+    //                                 popup: 'animate__animated animate__fadeInDown'
+    //                             },
+    //                             hideClass: {
+    //                                 popup: 'animate__animated animate__fadeOutUp'
+    //                             }
+    //                         })
+    //                     } else {
+    //                         Swal.fire({
+    //                             html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status Feasibility!</p>",
+    //                             icon: 'error',
+    //                             showClass: {
+    //                                 popup: 'animate__animated animate__fadeInDown'
+    //                             },
+    //                             hideClass: {
+    //                                 popup: 'animate__animated animate__fadeOutUp'
+    //                             }
+    //                         })
+    //                     }
+    //                 },
+    //                 error: function(err) {
+    //                     console.log(err);
+    //                 }
+    //             })
+    //         }
+    //     })
+    // }
 
-    function checkConclusion(score) {
-        $('.chk_score').html("");
-        if (score < 70) {
-            $("#chk_red").html('<span class="material-symbols-outlined">check</span>');
-        } else if (score < 90) {
-            $("#chk_yellow").html('<span class="material-symbols-outlined">check</span>');
-        } else {
-            $("#chk_green").html('<span class="material-symbols-outlined">check</span>');
-        }
-    }
+    // function checkConclusion(score) {
+    //     $('.chk_score').html("");
+    //     if (score < 70) {
+    //         $("#chk_red").html('<span class="material-symbols-outlined">check</span>');
+    //     } else if (score < 90) {
+    //         $("#chk_yellow").html('<span class="material-symbols-outlined">check</span>');
+    //     } else {
+    //         $("#chk_green").html('<span class="material-symbols-outlined">check</span>');
+    //     }
+    // }
 
-    // modal --------------------------------------
-    function editModal(id) {
-        event.preventDefault();
-        $('#if_id').val(id);
-        $.ajax({
-            type: 'get',
-            url: API_URL + 'feasibility/' + id,
-            success: function(result) {
-                $('#editRef').val(result.if_ref);
-                $('#editDate').val(result.create_date.substring(0, 10));
-                $('#editDuedate').val(result.if_duedate.substring(0, 10));
-                $('#editCustomer').val(result.if_customer);
-                let importText = '<option value="" disabled selected>Import From</option>' +
-                    '<option value="1" ' + ((result.if_import_tran == 1) ? 'selected' : '') + '>Oversea</option>' +
-                    '<option value="2" ' + ((result.if_import_tran == 2) ? 'selected' : '') + '>Domestic</option>';
-                $('#editImportFrom').html(importText);
-                $('#editPartNo').val(result.if_part_no);
-                $('#editPartName').val(result.if_part_name);
-                listRequirement(result.mrt_id);
-                viewFeasibility(id);
-            }
-        })
-    }
+    // // modal --------------------------------------
+    // function editModal(id) {
+    //     event.preventDefault();
+    //     $('#if_id').val(id);
+    //     $.ajax({
+    //         type: 'get',
+    //         url: API_URL + 'feasibility/' + id,
+    //         success: function(result) {
+    //             $('#editRef').val(result.if_ref);
+    //             $('#editDate').val(result.create_date.substring(0, 10));
+    //             $('#editDuedate').val(result.if_duedate.substring(0, 10));
+    //             $('#editCustomer').val(result.if_customer);
+    //             let importText = '<option value="" disabled selected>Import From</option>' +
+    //                 '<option value="1" ' + ((result.if_import_tran == 1) ? 'selected' : '') + '>Oversea</option>' +
+    //                 '<option value="2" ' + ((result.if_import_tran == 2) ? 'selected' : '') + '>Domestic</option>';
+    //             $('#editImportFrom').html(importText);
+    //             $('#editPartNo').val(result.if_part_no);
+    //             $('#editPartName').val(result.if_part_name);
+    //             listRequirement(result.mrt_id);
+    //             viewFeasibility(id);
+    //         }
+    //     })
+    // }
 
-    function listRequirement(id) {
-        $.ajax({
-            type: 'get',
-            url: API_URL + 'option/list_mrt',
-            success: function(result) {
-                var option_text = '<option value="" disabled selected>Choose Requirement</option>';
-                $.each(result, function(key, value) {
-                    let sel = "";
-                    if (value.mrt_id == id) {
-                        sel = "selected";
-                    }
-                    option_text += '<option value="' + value.mrt_id + '" ' + sel + '>' + value.mrt_name + '</option>';
-                })
-                $('#editRequirement').html(option_text);
-            }
-        })
-    }
+    // function listRequirement(id) {
+    //     $.ajax({
+    //         type: 'get',
+    //         url: API_URL + 'option/list_mrt',
+    //         success: function(result) {
+    //             var option_text = '<option value="" disabled selected>Choose Requirement</option>';
+    //             $.each(result, function(key, value) {
+    //                 let sel = "";
+    //                 if (value.mrt_id == id) {
+    //                     sel = "selected";
+    //                 }
+    //                 option_text += '<option value="' + value.mrt_id + '" ' + sel + '>' + value.mrt_name + '</option>';
+    //             })
+    //             $('#editRequirement').html(option_text);
+    //         }
+    //     })
+    // }
 
-    async function viewFeasibility(id) {
-        var table_text = '<table class="custom-table full-border"><tr style="font-weight: bold;text-align: center">' +
-            '<th colspan="2">Weight</th>' +
-            '<th colspan="2">Score</th>' +
-            '<th>Total</th>' +
-            '<th colspan="11">CONSIDERATION</th>' +
-            '<th colspan="5">Comment</th>' +
-            '<th>File</th>' +
-            '<th colspan="2">P.I.C</th>' +
-            '</tr>';
-        var arr_consider = await list_considerScore(id);
-        var arr_inDept = await list_inchargeDepartment();
-        var con_arr = [];
-        $.each(arr_consider, function(key, value) {
-            var subincharge = [];
-            $.each(arr_inDept, function(inkey, inval) {
-                if (value.mc_id == inval.mc_id) {
-                    subincharge.push(inval);
-                }
-            })
-            con_arr.push({
-                'data': value,
-                'incharge': subincharge
-            });
-        })
-        var fLastTotal = 0;
-        $.each(con_arr, function(key, value) {
-            var bg_color = "",
-                fileLink = "",
-                input = '';
-            if (value.data.ifcp_submit == 0) {
-                bg_color = ' style="background-color: lightgray;"';
-                input = ' disabled';
-            }
-            if (value.data.ifcp_file_name != null && value.data.ifcp_file_name != "") {
-                if (value.data.ifcp_file_name.slice(-4) == ".pdf") {
-                    fileLink = '<button class="text-block" onclick="view_pdf_file(\'' + value.data.ifcp_file_path + '\')"' + input + '><span class="material-symbols-outlined">find_in_page</span></button>';
-                } else {
-                    fileLink = '<button class="text-block" onclick="view_img_file(\'' + value.data.ifcp_file_path + '\')"' + input + '><span class="material-symbols-outlined">find_in_page</span></button>';
-                }
-            }
-            table_text += '<tr' + bg_color + '>' +
-                '<td colspan="2" class="text-center">' + value.data.mc_weight + '</td>' +
-                '<td colspan="2" class="text-center">' + value.data.ifcp_score + '</td>' +
-                '<td class="text-center inputScore" id="total' + value.data.mc_id + '">' + (value.data.mc_weight * value.data.ifcp_score) + '</td>' +
-                '<td colspan="11">' + value.data.mc_title + '</td>' +
-                '<td colspan="5">' + value.data.ifcp_comment + '</td>' +
-                '<td class="text-center"><div class="img_container" id="file_show' + value.data.mc_id + '">' + fileLink + '</div></td>' +
-                '<td colspan="2" class="text-center">';
-            if (value.incharge.length > 0) {
-                var innum = false;
-                $.each(value.incharge, function(inkey, inval) {
-                    if (innum) {
-                        table_text += '/';
-                    };
-                    table_text += inval.sd_name;
-                    innum = true;
-                })
-            } else {
-                table_text += ' - ';
-            }
-            table_text += '</td></tr>';
-            fLastTotal += (value.data.mc_weight * value.data.ifcp_score);
-        })
-        checkConclusion(fLastTotal);
-        table_text += '<tr class="text-center">' +
-            '<td colspan="2"></td>' +
-            '<td colspan="2" style="background-color: Yellow;">Total</td>' +
-            '<td style="background-color: Yellow;" id="lastTotal">' + fLastTotal + '</td></tr></table>';
-        $("#table_inner").html(table_text)
-        $.each(arr_inDept, function(inkey, inval) {
-            let fileContainer = "#file_show" + inval.mc_id;
-            $(fileContainer).css("display", "block");
-        })
-    }
+    // async function viewFeasibility(id) {
+    //     var table_text = '<table class="custom-table full-border"><tr style="font-weight: bold;text-align: center">' +
+    //         '<th colspan="2">Weight</th>' +
+    //         '<th colspan="2">Score</th>' +
+    //         '<th>Total</th>' +
+    //         '<th colspan="11">CONSIDERATION</th>' +
+    //         '<th colspan="5">Comment</th>' +
+    //         '<th>File</th>' +
+    //         '<th colspan="2">P.I.C</th>' +
+    //         '</tr>';
+    //     var arr_consider = await list_considerScore(id);
+    //     var arr_inDept = await list_inchargeDepartment();
+    //     var con_arr = [];
+    //     $.each(arr_consider, function(key, value) {
+    //         var subincharge = [];
+    //         $.each(arr_inDept, function(inkey, inval) {
+    //             if (value.mc_id == inval.mc_id) {
+    //                 subincharge.push(inval);
+    //             }
+    //         })
+    //         con_arr.push({
+    //             'data': value,
+    //             'incharge': subincharge
+    //         });
+    //     })
+    //     var fLastTotal = 0;
+    //     $.each(con_arr, function(key, value) {
+    //         var bg_color = "",
+    //             fileLink = "",
+    //             input = '';
+    //         if (value.data.ifcp_submit == 0) {
+    //             bg_color = ' style="background-color: lightgray;"';
+    //             input = ' disabled';
+    //         }
+    //         if (value.data.ifcp_file_name != null && value.data.ifcp_file_name != "") {
+    //             if (value.data.ifcp_file_name.slice(-4) == ".pdf") {
+    //                 fileLink = '<button class="text-block" onclick="view_pdf_file(\'' + value.data.ifcp_file_path + '\')"' + input + '><span class="material-symbols-outlined">find_in_page</span></button>';
+    //             } else {
+    //                 fileLink = '<button class="text-block" onclick="view_img_file(\'' + value.data.ifcp_file_path + '\')"' + input + '><span class="material-symbols-outlined">find_in_page</span></button>';
+    //             }
+    //         }
+    //         table_text += '<tr' + bg_color + '>' +
+    //             '<td colspan="2" class="text-center">' + value.data.mc_weight + '</td>' +
+    //             '<td colspan="2" class="text-center">' + value.data.ifcp_score + '</td>' +
+    //             '<td class="text-center inputScore" id="total' + value.data.mc_id + '">' + (value.data.mc_weight * value.data.ifcp_score) + '</td>' +
+    //             '<td colspan="11">' + value.data.mc_title + '</td>' +
+    //             '<td colspan="5">' + value.data.ifcp_comment + '</td>' +
+    //             '<td class="text-center"><div class="img_container" id="file_show' + value.data.mc_id + '">' + fileLink + '</div></td>' +
+    //             '<td colspan="2" class="text-center">';
+    //         if (value.incharge.length > 0) {
+    //             var innum = false;
+    //             $.each(value.incharge, function(inkey, inval) {
+    //                 if (innum) {
+    //                     table_text += '/';
+    //                 };
+    //                 table_text += inval.sd_name;
+    //                 innum = true;
+    //             })
+    //         } else {
+    //             table_text += ' - ';
+    //         }
+    //         table_text += '</td></tr>';
+    //         fLastTotal += (value.data.mc_weight * value.data.ifcp_score);
+    //     })
+    //     checkConclusion(fLastTotal);
+    //     table_text += '<tr class="text-center">' +
+    //         '<td colspan="2"></td>' +
+    //         '<td colspan="2" style="background-color: Yellow;">Total</td>' +
+    //         '<td style="background-color: Yellow;" id="lastTotal">' + fLastTotal + '</td></tr></table>';
+    //     $("#table_inner").html(table_text)
+    //     $.each(arr_inDept, function(inkey, inval) {
+    //         let fileContainer = "#file_show" + inval.mc_id;
+    //         $(fileContainer).css("display", "block");
+    //     })
+    // }
 
-    async function list_considerScore(id) {
-        try {
-            var result = await $.ajax({
-                type: 'GET',
-                url: API_URL + "view/feas_score/" + id,
-            });
-            return result;
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    }
+    // async function list_considerScore(id) {
+    //     try {
+    //         var result = await $.ajax({
+    //             type: 'GET',
+    //             url: API_URL + "view/feas_score/" + id,
+    //         });
+    //         return result;
+    //     } catch (err) {
+    //         console.log(err);
+    //         throw err;
+    //     }
+    // }
 
-    async function list_inchargeDepartment() {
-        try {
-            var result = await $.ajax({
-                type: 'GET',
-                url: API_URL + "view/in_dept",
-            });
-            return result;
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    }
+    // async function list_inchargeDepartment() {
+    //     try {
+    //         var result = await $.ajax({
+    //             type: 'GET',
+    //             url: API_URL + "view/in_dept",
+    //         });
+    //         return result;
+    //     } catch (err) {
+    //         console.log(err);
+    //         throw err;
+    //     }
+    // }
 
     function view_pdf_file(link) {
         event.preventDefault();
@@ -1102,126 +1107,126 @@
         $("#view_pdf_content").html(link_img);
     }
 
-    $(document).ready(function() {
-        if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
-            $('#tblFeasibility').DataTable().destroy();
-        }
-        var dataTable = $('#tblFeasibility').DataTable({
-            ajax: {
-                url: API_URL + 'feasibility/table'
-            },
-            columnDefs: [{
-                searchable: true,
-                orderable: false,
-                targets: 0,
-            }, ],
-            bSort: false,
-            order: [
-                [1, 'asc']
-            ],
-            columns: [{
-                    className: 'text-center',
-                    data: 'if_id'
-                },
-                {
-                    className: 'text-center',
-                    data: 'if_customer',
-                },
-                {
-                    className: 'text-center',
-                    data: 'if_part_no'
-                },
-                // {
-                //     className: 'text-center',
-                //     data:'if_import_tran',
-                //     "render": function (data, type, row){
-                //         if (type === 'display'){
-                //             if(row.if_import_tran == 1){
-                //                 disp = 'Oversea';
-                //             }else{
-                //                 disp = 'Domestic';
-                //             }
-                //         }
-                //         return disp;
-                //     }
-                // },
-                {
-                    className: 'text-center',
-                    data: 'update_date'
-                },
-                {
-                    className: 'text-center',
-                    data: 'update_by',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            if (row.update_by != "") {
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + row.update_by + '.jpg';
-                                if (!is_cached(img_ok)) {
-                                    img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
-                                }
-                                disp = '<div class="d-flex align-items-center">' +
-                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
-                                    '<div class="ms-3">' +
-                                    '<div class="user-meta-info">' +
-                                    '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
-                                    '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
-                                    '</div></div></div>';
-                            } else {
-                                disp = "";
-                            }
-                        }
-                        return disp;
-                    },
-                },
-                {
-                    className: 'text-center',
-                    data: 'if_id',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            if (row.if_status) {
-                                disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            } else {
-                                disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
-                            }
-                        }
-                        return disp;
-                    }
-                },
-                {
-                    className: 'text-center',
-                    data: 'if_id',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            disp = '<button type="button" onclick="editModal(\'' + row.if_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
-                                '<i class="ti ti-pencil me-1"></i> Edit </button>';
-                        }
-                        return disp;
-                    }
-                }
-            ]
-        });
-        dataTable.on('order.dt search.dt', function() {
-            let i = 1;
-            dataTable.cells(null, 0, {
-                search: 'applied',
-                order: 'applied'
-            }).every(function(cell) {
-                this.data(i++);
-            });
-        }).draw();
-        setInterval(function() {
-            dataTable.ajax.reload(null, false);
-        }, 1000);
+    // $(document).ready(function() {
+    //     if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
+    //         $('#tblFeasibility').DataTable().destroy();
+    //     }
+    //     var dataTable = $('#tblFeasibility').DataTable({
+    //         ajax: {
+    //             url: API_URL + 'feasibility/table'
+    //         },
+    //         columnDefs: [{
+    //             searchable: true,
+    //             orderable: false,
+    //             targets: 0,
+    //         }, ],
+    //         bSort: false,
+    //         order: [
+    //             [1, 'asc']
+    //         ],
+    //         columns: [{
+    //                 className: 'text-center',
+    //                 data: 'if_id'
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'if_customer',
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'if_part_no'
+    //             },
+    //             // {
+    //             //     className: 'text-center',
+    //             //     data:'if_import_tran',
+    //             //     "render": function (data, type, row){
+    //             //         if (type === 'display'){
+    //             //             if(row.if_import_tran == 1){
+    //             //                 disp = 'Oversea';
+    //             //             }else{
+    //             //                 disp = 'Domestic';
+    //             //             }
+    //             //         }
+    //             //         return disp;
+    //             //     }
+    //             // },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'update_date'
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'update_by',
+    //                 "render": function(data, type, row) {
+    //                     if (type === 'display') {
+    //                         if (row.update_by != "") {
+    //                             let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + row.update_by + '.jpg';
+    //                             if (!is_cached(img_ok)) {
+    //                                 img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
+    //                             }
+    //                             disp = '<div class="d-flex align-items-center">' +
+    //                                 '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+    //                                 '<div class="ms-3">' +
+    //                                 '<div class="user-meta-info">' +
+    //                                 '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
+    //                                 '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
+    //                                 '</div></div></div>';
+    //                         } else {
+    //                             disp = "";
+    //                         }
+    //                     }
+    //                     return disp;
+    //                 },
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'if_id',
+    //                 "render": function(data, type, row) {
+    //                     if (type === 'display') {
+    //                         if (row.if_status) {
+    //                             disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+    //                         } else {
+    //                             disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+    //                         }
+    //                     }
+    //                     return disp;
+    //                 }
+    //             },
+    //             {
+    //                 className: 'text-center',
+    //                 data: 'if_id',
+    //                 "render": function(data, type, row) {
+    //                     if (type === 'display') {
+    //                         disp = '<button type="button" onclick="editModal(\'' + row.if_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
+    //                             '<i class="ti ti-pencil me-1"></i> Edit </button>';
+    //                     }
+    //                     return disp;
+    //                 }
+    //             }
+    //         ]
+    //     });
+    //     dataTable.on('order.dt search.dt', function() {
+    //         let i = 1;
+    //         dataTable.cells(null, 0, {
+    //             search: 'applied',
+    //             order: 'applied'
+    //         }).every(function(cell) {
+    //             this.data(i++);
+    //         });
+    //     }).draw();
+    //     setInterval(function() {
+    //         dataTable.ajax.reload(null, false);
+    //     }, 600000);
 
-        // $('#reqCheck').on('change', function() {
-        //     if ($(this).is(':checked')) {
-        //         $('#editRequirement').val('');
-        //         $('#editRequirement').attr('disabled', true);
-        //     } else {
-        //         $('#editRequirement').attr('disabled', false);
-        //     }
-        // });
+    //     // $('#reqCheck').on('change', function() {
+    //     //     if ($(this).is(':checked')) {
+    //     //         $('#editRequirement').val('');
+    //     //         $('#editRequirement').attr('disabled', true);
+    //     //     } else {
+    //     //         $('#editRequirement').attr('disabled', false);
+    //     //     }
+    //     // });
 
 
-    });
+    // });
 </script>

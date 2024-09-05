@@ -52,9 +52,9 @@
                                             <th>No.</th>
                                             <th>Costomer</th>
                                             <th>Part No.</th>
-                                            <th>Updated Date</th>
-                                            <th>Updated By</th>
-                                            <th>Status</th>
+                                            <th>Issue Date</th>
+                                            <th>Issue By</th>
+                                            <!-- <th>Status</th> -->
                                             <th>Action</th>
                                         </tr>
                                         <!-- end row -->
@@ -84,63 +84,93 @@
             </div>
             <div class="modal-body">
                 <form id="add_form" name="add_form">
-                    <div class="container-fluid">
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpDate" class="form-label fw-semibold">Date</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpDate" name="create_date" placeholder="Date" value="<?php echo date('Y/m/d'); ?>" disabled>
-                                <span class="form_error"></span>
+                    <div class="card">
+                        <div class="card-body">
+                            <ul class="nav nav-pills nav-fill" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#navpill-111" role="tab" aria-selected="true">
+                                        <span>Feasibility Detail</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#navpill-222" role="tab" aria-selected="false" tabindex="-1">
+                                        <span>Part No</span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="row">
+                                <div class="tab-content mt-2">
+                                    <div class="tab-pane p-3 active show" id="navpill-111" role="tabpanel">
+                                        <div class="container-fluid">
+                                            <div class="mb-3 row align-items-center">
+                                                <label for="inpDate" class="form-label fw-semibold">Date</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" id="inpDate" name="create_date" placeholder="Date" value="<?php echo date('Y/m/d'); ?>" disabled>
+                                                    <span class="form_error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 row align-items-center">
+                                                <label for="inpCustomer" class="form-label fw-semibold">Customer</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" id="inpCustomer" name="if_customer" placeholder="Customer">
+                                                    <span class="form_error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 row align-items-center">
+                                                <label for="inpImportFrom" class="form-label fw-semibold">Import From</label>
+                                                <div class="col-sm-9">
+                                                    <select name="if_import_tran" id="selImport" class="form-control">
+                                                        <option value="" disabled selected>Import From</option>
+                                                        <option value="1">Oversea</option>
+                                                        <option value="2">Domestic</option>
+                                                    </select>
+                                                    <span class="form_error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 row align-items-center">
+                                                <label for="selRequirement" class="form-label fw-semibold">Requirement</label>
+                                                <div class="col-sm-9">
+                                                    <select name="mrt_id" id="selRequirement" class="form-control">
+                                                        <option value="" disabled selected>Choose Requirement</option>
+                                                        <?php
+                                                        $option_mrt = $this->ManageBackend->list_option("option/list_mrt");
+                                                        foreach ($option_mrt as $op_mrt) {
+                                                            echo '<option value="' . $op_mrt['mrt_id'] . '">' . $op_mrt['mrt_name'] . '</option>';
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                    <span class="form_error"></span>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" id="add_if_ref" name="if_ref">
+                                            <span class="form_error"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane p-3" id="navpill-222" role="tabpanel">
+                                        <div id="tab-2" style="display: block;">
+                                            <div class="row border" style="padding: 15px;">
+                                                <div class="container-fluid">
+                                                    <div class="mb-3 row align-items-center">
+                                                        <label for="inpQtyPartNo" class="form-label fw-semibold">Select Quantity</label>
+                                                        <div class="col-sm-9">
+                                                            <input type="number" class="form-control" onchange="changePartNo()" id="inpQtyPartNo" name="if_qty_part_no" max="20" min="1" placeholder="Part No."></input>
+                                                            <span class="form_error"></span>
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div id="form_part_no" name="form_part_no">
+
+                                                    </div>
+                                                    <span class="form_error"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpCustomer" class="form-label fw-semibold">Customer</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpCustomer" name="if_customer" placeholder="Customer">
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpImportFrom" class="form-label fw-semibold">Import From</label>
-                            <div class="col-sm-9">
-                                <select name="if_import_tran" id="selImport" class="form-control">
-                                    <option value="" disabled selected>Import From</option>
-                                    <option value="1">Oversea</option>
-                                    <option value="2">Domestic</option>
-                                </select>
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpPartNo" class="form-label fw-semibold">Part No.</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpPartNo" name="if_part_no" placeholder="Part No.">
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpPartName" class="form-label fw-semibold">Part Name</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpPartName" name="if_part_name" placeholder="Part Name">
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="selRequirement" class="form-label fw-semibold">Requirement</label>
-                            <div class="col-sm-9">
-                                <select name="mrt_id" id="selRequirement" class="form-control">
-                                    <option value="" disabled selected>Choose Requirement</option>
-                                    <?php
-                                    $option_mrt = $this->ManageBackend->list_option("option/list_mrt");
-                                    foreach ($option_mrt as $op_mrt) {
-                                        echo '<option value="' . $op_mrt['mrt_id'] . '">' . $op_mrt['mrt_name'] . '</option>';
-                                    }
-                                    ?>
-                                </select>
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <input type="hidden" id="add_if_ref" name="if_ref">
-                        <span class="form_error"></span>
                     </div>
             </div>
             <div class="modal-footer">
@@ -155,6 +185,7 @@
         </div>
     </div>
 </div>
+
 <!-- Modal for edit Feasibility -->
 <div class="modal fade" id="mdlEdits" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -200,12 +231,12 @@
                             <tr>
                                 <th colspan="2"><label for="editPartNo" class="form-label fw-semibold">Part No.</label></th>
                                 <th colspan="8" class="b-bottom">
-                                    <input type="text" class="border-transparent" id="editPartNo" name="if_part_no" placeholder="Part No.">
+                                    <input type="text" class="border-transparent" id="editPartNo" name="if_part_no" placeholder="Part No." disabled>
                                     <span class="form_error"></span>
                                 </th>
                                 <th colspan="2"><label for="editPartName" class="form-label fw-semibold">Part Name</label></th>
                                 <th colspan="8" class="b-bottom">
-                                    <input type="text" class="border-transparent" id="editPartName" name="if_part_name" placeholder="Part Name">
+                                    <input type="text" class="border-transparent" id="editPartName" name="if_part_name" placeholder="Part Name" disabled>
                                     <span class="form_error"></span>
                                 </th>
                             </tr>
@@ -320,6 +351,43 @@
         </div>
     </div>
 </div>
+<!-- Modal for View Feasibility Group Part No-->
+<div class="modal fade" id="mdlPartNo" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center">
+                <h4 class="modal-title" id="myLargeModalLabel">
+                    <i class="ti ti-layout-list me-1"></i> Part No.
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit_part" name="edit_part">
+                    <table class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;" id="tblPartNo">
+                        <thead class="fw-semibold">
+                            <tr>
+                                <th>No.</th>
+                                <th>Part No.</th>
+                                <th>Part Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyPartNo">
+
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal">
+                    Close
+                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for View Feasibility -->
 <div class="modal" id="view_pdf_file">
     <div class="modal-dialog modal-xl mt-3 mb-0">
         <div class="modal-content">
@@ -336,7 +404,7 @@
     function previewPDF() {
 
         $('#table_inner tr').each(function() {
-                $(this).css('background-color', 'white');
+            $(this).css('background-color', 'white');
         });
 
         const {
@@ -373,12 +441,10 @@
         });
     }
 
-
-
     async function addFeasibility() {
         event.preventDefault();
         let chk = await Feasibility_validate("add");
-        // console.log(chk);
+        // console.log('check =>',chk);
         if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -392,15 +458,23 @@
                 if (result.isConfirmed) {
                     var add_form = {};
                     $('#add_form').serializeArray().forEach(function(item) {
+
                         if (item.name == 'if_import_tran' || item.name == 'mrt_id') {
                             item.value = parseInt(item.value)
                         }
+
+                        if (item.name == 'if_part_no[]' || item.name == 'if_part_name[]') {
+                            return;
+                        }
+
                         add_form[item.name] = item.value;
                     })
                     add_form["create_date"] = getTimeNow();
                     add_form["if_duedate"] = getTimeNow().substring(0, 10) + " 11:59:59";
                     add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-
+                    add_form["update_date"] = getTimeNow();
+                    add_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                    add_form["if_group_part"] = chk;
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
@@ -569,11 +643,36 @@
     // modal --------------------------------------
     function editModal(id) {
         event.preventDefault();
+        var partNo = "";
+        var partName = "";
         $('#if_id').val(id);
         $.ajax({
             type: 'get',
             url: API_URL + 'feasibility/' + id,
-            success: function(result) {
+            success: async function(result) {
+                await $.ajax({
+                    type: 'GET',
+                    url: API_URL + 'view/partno/' + id,
+                    success: function(result) {
+                        // console.log(result);
+                        let data = result.data;
+                        if (data.length > 0) {
+                            for (let i = 0; i < data.length; i++) {
+                                partNo += data[i].partNo;
+                                partName += data[i].partName;
+
+                                // Add a comma if it's not the last item
+                                if (i < data.length - 1) {
+                                    partNo += ", ";
+                                    partName += ", ";
+                                }
+                            }
+                        } else {
+                            partNo = "";
+                            partName = "";
+                        }
+                    }
+                });
                 $('#editRef').val(result.if_ref);
                 $('#editDate').val(result.create_date.substring(0, 10));
                 $('#editDuedate').val(result.if_duedate.substring(0, 10));
@@ -582,12 +681,175 @@
                     '<option value="1" ' + ((result.if_import_tran == 1) ? 'selected' : '') + '>Oversea</option>' +
                     '<option value="2" ' + ((result.if_import_tran == 2) ? 'selected' : '') + '>Domestic</option>';
                 $('#editImportFrom').html(importText);
-                $('#editPartNo').val(result.if_part_no);
-                $('#editPartName').val(result.if_part_name);
+                $('#editPartNo').val(partNo);
+                $('#editPartName').val(partName);
                 listRequirement(result.mrt_id);
                 viewFeasibility(id);
             }
         })
+    }
+
+    async function editPartNo(id) {
+        event.preventDefault();
+        var partNo = $('#' + id).val();
+        var partName = $('#' + id).closest('tr').find('input').last().val();
+        var partNoInput = $('#' + id).closest('tr').find('input[name="partNo"]');
+        var partNameInput = $('#' + id).closest('tr').find('input[name="partName"]');
+
+        let partData = []
+        partData.push({
+            "ifpn_id": id
+        });
+        partData.push({
+            "partNo": partNo
+        });
+        partData.push({
+            "partName": partName
+        });
+        partData.push({
+            "update_date": getTimeNow()
+        });
+        partData.push({
+            "update_by": "<?php echo $this->session->userdata('sessUsr') ?>"
+        });
+
+        var chk = await edit_partno(partData);
+        if (chk) {
+            if (chk == "err_prtNo") {
+                form_err(partNoInput.get(0), "*Please Enter Part No.");
+            } else {
+                form_ok(partNoInput.get(0));
+                if (chk == "err_prtName") {
+                    form_err(partNameInput.get(0), "*Please Enter Part Name.");
+                } else {
+                    if (chk == "ok") {
+                        form_ok(partNameInput.get(0));
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    type: 'PUT',
+                                    dataType: 'json',
+                                    contentType: 'application/json',
+                                    url: API_URL + 'feasibility/update_partno',
+                                    data: JSON.stringify(partData),
+                                    success: function(data) {
+                                        console.log(data);
+                                        if (data != false) {
+                                            Swal.fire({
+                                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Part No. success!</p>",
+                                                icon: 'success',
+                                                showClass: {
+                                                    popup: 'animate__animated animate__fadeInDown'
+                                                }
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Part No.!</p>",
+                                                icon: 'error',
+                                                showClass: {
+                                                    popup: 'animate__animated animate__fadeInDown'
+                                                }
+                                            })
+                                        }
+                                    },
+                                    error: function(err) {
+                                        console.log(err);
+                                    }
+                                })
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }
+
+    function modalPartno(id) {
+        event.preventDefault();
+        if ($.fn.DataTable.isDataTable('#tblPartNo')) {
+            $('#tblPartNo').DataTable().destroy();
+        }
+        var dataTable = $('#tblPartNo').DataTable({
+            ajax: {
+                url: API_URL + 'view/partno/' + id,
+            },
+            autoWidth: false,
+            columnDefs: [{
+                    searchable: false,
+                    orderable: false,
+                    targets: 0,
+                },
+                {
+
+                    targets: 0,
+                    width: "10%",
+                },
+                {
+                    targets: 3,
+                    width: "15%",
+                }
+            ],
+            bSort: false,
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    className: 'text-center',
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return meta.row + 1;
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'partNo',
+                    "render": function(data, type, row) {
+                        return "<div>" +
+                            "<input type='text' class='form-control' id='" + row.ifpn_id + "' value='" + data + "' name='partNo'>" +
+                            '<span class="form_error"></span>' +
+                            "</div>"
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'partName',
+                    "render": function(data, type, row) {
+                        return "<div>" +
+                            "<input type='text' class='form-control' id='" + row.ifpn_id + "' value='" + data + "' name='partName'>" +
+                            '<span class="form_error"></span>' +
+                            "</div>"
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'ifpn_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<button type="button" onclick="editPartNo(\'' + row.ifpn_id + '\')" class="btn btn btn-outline-warning">' +
+                                '<i class="ti ti-pencil fw-semibold"></i></button>';
+                        }
+                        return disp;
+                    }
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
+            let i = 1;
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
+                this.data(i++);
+            });
+        }).draw();
     }
 
     function listRequirement(id) {
@@ -661,7 +923,7 @@
                 var innum = false;
                 $.each(value.incharge, function(inkey, inval) {
                     if (innum) {
-                        table_text += '/';
+                        table_text += ', ';
                     };
                     table_text += inval.sd_name;
                     innum = true;
@@ -710,6 +972,19 @@
         }
     }
 
+    async function get_partById(id) {
+        try {
+            var result = await $.ajax({
+                type: 'GET',
+                url: API_URL + "view/partno/" + id,
+            });
+            return result;
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
+    }
+
     function view_pdf_file(link) {
         event.preventDefault();
         $('#view_pdf_file').fadeIn(500).modal('show');
@@ -724,6 +999,43 @@
         $('#view_pdf_file').fadeIn(500).modal('show');
         link_img = '<img src="' + <?php echo "'" . base_url() . "'" ?> + link + '" width="100%">';
         $("#view_pdf_content").html(link_img);
+    }
+
+    function changePartNo() {
+        var maxPartNo = parseInt(inpQtyPartNo.getAttribute('max'), 10);
+        var inpQtyPart = $('#inpQtyPartNo');
+
+        if (inpQtyPartNo.value > maxPartNo) {
+            inpQtyPartNo.value = 0;
+            let err = document.getElementById('inpQtyPartNo');
+            form_err(err, "*Please Enter Quentity 1-20");
+            return false;
+        }
+
+        if (inpQtyPart.length && inpQtyPart.val() !== "") {
+            inpQtyPart[0].style.border = "1px solid #d1d3e2";
+            inpQtyPart[0].nextElementSibling.style.display = "none";
+        }
+        var html = '';
+        for (var i = 0; i < inpQtyPart.val(); i++) {
+            var i_plus_1 = i + 1;
+            html += '<div class="mb-3 row align-items-center">' +
+                '<label for="inpPartNo' + i + '" class="form-label fw-semibold">Part No (' + i_plus_1 + ')</label>' +
+                '<div class="col-sm-9">' +
+                '<input type="text" class="form-control" id="inpPartNo' + i + '" name="if_part_no[]" placeholder="Part No.">' +
+                '<span class="form_error"></span>' +
+                '</div>' +
+                '</div>' +
+                '<div class="mb-3 row align-items-center">' +
+                '<label for="inpPartName' + i + '" class="form-label fw-semibold">Part Name (' + i_plus_1 + ')</label>' +
+                '<div class="col-sm-9">' +
+                '<input type="text" class="form-control" id="inpPartName' + i + '" name="if_part_name[]" placeholder="Part Name">' +
+                '<span class="form_error"></span>' +
+                '</div>' +
+                '</div>' +
+                '<hr>';
+        }
+        $('#form_part_no').html(html);
     }
 
     $(document).ready(function() {
@@ -753,33 +1065,24 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'if_part_no'
+                    data: 'if_id',
+                    "render": function(data, type, row) {
+                        return '<button type="button" onclick="modalPartno(\'' + row.if_id + '\')" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#mdlPartNo">' +
+                            '<i class="ti ti-search fw-semibold fs-5"></i></button>';
+                    }
                 },
-                // {
-                //     className: 'text-center',
-                //     data:'if_import_tran',
-                //     "render": function (data, type, row){
-                //         if (type === 'display'){
-                //             if(row.if_import_tran == 1){
-                //                 disp = 'Oversea';
-                //             }else{
-                //                 disp = 'Domestic';
-                //             }
-                //         }
-                //         return disp;
-                //     }
-                // },
                 {
                     className: 'text-center',
-                    data: 'update_date'
+                    data: 'create_date'
                 },
                 {
                     className: 'text-center',
                     data: 'update_by',
                     "render": function(data, type, row) {
+                        let emp_code = row.update_by.substring(2, 7);
                         if (type === 'display') {
                             if (row.update_by != "") {
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + row.update_by + '.jpg';
+                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
                                 if (!is_cached(img_ok)) {
                                     img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
                                 }
@@ -796,20 +1099,6 @@
                         }
                         return disp;
                     },
-                },
-                {
-                    className: 'text-center',
-                    data: 'if_id',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            if (row.if_status) {
-                                disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            } else {
-                                disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
-                            }
-                        }
-                        return disp;
-                    }
                 },
                 {
                     className: 'text-center',
@@ -835,6 +1124,6 @@
         }).draw();
         setInterval(function() {
             dataTable.ajax.reload(null, false);
-        }, 1000);
+        }, 600000);
     });
 </script>

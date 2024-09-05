@@ -235,6 +235,37 @@ func SettingUser(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
 }
+func UpdateSignature(c *gin.Context) {
+	var objSignature Signature
+	if err := c.BindJSON(&objSignature); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var existingID int
+	err := db.QueryRow("SELECT su_id FROM sys_signature WHERE su_id = ?", objSignature.Su_id).Scan(&existingID)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			objResult, err := db.Exec("INSERT INTO sys_signature (su_id, snt_file_name, snt_file_path, snt_status, create_date, update_date, create_by, update_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", objSignature.Su_id, objSignature.Snt_file_name, objSignature.Snt_file_path, objSignature.Snt_status, objSignature.Create_date, objSignature.Update_date, objSignature.Create_by, objSignature.Update_by)
+			if err != nil {
+				c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+				return
+			}
+			c.IndentedJSON(http.StatusOK, gin.H{"Insert": objResult})
+		} else {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		}
+	} else {
+		objResult, err := db.Exec("UPDATE sys_signature SET snt_file_name = ?, snt_file_path = ?, update_date = ?, update_by = ? WHERE su_id = ?", objSignature.Snt_file_name, objSignature.Snt_file_path, objSignature.Update_date, objSignature.Update_by, objSignature.Su_id)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		}
+		c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+	}
+}
+
 func SettingPassword(c *gin.Context) {
 	var objUser User
 	if err := c.BindJSON(&objUser); err != nil {
