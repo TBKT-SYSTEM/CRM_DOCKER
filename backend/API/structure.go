@@ -324,6 +324,66 @@ type Feasibility1 struct {
 	Update_by      string              `json:"update_by"`
 }
 
+type Rfq struct {
+	Ir_id       string `json:"ir_ref"`
+	Ir_customer string `json:"ir_customer"`
+	Ir_ref_nbc  int    `json:"ir_ref_nbc"`
+	Ir_pro_life string `json:"ir_pro_life"`
+	Ir_pro_tim  string `json:"ir_sop"`
+	Ir_duedate  string `json:"ir_duedate"`
+	Ir_status   int    `json:"ir_status"`
+	Create_date string `json:"create_date"`
+	Update_date string `json:"update_date"`
+	Create_by   string `json:"create_by"`
+	Update_by   string `json:"update_by"`
+}
+
+type RfqData struct {
+	Data []RfqTable `json:"data"`
+}
+
+type RfqTable struct {
+	Ir_id       string `json:"ir_ref"`
+	Ir_customer string `json:"ir_customer"`
+	Ir_ref_nbc  int    `json:"ir_ref_nbc"`
+	Ir_pro_life string `json:"ir_pro_life"`
+	Ir_pro_tim  string `json:"ir_sop"`
+	Ir_duedate  string `json:"ir_duedate"`
+	Ir_status   int    `json:"ir_status"`
+	Create_date string `json:"create_date"`
+	Update_date string `json:"update_date"`
+	Create_by   string `json:"create_by"`
+	Update_by   string `json:"update_by"`
+	Su_fname    string `json:"su_fname"`
+	Su_lname    string `json:"su_lname"`
+	Su_img_path string `json:"su_img_path"`
+	Su_img_name string `json:"su_img_name"`
+}
+
+type GetRfqFileByIdData struct {
+	Data []GetRfqFileById `json:"data"`
+}
+type GetRfqFileById struct {
+	Sfu_id        int    `json:"sfu_id"`
+	Sfu_file_name string `json:"sfu_file_name"`
+	Sfu_file_path string `json:"sfu_file_path"`
+}
+
+type GetBtnRfqData struct {
+	Data []GetBtnRfq `json:"data"`
+}
+type GetBtnRfq struct {
+	Swd_id     int    `json:"swd_id"`
+	Swd_app_lv int    `json:"swd_app_lv"`
+	Su_id      int    `json:"su_id"`
+	Swg_id     int    `json:"swg_id"`
+	Sat_id     int    `json:"sat_id"`
+	Su_fname   string `json:"su_fname"`
+	Su_lname   string `json:"su_lname"`
+	Swg_name   string `json:"swg_name"`
+	Sat_name   string `json:"sat_name"`
+}
+
 type GroupPartNo struct {
 	Ifpn_id  int    `json:"ifpn_id"`
 	PartNo   string `json:"partNo"`

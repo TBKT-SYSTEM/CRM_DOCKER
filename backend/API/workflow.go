@@ -167,7 +167,7 @@ func ChangeSwgStatus(c *gin.Context) {
 func ListWorkflowDetailTable(c *gin.Context) {
 	var objWorkflowDetailList []WorkflowDetailTable
 	iId := c.Param("id")
-	objListWorkflowd, err := db.Query("SELECT swd.*,CONCAT(suall.su_fname,' ',suall.su_lname) AS fullname, swg.swg_name, sat.sat_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name FROM `sys_workflow_detail` AS swd LEFT JOIN sys_workflow_group AS swg ON swd.swg_id = swg.swg_id LEFT JOIN sys_approve_type AS sat ON swd.sat_id = sat.sat_id LEFT JOIN sys_user AS su ON swd.update_by = su.su_emp_code LEFT JOIN sys_user AS suall ON swd.su_id = suall.su_id WHERE swd.swg_id = ? ORDER BY swd.swd_id", iId)
+	objListWorkflowd, err := db.Query("SELECT swd.*,CONCAT(suall.su_fname,' ',suall.su_lname) AS fullname, swg.swg_name, sat.sat_name, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name FROM `sys_workflow_detail` AS swd LEFT JOIN sys_workflow_group AS swg ON swd.swg_id = swg.swg_id LEFT JOIN sys_approve_type AS sat ON swd.sat_id = sat.sat_id LEFT JOIN sys_user AS su ON swd.create_by = su.su_emp_code LEFT JOIN sys_user AS suall ON swd.su_id = suall.su_id WHERE swd.swg_id = ? ORDER BY swd.swd_id", iId)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),

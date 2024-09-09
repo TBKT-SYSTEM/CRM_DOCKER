@@ -1489,13 +1489,15 @@ func LineNotify(c *gin.Context) {
 	client := resty.New()
 	var objResult map[string]string
 	json.Unmarshal([]byte(`{
-		"message": "สวัสดีไกด์",
-		"stickerId": "125",
-		"stickerPackageId": "1"
+		"message": "กินข้าวหรือยังครับ",
+		"stickerId": "10882",
+		"stickerPackageId": "789"
 	}`), &objResult)
 
 	objRespond, err := client.R().
-		SetHeader("Authorization", "Bearer ffPxZ5rDxpVdLdHNSWWqlwGnXmnhdmeunAASbrLtrnX").
+		// Group คุยคนเดียว
+		SetHeader("Authorization", "Bearer HEz7aXgkvssjDRj84bi1KuH8GsV4f7yccpljGDtUOVl").
+		// SetHeader("Authorization", "Bearer ffPxZ5rDxpVdLdHNSWWqlwGnXmnhdmeunAASbrLtrnX").
 		SetFormData(objResult).Post("https://notify-api.line.me/api/notify")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"ERROR LINE Notify API: ": err.Error()})

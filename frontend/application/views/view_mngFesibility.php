@@ -822,13 +822,11 @@
                     data: 'update_by',
                     "render": function(data, type, row) {
                         if (type === 'display') {
+                            let emp_code = row.update_by.substring(2,7);
                             if (row.update_by != "") {
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + row.update_by + '.jpg';
-                                if (!is_cached(img_ok)) {
-                                    img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
-                                }
+                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
                                 disp = '<div class="d-flex align-items-center">' +
-                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35" onerror="this.onerror=null;this.src=\'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png\';">' +
                                     '<div class="ms-3">' +
                                     '<div class="user-meta-info">' +
                                     '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +

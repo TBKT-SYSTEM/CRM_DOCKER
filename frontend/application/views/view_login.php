@@ -9,11 +9,13 @@
     <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/styles.min.css" />
 </head>
 
+
 <body>
     <script>
         var API_URL = '<?php echo API_BASE_URL; ?>';
     </script>
     <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/form_validation.css" />
+
     <!--  Body Wrapper -->
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
         <div class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
@@ -66,7 +68,7 @@
             <div class="modal-content">
                 <div class="modal-header d-flex align-items-center">
                     <h4 class="modal-title" id="myLargeModalLabel">
-                    Forgot Password
+                        Forgot Password
                     </h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -101,22 +103,24 @@
     <script src="<?php echo base_url() ?>assets/js/forms/form_validation.js"></script>
 </body>
 <script>
-    async function login(){
+    async function login() {
         event.preventDefault();
         let chk = await login_validate();
-        if(chk){
+        if (chk) {
             var login_data = {};
-            $('#form_login').serializeArray().map(function(x){login_data[x.name] = x.value;});
+            $('#form_login').serializeArray().map(function(x) {
+                login_data[x.name] = x.value;
+            });
             // console.log(login_data);
             $.ajax({
                 type: 'post',
                 dataType: 'json',
                 contentType: 'application/json',
-                url: API_URL+'login/login',
+                url: API_URL + 'login/login',
                 data: JSON.stringify(login_data),
-                success: function (result){
+                success: function(result) {
                     console.log(result);
-                    if(typeof result == "string"){
+                    if (typeof result == "string") {
                         Swal.fire({
                             html: result,
                             icon: 'error',
@@ -124,13 +128,13 @@
                                 popup: 'animate__animated animate__fadeInDown'
                             }
                         })
-                    }else{
+                    } else {
                         $.ajax({
                             type: 'post',
                             dataType: 'json',
                             url: '<?php echo base_url() ?>dashboard/login',
                             data: result,
-                            success: function (res){
+                            success: function(res) {
                                 window.location = "<?php echo base_url('Dashboard'); ?>";
                             }
                         })
@@ -139,26 +143,26 @@
             })
         }
     }
-    async function forgotPass(){
+    async function forgotPass() {
         event.preventDefault();
         let chk = await forgot_validate();
-        if(chk){
+        if (chk) {
             var forgot_form = {};
             forgot_form["su_emp_code"] = $('#emp_code').val();
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
                 contentType: 'application/json',
-                url: API_URL+'email/userdata',
+                url: API_URL + 'email/userdata',
                 data: JSON.stringify(forgot_form),
-                success: function(result){
-                    if(result!=false){
+                success: function(result) {
+                    if (result != false) {
                         $.ajax({
                             type: 'POST',
-                            dataType:'JSON',
+                            dataType: 'JSON',
                             url: '<?php echo base_url() ?>dashboard/send_toEmail',
                             data: result,
-                            success: function (data) {
+                            success: function(data) {
                                 if (data == true) {
                                     Swal.fire({
                                         html: "Please check your email.",
@@ -184,7 +188,7 @@
                                 }
                             }
                         })
-                    }else{
+                    } else {
                         Swal.fire({
                             html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error get user data!</p>",
                             icon: 'error',
@@ -197,9 +201,12 @@
                         })
                     }
                 },
-                error: function(err){console.log(err);}
+                error: function(err) {
+                    console.log(err);
+                }
             })
         }
     }
 </script>
+
 </html>

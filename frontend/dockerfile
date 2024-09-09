@@ -3,8 +3,15 @@ FROM php:7.4-apache
 # ติดตั้ง dependencies ที่จำเป็น
 RUN apt-get update && apt-get install -y \
     libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     zip \
-    && docker-php-ext-install zip
+    default-libmysqlclient-dev \
+    && docker-php-ext-install \
+        zip \
+        mysqli \
+        gd
 
 # เปิดใช้งาน mod_rewrite สำหรับ Apache
 RUN a2enmod rewrite
@@ -14,3 +21,8 @@ COPY . /var/www/html
 
 # ตั้งค่าสิทธิ์ที่เหมาะสม
 RUN chown -R www-data:www-data /var/www/html
+
+# ตั้งค่า PHP สำหรับการอัปโหลดไฟล์ขนาดใหญ่
+RUN echo "upload_max_filesize = 100M" > /usr/local/etc/php/conf.d/uploads.ini
+RUN echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/uploads.ini
+RUN echo "memory_limit = 128M" >> /usr/local/etc/php/conf.d/uploads.ini

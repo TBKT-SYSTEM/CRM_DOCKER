@@ -78,6 +78,13 @@ func Routy() {
 	router.GET("/feasibilityHistory/table", ListFeasibilityTableHistory)
 	router.GET("/feasibilityHistory/tableDate/:date", ListFeasibilityTableHistoryDate)
 
+	router.GET("/rfq/:id", ListRFQ)
+	router.GET("/rfq/last_id", RfqLastid)
+	router.GET("/rfq/table", ListRfqTable)
+	router.GET("/rfq/file/:id", ListRfqFileId)
+	router.GET("/rfq/getBtnRfq/:id", ListBtnRfq)
+	router.POST("/rfq/insert", InsertRfq)
+
 	router.GET("/manage_feasibility/table/:id", ListManageFeasibilityTable)
 	router.PUT("/manage_feasibility/scoring", UpdateFeasibilityScore)
 	router.PUT("/manage_feasibility/commenting", UpdateFeasibilityComment)

@@ -19996,7 +19996,7 @@ fieldset:disabled .btn {
 .body-wrapper>.container-sm,
 .body-wrapper>.container-xl,
 .body-wrapper>.container-xxl {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 24px;
     -webkit-transition: 0.2s ease-in;
@@ -24801,11 +24801,6 @@ a:hover .h1 {
     color: var(--bs-primary) !important;
 }
 
-.btn.bg-primary-subtle:hover {
-    background-color: var(--bs-primary) !important;
-    color: var(--bs-white) !important;
-}
-
 .timeline-widget .timeline-item .timeline-badge-wrap .timeline-badge-border {
     width: 1px;
     height: 2rem;
@@ -24821,8 +24816,28 @@ a:hover .h1 {
     color: var(--bs-white) !important;
 }
 
+.btn.bg-primary-subtle:hover {
+    background-color: var(--bs-primary) !important;
+    color: var(--bs-white) !important;
+}
+
+.btn.bg-secondary-subtle:hover {
+    background-color: var(--bs-secondary) !important;
+    color: var(--bs-white) !important;
+}
+
+.btn.bg-info-subtle:hover {
+    background-color: var(--bs-info) !important;
+    color: var(--bs-white) !important;
+}
+
 .btn.bg-danger-subtle:hover {
     background-color: var(--bs-danger) !important;
+    color: var(--bs-white) !important;
+}
+
+.btn.bg-warning-subtle:hover {
+    background-color: var(--bs-warning) !important;
     color: var(--bs-white) !important;
 }
 
@@ -24834,21 +24849,21 @@ a:hover .h1 {
 
 /* width */
 ::-webkit-scrollbar {
-    width: 2px;
+    width: 1px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
     /* box-shadow: inset 0 0 5px grey; */
     /* border-radius: 10px; */
-    height: 2px;
+    height: 1px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: white;
-    /* border-radius: 10px; */
-    width: 2px;
+    background-color: #c7c7c787;
+    border-radius: 10px;
+    width: 1px;
 }
 
 /* Handle on hover */

@@ -38,33 +38,30 @@
                                 </div>
                             </div>
                             <div class="col-md-5 text-end">
-                                <button type="button" class="btn bg-primary-subtle text-primary" data-bs-toggle="modal" data-bs-target="" style="cursor:not-allowed">
+                                <button type="button" class="btn bg-primary-subtle text-primary" data-bs-toggle="modal" data-bs-target="#mdlRegister">
                                     <i class=""></i> Add RFQ
                                 </button>
                             </div>
                         </div>
                         <div class="row border" style="padding: 15px;">
                             <div class="table-responsive">
-                                <table id="tblFeasibility" class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;">
+                                <table id="tblRFQ" class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;">
                                     <thead>
                                         <!-- start row -->
                                         <tr>
-                                            <th>No.</th>
-                                            <th class="text-center">Topic</th>
-                                            <!-- <th>Part No.</th>
-                                            <th>Updated Date</th>
-                                            <th>Updated By</th>
-                                            <th>Status</th> -->
-                                            <th>Action</th>
+                                            <th class="text-center">No.</th>
+                                            <th class="text-center">RFQ No.</th>
+                                            <th class="text-center">Customer</th>
+                                            <th class="text-center">Project Life</th>
+                                            <th class="text-center">Program Timing Info. (SOP)</th>
+                                            <th class="text-center">Issue Date</th>
+                                            <th class="text-center">Due Date</th>
+                                            <th class="text-center">Issue By</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                         <!-- end row -->
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="text-center col-1">1</td>
-                                            <td class="text-center" style="font-weight: bold;">Tutorial RFQ Form</td>
-                                            <td class="text-center col-2"><button type="button" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits"><i class="ti ti-pencil me-1"></i> View </button></td>
-                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -77,7 +74,7 @@
 
     </div>
 </div>
-<!-- Modal for register Feasibility -->
+<!-- Modal for register RFQ -->
 <div class="modal fade" id="mdlRegister" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
@@ -88,10 +85,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="add_form" name="add_form">
+                <form id="add_form" name="add_form" type="multipart/form-data">
                     <div class="container-fluid">
                         <div class="mb-3 row align-items-center">
-                            <label for="inpDate" class="form-label fw-semibold">Date</label>
+                            <label for="inpDate" class="form-label fw-semibold">Issued Date</label>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control" id="inpDate" name="create_date" placeholder="Date" value="<?php echo date('Y/m/d'); ?>" disabled>
                                 <span class="form_error"></span>
@@ -100,59 +97,51 @@
                         <div class="mb-3 row align-items-center">
                             <label for="inpCustomer" class="form-label fw-semibold">Customer</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpCustomer" name="if_customer" placeholder="Customer">
+                                <input type="text" class="form-control" id="inpCustomer" name="ir_customer" placeholder="Customer">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
-                            <label for="inpImportFrom" class="form-label fw-semibold">Import From</label>
+                            <label for="selRefNbc" class="form-label fw-semibold">Ref. NBC.</label>
                             <div class="col-sm-9">
-                                <select name="if_import_tran" id="selImport" class="form-control">
-                                    <option value="" disabled selected>Import From</option>
-                                    <option value="1">Oversea</option>
-                                    <option value="2">Domestic</option>
+                                <select name="ir_ref_nbc" id="selRefNbc" class="form-control">
+                                    <option value="" disabled selected>please select</option>
+                                    <option value="1">NBC-1</option>
+                                    <option value="2">NBC-2</option>
                                 </select>
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
-                            <label for="inpPartNo" class="form-label fw-semibold">Part No.</label>
+                            <label for="inpProjectLife" class="form-label fw-semibold">Project Life</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpPartNo" name="if_part_no" placeholder="Part No.">
+                                <input type="text" class="form-control" id="inpProjectLife" name="ir_pro_life" placeholder="Project Life">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
-                            <label for="inpPartName" class="form-label fw-semibold">Part Name</label>
+                            <label for="inpSop" class="form-label fw-semibold">Program Timing Info. (SOP)</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpPartName" name="if_part_name" placeholder="Part Name">
+                                <input type="month" class="form-control" id="inpSop" name="ir_sop" placeholder="">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
-                            <label for="selRequirement" class="form-label fw-semibold">Requirement</label>
+                            <label for="inpFile" class="form-label fw-semibold">Attached Files</label>
                             <div class="col-sm-9">
-                                <select name="mrt_id" id="selRequirement" class="form-control">
-                                    <option value="" disabled selected>Choose Requirement</option>
-                                    <?php
-                                    $option_mrt = $this->ManageBackend->list_option("option/list_mrt");
-                                    foreach ($option_mrt as $op_mrt) {
-                                        echo '<option value="' . $op_mrt['mrt_id'] . '">' . $op_mrt['mrt_name'] . '</option>';
-                                    }
-                                    ?>
-                                </select>
+                                <input type="file" class="form-control" id="inpFile" name="ir_file[]" placeholder="Attached Files" multiple>
                                 <span class="form_error"></span>
                             </div>
                         </div>
-                        <input type="hidden" id="add_if_ref" name="if_ref">
-                        <span class="form_error"></span>
                     </div>
             </div>
+            <input type="hidden" id="add_ir_ref" name="ir_ref">
+            <span class="form_error"></span>
             <div class="modal-footer">
                 <button type="reset" class="btn bg-danger-subtle text-danger  waves-effect text-start" data-bs-dismiss="modal">
                     Close
                 </button>
-                <button type="button" class="btn btn-primary" id="btnSubmitRegister" type="submit" onclick="addFeasibility()">
+                <button type="button" class="btn btn-primary" id="btnSubmitRegister" type="submit" onclick="addRfq()">
                     Submit
                 </button>
             </div>
@@ -160,7 +149,8 @@
         </div>
     </div>
 </div>
-<!-- Modal for edit Feasibility -->
+
+<!-- Modal for edit RFQ -->
 <div class="modal fade" id="mdlEdits" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
@@ -378,8 +368,6 @@
                                     <span class="form_error"></span>
                                 </th>
                             </tr>
-
-
 
                             <tr>
                                 <th colspan="2"><label for="" class="form-label fw-semibold mt-2">Project Life </label></th>
@@ -641,14 +629,25 @@
                                             <th colspan="16">Closing Date</th>
                                         </tr>
                                         <tr>
-                                            <th colspan="16">04-01-2024</th>
+                                            <th colspan="16" id="ir_duedate"></th>
                                         </tr>
                                     </table>
                                 <td colspan="4"></td>
                             </tr>
 
-                            <tr height="50px"></tr>
+                            <tr height="20px"></tr>
 
+                            <tr class="text-center">
+                                <td colspan="2"></td>
+                                <td class="" colspan="3"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="1"></td>
+                                <td class="" colspan="3"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="2"></td>
+                                <td class="" colspan="3"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="1"></td>
+                                <td class="" colspan="3"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="2"></td>
+                            </tr>
 
                             <tr class="text-center">
                                 <td colspan="2"></td>
@@ -693,21 +692,55 @@
                     </table>
                     <input type="hidden" id="if_id" name="if_id">
             </div>
-            <div class="modal-footer">
-                <button type="button" onclick="previewPDF()" class="btn bg-info-subtle text-info waves-effect text-start">
-                    PDF
-                </button>
-                <button type="reset" onclick="return false;" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal" style="cursor:not-allowed">
+            <div class="modal-footer gap-1" id="btnFooter">
+
+                <!-- <button type="reset" onclick="return false;" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal" style="cursor:not-allowed">
                     Close
-                </button>
-                <button type="button" class="btn btn-primary" type="submit" onclick="return false;" style="cursor:not-allowed">
+                </button> -->
+                <!-- <button type="button" class="btn btn-primary" type="submit" onclick="return false;" style="cursor:not-allowed">
                     Submit
+                </button> -->
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for View RFQ File Group -->
+<div class="modal fade" id="mdlRfqFile" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center">
+                <h4 class="modal-title rfq-id" id="myLargeModalLabel">
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rfq_file" name="rfq_file">
+                    <table class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;" id="tblRfqFile">
+                        <thead class="fw-semibold">
+                            <tr>
+                                <th>No.</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="">
+
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal">
+                    Close
                 </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 <div class="modal" id="view_pdf_file">
     <div class="modal-dialog modal-xl mt-3 mb-0">
         <div class="modal-content">
@@ -747,7 +780,6 @@
 
             doc.addImage(imgData, 'PNG', pdfMargin, pdfMargin, pdfWidth - 2 * pdfMargin, pdfHeight - 2 * pdfMargin);
 
-
             // Create a Blob from the PDF and open it in a new tab
             const pdfBlob = doc.output('blob');
             const url = URL.createObjectURL(pdfBlob);
@@ -755,73 +787,161 @@
         });
     }
 
+    function modalRfqFile(id) {
+        event.preventDefault();
+        $('.rfq-id').html('<i class="ti ti-clipboard-text me-1" style="font-size: 25px;"></i>' + id);
+        if ($.fn.DataTable.isDataTable('#tblRfqFile')) {
+            $('#tblRfqFile').DataTable().destroy();
+        }
+        var dataTable = $('#tblRfqFile').DataTable({
+            ajax: {
+                url: API_URL + 'rfq/file/' + id,
+            },
+            autoWidth: false,
+            columnDefs: [{
+                    searchable: false,
+                    orderable: false,
+                    targets: 0,
+                },
+                {
 
+                    targets: 0,
+                    width: "10%",
+                },
+                {
+                    targets: 2,
+                    width: "15%",
+                }
+            ],
+            bSort: false,
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    className: 'text-center',
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return meta.row + 1;
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'sfu_file_name',
+                },
+                {
+                    className: 'text-center',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<a href="' + row.sfu_file_path + '" class="btn btn-link m-1" download>Dowload</a>';
+                        }
+                        return disp;
+                    }
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
+            let i = 1;
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
+                this.data(i++);
+            });
+        }).draw();
+    }
 
-    // async function addFeasibility() {
-    //     event.preventDefault();
-    //     let chk = await Feasibility_validate("add");
-    //     // console.log(chk);
-    //     if (chk) {
-    //         Swal.fire({
-    //             title: 'Are you sure?',
-    //             text: "You won't be able to revert this!",
-    //             icon: 'warning',
-    //             showCancelButton: true,
-    //             confirmButtonColor: '#3085d6',
-    //             cancelButtonColor: '#d33',
-    //             confirmButtonText: 'Yes'
-    //         }).then((result) => {
-    //             if (result.isConfirmed) {
-    //                 var add_form = {};
-    //                 $('#add_form').serializeArray().forEach(function(item) {
-    //                     if (item.name == 'if_import_tran' || item.name == 'mrt_id') {
-    //                         item.value = parseInt(item.value)
-    //                     }
-    //                     add_form[item.name] = item.value;
-    //                 })
-    //                 add_form["create_date"] = getTimeNow();
-    //                 add_form["if_duedate"] = getTimeNow().substring(0, 10) + " 11:59:59";
-    //                 add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+    async function addRfq() {
+        event.preventDefault();
+        let chk = await Rfq_validate("add");
+        // console.log("check =>", chk);
+        if (chk) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var add_form = {};
+                    $('#add_form').serializeArray().forEach(function(item) {
+                        if (item.name == 'ir_ref_nbc') {
+                            item.value = parseInt(item.value)
+                        }
+                        add_form[item.name] = item.value;
+                    })
+                    add_form["create_date"] = getTimeNow();
+                    add_form["ir_duedate"] = addDaysToDate(getTimeNow(), 7).substring(0, 10) + " 11:59:59";
+                    add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                    add_form["ir_status"] = 1;
 
-    //                 $.ajax({
-    //                     type: 'POST',
-    //                     dataType: 'json',
-    //                     contentType: 'application/json',
-    //                     url: API_URL + 'feasibility/insert',
-    //                     data: JSON.stringify(add_form),
-    //                     success: function(data) {
-    //                         if (data.Error != "null" || data.Error != "") {
-    //                             Swal.fire({
-    //                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Feasibility success!</p>",
-    //                                 icon: 'success',
-    //                                 showClass: {
-    //                                     popup: 'animate__animated animate__fadeInDown'
-    //                                 },
-    //                                 hideClass: {
-    //                                     popup: 'animate__animated animate__fadeOutUp'
-    //                                 }
-    //                             })
-    //                         } else {
-    //                             Swal.fire({
-    //                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Feasibility!</p>",
-    //                                 icon: 'error',
-    //                                 showClass: {
-    //                                     popup: 'animate__animated animate__fadeInDown'
-    //                                 },
-    //                                 hideClass: {
-    //                                     popup: 'animate__animated animate__fadeOutUp'
-    //                                 }
-    //                             })
-    //                         }
-    //                     },
-    //                     error: function(err) {
-    //                         console.log(err);
-    //                     }
-    //                 })
-    //             }
-    //         })
-    //     }
-    // }
+                    var formFile = new FormData();
+                    var files = document.getElementById('inpFile').files;
+                    for (var i = 0; i < files.length; i++) {
+                        formFile.append('ir_file[]', files[i]);
+                    }
+                    formFile.append('doc_no', add_form['ir_ref']);
+                    $.ajax({
+                        type: 'POST',
+                        url: "<?php echo base_url(); ?>FileControl/uploadFile",
+                        data: formFile,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            var data = JSON.parse(response);
+                            if (data.success == true) {
+                                $.ajax({
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    contentType: 'application/json',
+                                    url: API_URL + 'rfq/insert',
+                                    data: JSON.stringify(add_form),
+                                    success: function(data) {
+                                        if (data.Error != "null" || data.Error != "") {
+                                            Swal.fire({
+                                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add RFQ success!</p>",
+                                                icon: 'success',
+                                                showClass: {
+                                                    popup: 'animate__animated animate__fadeInDown'
+                                                },
+                                                hideClass: {
+                                                    popup: 'animate__animated animate__fadeOutUp'
+                                                }
+                                            })
+                                            $('#mdlRegister').modal('hide');
+                                        } else {
+                                            Swal.fire({
+                                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add RFQ!</p>",
+                                                icon: 'error',
+                                                showClass: {
+                                                    popup: 'animate__animated animate__fadeInDown'
+                                                },
+                                                hideClass: {
+                                                    popup: 'animate__animated animate__fadeOutUp'
+                                                }
+                                            })
+                                            $('#mdlRegister').modal('hide');
+                                        }
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.message,
+                                });
+                            }
+                        },
+                        error: function(err) {
+                            console.log(err);
+                        }
+                    })
+                }
+            })
+        }
+    }
 
     // async function editFeasibility() {
     //     event.preventDefault();
@@ -948,28 +1068,65 @@
     // }
 
     // // modal --------------------------------------
-    // function editModal(id) {
-    //     event.preventDefault();
-    //     $('#if_id').val(id);
-    //     $.ajax({
-    //         type: 'get',
-    //         url: API_URL + 'feasibility/' + id,
-    //         success: function(result) {
-    //             $('#editRef').val(result.if_ref);
-    //             $('#editDate').val(result.create_date.substring(0, 10));
-    //             $('#editDuedate').val(result.if_duedate.substring(0, 10));
-    //             $('#editCustomer').val(result.if_customer);
-    //             let importText = '<option value="" disabled selected>Import From</option>' +
-    //                 '<option value="1" ' + ((result.if_import_tran == 1) ? 'selected' : '') + '>Oversea</option>' +
-    //                 '<option value="2" ' + ((result.if_import_tran == 2) ? 'selected' : '') + '>Domestic</option>';
-    //             $('#editImportFrom').html(importText);
-    //             $('#editPartNo').val(result.if_part_no);
-    //             $('#editPartName').val(result.if_part_name);
-    //             listRequirement(result.mrt_id);
-    //             viewFeasibility(id);
-    //         }
-    //     })
-    // }
+    function editModal(id) {
+        event.preventDefault();
+
+        $('#ir_id').val(id);
+        $.ajax({
+            type: 'get',
+            url: API_URL + 'rfq/' + id,
+            success: function(result) {
+                // console.log(result);
+                // return;
+                $('#editRef').val(result.ir_ref);
+                $('#editDate').val(result.create_date.substring(0, 10));
+                // $('#editDuedate').val(result.ir_duedate.substring(0, 10));
+                $('#editCustomer').val(result.ir_customer);
+                $('#ir_duedate').text(result.ir_duedate.substring(0, 10));
+                // let importText = '<option value="" disabled selected>Import From</option>' +
+                //     '<option value="1" ' + ((result.if_import_tran == 1) ? 'selected' : '') + '>Oversea</option>' +
+                //     '<option value="2" ' + ((result.if_import_tran == 2) ? 'selected' : '') + '>Domestic</option>';
+                // $('#editImportFrom').html(importText);
+                // $('#editPartNo').val(result.if_part_no);
+                // $('#editPartName').val(result.if_part_name);
+                // listRequirement(result.mrt_id);
+                // viewFeasibility(id);
+            }
+        })
+
+        $.ajax({
+            type: 'get',
+            url: API_URL + 'rfq/getBtnRfq/' + '<?php echo $this->session->userdata('sessUsr') ?>',
+            success: async function(result) {
+                var html = `<button type="button" onclick="previewPDF()" class="btn bg-secondary-subtle text-secondary waves-effect text-start">PDF</button>`;
+                var data = result.data;
+                if (data != null) {
+                    for (let i = 0; i < data.length; i++) {
+                        html += await btnFormRfq(data[i].sat_name)
+                    }
+                    $('#btnFooter').html(html);
+                } else {
+                    $('#btnFooter').html(html);
+                }
+            }
+        })
+    }
+
+    async function btnFormRfq(sat_name) {
+        var btnText = ``;
+        if (sat_name == 'Issue') {
+            btnText += `<button type="button" class="btn bg-warning-subtle text-warning waves-effect" onclick="return false;">Issue</button>`
+        } else if (sat_name == 'Checked') {
+            btnText += `<button type="button" class="btn bg-info-subtle text-info waves-effect" onclick="return false;">Check</button>`
+        } else if (sat_name == 'Approve') {
+            btnText += `<button type="button" class="btn bg-danger-subtle text-danger waves-effect" onclick="return false;">Approve</button>`
+        } else if (sat_name == 'Authorize') {
+            btnText += ` <button type="button" class="btn bg-success-subtle text-success waves-effect" onclick="return false;">Authorize</button>`
+        } else {
+            btnText += ``;
+        }
+        return btnText;
+    }
 
     // function listRequirement(id) {
     //     $.ajax({
@@ -1107,126 +1264,106 @@
         $("#view_pdf_content").html(link_img);
     }
 
-    // $(document).ready(function() {
-    //     if ($.fn.DataTable.isDataTable('#tblFeasibility')) {
-    //         $('#tblFeasibility').DataTable().destroy();
-    //     }
-    //     var dataTable = $('#tblFeasibility').DataTable({
-    //         ajax: {
-    //             url: API_URL + 'feasibility/table'
-    //         },
-    //         columnDefs: [{
-    //             searchable: true,
-    //             orderable: false,
-    //             targets: 0,
-    //         }, ],
-    //         bSort: false,
-    //         order: [
-    //             [1, 'asc']
-    //         ],
-    //         columns: [{
-    //                 className: 'text-center',
-    //                 data: 'if_id'
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'if_customer',
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'if_part_no'
-    //             },
-    //             // {
-    //             //     className: 'text-center',
-    //             //     data:'if_import_tran',
-    //             //     "render": function (data, type, row){
-    //             //         if (type === 'display'){
-    //             //             if(row.if_import_tran == 1){
-    //             //                 disp = 'Oversea';
-    //             //             }else{
-    //             //                 disp = 'Domestic';
-    //             //             }
-    //             //         }
-    //             //         return disp;
-    //             //     }
-    //             // },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'update_date'
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'update_by',
-    //                 "render": function(data, type, row) {
-    //                     if (type === 'display') {
-    //                         if (row.update_by != "") {
-    //                             let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + row.update_by + '.jpg';
-    //                             if (!is_cached(img_ok)) {
-    //                                 img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
-    //                             }
-    //                             disp = '<div class="d-flex align-items-center">' +
-    //                                 '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
-    //                                 '<div class="ms-3">' +
-    //                                 '<div class="user-meta-info">' +
-    //                                 '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
-    //                                 '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
-    //                                 '</div></div></div>';
-    //                         } else {
-    //                             disp = "";
-    //                         }
-    //                     }
-    //                     return disp;
-    //                 },
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'if_id',
-    //                 "render": function(data, type, row) {
-    //                     if (type === 'display') {
-    //                         if (row.if_status) {
-    //                             disp = '<a onclick="change_status(' + row.if_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-    //                         } else {
-    //                             disp = '<a onclick="change_status(' + row.if_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
-    //                         }
-    //                     }
-    //                     return disp;
-    //                 }
-    //             },
-    //             {
-    //                 className: 'text-center',
-    //                 data: 'if_id',
-    //                 "render": function(data, type, row) {
-    //                     if (type === 'display') {
-    //                         disp = '<button type="button" onclick="editModal(\'' + row.if_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
-    //                             '<i class="ti ti-pencil me-1"></i> Edit </button>';
-    //                     }
-    //                     return disp;
-    //                 }
-    //             }
-    //         ]
-    //     });
-    //     dataTable.on('order.dt search.dt', function() {
-    //         let i = 1;
-    //         dataTable.cells(null, 0, {
-    //             search: 'applied',
-    //             order: 'applied'
-    //         }).every(function(cell) {
-    //             this.data(i++);
-    //         });
-    //     }).draw();
-    //     setInterval(function() {
-    //         dataTable.ajax.reload(null, false);
-    //     }, 600000);
+    $(document).ready(function() {
 
-    //     // $('#reqCheck').on('change', function() {
-    //     //     if ($(this).is(':checked')) {
-    //     //         $('#editRequirement').val('');
-    //     //         $('#editRequirement').attr('disabled', true);
-    //     //     } else {
-    //     //         $('#editRequirement').attr('disabled', false);
-    //     //     }
-    //     // });
+        if ($.fn.DataTable.isDataTable('#tblRFQ')) {
+            $('#tblRFQ').DataTable().destroy();
+        }
+        var dataTable = $('#tblRFQ').DataTable({
+            ajax: {
+                url: API_URL + 'rfq/table'
+            },
+            columnDefs: [{
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
+            scrollX: true,
+            bSort: false,
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    className: 'text-center',
+                    data: 'ir_ref'
+                },
+                {
+                    className: 'text-center',
+                    data: 'ir_ref',
+                },
+                {
+                    className: 'text-center',
+                    data: 'ir_customer',
+                },
+                {
+                    className: 'text-center',
+                    data: 'ir_pro_life',
+                },
+                {
+                    className: 'text-center',
+                    data: 'ir_sop'
+                },
+                {
+                    className: 'text-center',
+                    data: 'create_date',
+                },
+                {
+                    className: 'text-center',
+                    data: 'ir_duedate',
+                },
+                {
+                    className: 'text-center',
+                    data: 'create_by',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.create_by != "") {
+                                let emp_code = row.create_by.substring(2, 7);
+                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
+                                disp = '<div class="d-flex align-items-center justify-content-center">' +
+                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+                                    '<div class="ms-3">' +
+                                    '<div class="user-meta-info">' +
+                                    '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
+                                    '<span class="user-work fs-3" data-occupation="' + row.create_by + '">' + row.create_by + '</span>' +
+                                    '</div></div></div>';
+                            } else {
+                                disp = "";
+                            }
+                        }
+                        return disp;
+                    },
+                },
+                {
+                    className: 'text-center',
+                    data: 'if_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<div class="d-flex justify-content-around gap-1">' +
 
+                                '<button ype="button" onclick="modalRfqFile(\'' + row.ir_ref + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlRfqFile"> <i class="ti ti-file-search fs-6"></i></button>' +
 
-    // });
+                                '<button type="button" onclick="editModal(\'' + row.ir_ref + '\')" class="btn bg-primary-subtle waves-effect text-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
+                                '<i class="ti ti-pencil fs-6"></i></button>' +
+
+                                '</div>';
+                        }
+                        return disp;
+                    }
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
+            let i = 1;
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
+                this.data(i++);
+            });
+        }).draw();
+        setInterval(function() {
+            dataTable.ajax.reload(null, false);
+        }, 600000);
+
+    });
 </script>

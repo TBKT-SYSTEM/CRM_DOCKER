@@ -46,10 +46,10 @@
                                             <select class="form-control" id="selWorkflowGroup">
                                                 <option value="" selected disabled>Choose Workflow group</option>
                                                 <?php
-                                                    $option_swg = $this->ManageBackend->list_option("option/list_swg");
-                                                    foreach($option_swg as $op_swg){
-                                                        echo '<option value="'.$op_swg['swg_id'].'">'.$op_swg['swg_name'].'</option>';
-                                                    }
+                                                $option_swg = $this->ManageBackend->list_option("option/list_swg");
+                                                foreach ($option_swg as $op_swg) {
+                                                    echo '<option value="' . $op_swg['swg_id'] . '">' . $op_swg['swg_name'] . '</option>';
+                                                }
                                                 ?>
                                             </select>
                                             <span class="form_error"></span>
@@ -79,15 +79,15 @@
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="mb-3 row align-items-center">
-                                                    <label for="selUser" class="form-label fw-semibold col-sm-3 col-form-label">User</label>
+                                                    <label for="selUser" class="form-label fw-semibold col-sm-1 col-form-label">User</label>
                                                     <div class="col-sm-8">
                                                         <select class="form-control" id="selUser">
                                                             <option value="" selected disabled>Choose user</option>
                                                             <?php
-                                                                $option_user = $this->ManageBackend->list_option("option/list_user");
-                                                                foreach($option_user as $op_user){
-                                                                    echo '<option value="'.$op_user['su_id'].'">'.$op_user['su_fname'].' '.$op_user['su_lname'].' ('.$op_user['sd_name'].')</option>';
-                                                                }
+                                                            $option_user = $this->ManageBackend->list_option("option/list_user");
+                                                            foreach ($option_user as $op_user) {
+                                                                echo '<option value="' . $op_user['su_id'] . '">' . $op_user['su_fname'] . ' ' . $op_user['su_lname'] . ' (' . $op_user['sd_name'] . ')</option>';
+                                                            }
                                                             ?>
                                                         </select>
                                                         <span class="form_error"></span>
@@ -101,10 +101,10 @@
                                                         <select class="form-control" id="selApproveType">
                                                             <option value="" selected disabled>Choose approve type</option>
                                                             <?php
-                                                                $option_user = $this->ManageBackend->list_option("option/list_approve_type");
-                                                                foreach($option_user as $op_user){
-                                                                    echo '<option value="'.$op_user['sat_id'].'">'.$op_user['sat_name'].'</option>';
-                                                                }
+                                                            $option_user = $this->ManageBackend->list_option("option/list_approve_type");
+                                                            foreach ($option_user as $op_user) {
+                                                                echo '<option value="' . $op_user['sat_id'] . '">' . $op_user['sat_name'] . '</option>';
+                                                            }
                                                             ?>
                                                         </select>
                                                         <span class="form_error"></span>
@@ -179,9 +179,9 @@
                                                             <select class="form-control" id="inpMaxLv">
                                                                 <option value="" selected disabled>Choose Max Level of approval</option>
                                                                 <?php
-                                                                    for($i=1;$i<=10;$i++){
-                                                                        echo '<option value="'.$i.'">'.$i.'</option>';
-                                                                    }
+                                                                for ($i = 1; $i <= 10; $i++) {
+                                                                    echo '<option value="' . $i . '">' . $i . '</option>';
+                                                                }
                                                                 ?>
                                                             </select>
                                                             <span class="form_error"></span>
@@ -213,8 +213,8 @@
                                                             <th>No.</th>
                                                             <th>Workflow Group</th>
                                                             <th>Max Level</th>
-                                                            <th>Updated Date</th>
-                                                            <th>Updated By</th>
+                                                            <th>Create Date</th>
+                                                            <th>Create By</th>
                                                             <th>Status</th>
                                                             <th>Action</th>
                                                         </tr>
@@ -331,11 +331,11 @@
     </div>
 </div>
 <script>
-    async function addWorkflowGroup(){
-		event.preventDefault();
+    async function addWorkflowGroup() {
+        event.preventDefault();
         let chk = await swg_validate("add");
         // console.log(chk);
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -356,11 +356,11 @@
                         type: 'POST',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'workflow_group/insert',
+                        url: API_URL + 'workflow_group/insert',
                         data: JSON.stringify(add_form),
-                        success: function(data){
+                        success: function(data) {
                             // console.log(data);
-                            if(data!=false){
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Workflow group success!</p>",
                                     icon: 'success',
@@ -371,7 +371,7 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 })
-                            }else{
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Workflow group!</p>",
                                     icon: 'error',
@@ -384,17 +384,19 @@
                                 })
                             }
                         },
-                        error: function(err){console.log(err);}
+                        error: function(err) {
+                            console.log(err);
+                        }
                     })
                 }
             })
 
         }
-	}
-    async function editWorkflowGroup(){
-		event.preventDefault();
+    }
+    async function editWorkflowGroup() {
+        event.preventDefault();
         let chk = await swg_validate("edit");
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -407,22 +409,22 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#edit_formWorkflowGroup').serializeArray().forEach(function(item) {
-                        if(item.name == 'swg_id' || item.name == 'swg_max_lv'){
+                        if (item.name == 'swg_id' || item.name == 'swg_max_lv') {
                             item.value = parseInt(item.value)
                         }
                         edit_form[item.name] = item.value;
                     })
                     edit_form["update_date"] = getTimeNow();
                     edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-    
+
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'workflow_group/update',
+                        url: API_URL + 'workflow_group/update',
                         data: JSON.stringify(edit_form),
-                        success: function(data){
-                            if(data!=false){
+                        success: function(data) {
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Workflow group success!</p>",
                                     icon: 'success',
@@ -430,7 +432,7 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 })
-                            }else{
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Workflow group!</p>",
                                     icon: 'error',
@@ -440,13 +442,16 @@
                                 })
                             }
                         },
-                        error: function(err){console.log(err)}
+                        error: function(err) {
+                            console.log(err)
+                        }
                     })
                 }
             })
         }
-	}
-    function change_swg_status(id,status){
+    }
+
+    function change_swg_status(id, status) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -462,13 +467,13 @@
                 status_form["swg_status"] = status;
                 $.ajax({
                     type: 'PUT',
-					dataType: 'json',
+                    dataType: 'json',
                     contentType: 'application/json',
-                    url: API_URL+'workflow_group/change_status',
+                    url: API_URL + 'workflow_group/change_status',
                     data: JSON.stringify(status_form),
-                    success: function(data){
+                    success: function(data) {
                         // console.log(data);
-                        if(data!=false){
+                        if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status Workflow group success!</p>",
                                 icon: 'success',
@@ -479,7 +484,7 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
-                        }else{
+                        } else {
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status Workflow group!</p>",
                                 icon: 'error',
@@ -492,15 +497,17 @@
                             })
                         }
                     },
-                    error: function(err){console.log(err);}
+                    error: function(err) {
+                        console.log(err);
+                    }
                 })
             }
         })
     }
-    async function addWorkflowDetail(){
-		event.preventDefault();
+    async function addWorkflowDetail() {
+        event.preventDefault();
         let chk = await swd_validate("add");
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -523,11 +530,11 @@
                         type: 'POST',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'workflow_detail/insert',
+                        url: API_URL + 'workflow_detail/insert',
                         data: JSON.stringify(add_form),
-                        success: function(data){
+                        success: function(data) {
                             // console.log(data);
-                            if(data!=false){
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Workflow detail success!</p>",
                                     icon: 'success',
@@ -538,7 +545,7 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 })
-                            }else{
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Workflow detail!</p>",
                                     icon: 'error',
@@ -551,17 +558,19 @@
                                 })
                             }
                         },
-                        error: function(err){console.log(err);}
+                        error: function(err) {
+                            console.log(err);
+                        }
                     })
                 }
             })
 
         }
-	}
-    async function editWorkflowDetail(){
-		event.preventDefault();
+    }
+    async function editWorkflowDetail() {
+        event.preventDefault();
         let chk = await swd_validate("edit");
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -574,7 +583,7 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#frmEditWorkflow').serializeArray().forEach(function(item) {
-                        if(item.name == 'swd_id' || item.name == 'swd_app_lv' || item.name == 'su_id' || item.name == 'sat_id'){
+                        if (item.name == 'swd_id' || item.name == 'swd_app_lv' || item.name == 'su_id' || item.name == 'sat_id') {
                             item.value = parseInt(item.value)
                         }
                         edit_form[item.name] = item.value;
@@ -582,15 +591,15 @@
                     edit_form["swg_id"] = parseInt($("#selWorkflowGroup").val());
                     edit_form["update_date"] = getTimeNow();
                     edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-    
+
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'workflow_detail/update',
+                        url: API_URL + 'workflow_detail/update',
                         data: JSON.stringify(edit_form),
-                        success: function(data){
-                            if(data!=false){
+                        success: function(data) {
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Workflow detail success!</p>",
                                     icon: 'success',
@@ -598,7 +607,7 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 })
-                            }else{
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Workflow detail!</p>",
                                     icon: 'error',
@@ -608,13 +617,16 @@
                                 })
                             }
                         },
-                        error: function(err){console.log(err)}
+                        error: function(err) {
+                            console.log(err)
+                        }
                     })
                 }
             })
         }
-	}
-    function change_swd_status(id,status){
+    }
+
+    function change_swd_status(id, status) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -630,13 +642,13 @@
                 status_form["swd_status"] = status;
                 $.ajax({
                     type: 'PUT',
-					dataType: 'json',
+                    dataType: 'json',
                     contentType: 'application/json',
-                    url: API_URL+'workflow_detail/change_status',
+                    url: API_URL + 'workflow_detail/change_status',
                     data: JSON.stringify(status_form),
-                    success: function(data){
+                    success: function(data) {
                         // console.log(data);
-                        if(data!=false){
+                        if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status Workflow detail success!</p>",
                                 icon: 'success',
@@ -647,7 +659,7 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
-                        }else{
+                        } else {
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status Workflow detail!</p>",
                                 icon: 'error',
@@ -660,86 +672,101 @@
                             })
                         }
                     },
-                    error: function(err){console.log(err);}
+                    error: function(err) {
+                        console.log(err);
+                    }
                 })
             }
         })
     }
-// modal --------------------------------------
-	function editModal(name,id,swg_max_lv){
-		event.preventDefault();
-		$('#edtWorkflowGroup').val(name);
-		$('#edtWorkflowGroupId').val(id);
+    // modal --------------------------------------
+    function editModal(name, id, swg_max_lv) {
+        event.preventDefault();
+        $('#edtWorkflowGroup').val(name);
+        $('#edtWorkflowGroupId').val(id);
         let maxText = '<option value="" selected disabled>Choose Max Level of approval</option>';
-        for(let i=1;i<=10;i++){
+        for (let i = 1; i <= 10; i++) {
             let sel = "";
-            if(sel == swg_max_lv){sel = "selected";}
-            maxText += '<option value="'+i+'" '+sel+'>'+i+'</option>';
+            if (sel == swg_max_lv) {
+                sel = "selected";
+            }
+            maxText += '<option value="' + i + '" ' + sel + '>' + i + '</option>';
         }
-		$('#edtMaxLv').html(maxText);
-	}
-    function editDetailModal(app_lv,su_id,sat_id,id){
-		event.preventDefault();
-		$('#WorkflowDetail_id').val(id);
+        $('#edtMaxLv').html(maxText);
+    }
+
+    function editDetailModal(app_lv, su_id, sat_id, id) {
+        event.preventDefault();
+        $('#WorkflowDetail_id').val(id);
         editMaxLevel(app_lv);
         editUserOption(su_id);
         editAppTypeOption(sat_id);
-	}
-    function editUserOption(id){
+    }
+
+    function editUserOption(id) {
         $.ajax({
             type: 'get',
-            url: API_URL+'option/list_user',
-            success: function (result){
+            url: API_URL + 'option/list_user',
+            success: function(result) {
                 var option_text = '<option value="" selected disabled>Choose user</option>';
-                $.each(result, function (key, value){
+                $.each(result, function(key, value) {
                     let sel = "";
-                    if(value.su_id == id){sel = "selected";}
-                    option_text += '<option value="'+value.su_id+'" '+sel+'>'+value.su_fname+' '+value.su_lname+'</option>';
+                    if (value.su_id == id) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + value.su_id + '" ' + sel + '>' + value.su_fname + ' ' + value.su_lname + '</option>';
                 })
                 $('#editUser').html(option_text);
             }
         })
     }
-    function editAppTypeOption(id){
+
+    function editAppTypeOption(id) {
         $.ajax({
             type: 'get',
-            url: API_URL+'option/list_approve_type',
-            success: function (result){
+            url: API_URL + 'option/list_approve_type',
+            success: function(result) {
                 var option_text = '<option value="" selected disabled>Choose Approve Type</option>';
-                $.each(result, function (key, value){
+                $.each(result, function(key, value) {
                     let sel = "";
-                    if(value.sat_id == id){sel = "selected";}
-                    option_text += '<option value="'+value.sat_id+'" '+sel+'>'+value.sat_name+'</option>';
+                    if (value.sat_id == id) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + value.sat_id + '" ' + sel + '>' + value.sat_name + '</option>';
                 })
                 $('#editApproveType').html(option_text);
             }
         })
     }
-    function editMaxLevel(app_lv){
+
+    function editMaxLevel(app_lv) {
         var swg_id = document.getElementById("selWorkflowGroup").value;
         $.ajax({
             type: 'get',
-            url: API_URL+'workflow_group/'+swg_id,
-            success: function (result){
+            url: API_URL + 'workflow_group/' + swg_id,
+            success: function(result) {
                 console.log(swg_id)
                 var option_text = '<option value="" selected disabled>Choose approve level</option>';
-                for(let i = 1;i<=result.swg_max_lv;i++){
+                for (let i = 1; i <= result.swg_max_lv; i++) {
                     let sel = "";
-                    if(app_lv == i){sel = "selected";}
-                    option_text += '<option value="'+i+'" '+sel+'>Approve Lv.'+i+'</option>';
+                    if (app_lv == i) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + i + '" ' + sel + '>Approve Lv.' + i + '</option>';
                 }
                 $('#editAppLv').html(option_text);
             }
         })
     }
-    function getMaxLevel(swg_id){
+
+    function getMaxLevel(swg_id) {
         $.ajax({
             type: 'get',
-            url: API_URL+'workflow_group/'+swg_id,
-            success: function (result){
+            url: API_URL + 'workflow_group/' + swg_id,
+            success: function(result) {
                 var option_text = '<option value="" selected disabled>Choose approve level</option>';
-                for(let i = 1;i<=result.swg_max_lv;i++){
-                    option_text += '<option value="'+i+'">Approve Lv.'+i+'</option>';
+                for (let i = 1; i <= result.swg_max_lv; i++) {
+                    option_text += '<option value="' + i + '">Approve Lv.' + i + '</option>';
                 }
                 $('#selAppLv').html(option_text);
             }
@@ -748,167 +775,163 @@
     $('#selWorkflowGroup').on('change', function() {
         // alert( this.value );
         getMaxLevel(this.value);
-        if ( $.fn.DataTable.isDataTable('#tblWorkflowDetail') ) {
+        if ($.fn.DataTable.isDataTable('#tblWorkflowDetail')) {
             $('#tblWorkflowDetail').DataTable().destroy();
             $('#tblWorkflowDetail').empty();
         }
-		var detailTable = $('#tblWorkflowDetail').DataTable({
-			ajax: {
-				url: API_URL+'workflow_detail/table/'+this.value
-			},
+        var detailTable = $('#tblWorkflowDetail').DataTable({
+            ajax: {
+                url: API_URL + 'workflow_detail/table/' + this.value
+            },
             columnDefs: [{
-					searchable: true,
-					orderable: false,
-					targets: 0,
-				},
-			],
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
             bSort: false,
-			order: [[1, 'asc']],
-			columns: [{
-                    title:'No.',
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    title: 'No.',
                     className: 'text-center',
-                    data:'swd_id'
+                    data: 'swd_id'
                 },
                 {
-                    title:'Approve Level',
+                    title: 'Approve Level',
                     className: 'text-center',
-                    data:'swd_app_lv'
+                    data: 'swd_app_lv'
                 },
                 {
-                    title:'Approve By',
+                    title: 'Approve By',
                     className: 'text-center',
-                    data:'fullname'
+                    data: 'fullname'
                 },
                 {
-                    title:'Approve Type',
+                    title: 'Approve Type',
                     className: 'text-center',
-                    data:'sat_name'
+                    data: 'sat_name'
                 },
                 {
-                    title:'Updated Date',
+                    title: 'Create Date',
                     className: 'text-center',
-                    data:'update_date'
+                    data: 'create_date'
                 },
                 {
-                    title:'Updated By',
+                    title: 'Create By',
                     className: 'text-center',
-                    data:'update_by',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.update_by!=""){
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/'+row.update_by+'.jpg';
-                                if(!is_cached(img_ok)){img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';}
-                                disp = '<div class="d-flex align-items-center">'+
-                                    '<img src="'+img_ok+'" alt="avatar" class="rounded-circle avatar" width="35">'+
-                                    '<div class="ms-3">'+
-                                        '<div class="user-meta-info">'+
-                                            '<h6 class="user-name mb-0" data-name="'+row.su_fname+' '+row.su_lname+'">'+row.su_fname+'</h6>'+
-                                            '<span class="user-work fs-3" data-occupation="'+row.update_by+'">'+row.update_by+'</span>'+
-                                '</div></div></div>';
-                            }else{disp="";}
-                        }
-                        return disp;
-                    },
-                },
-                {
-                    title:'Status',
-                    className: 'text-center',
-                    data:'swd_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.swd_status){
-                                disp = '<a onclick="change_swd_status('+row.swd_id+',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            }else{
-                                disp = '<a onclick="change_swd_status('+row.swd_id+',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                    data: 'create_by',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.create_by != "") {
+                                let emp_code = row.create_by.substring(2, 7);
+                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
+                                disp = '<div class="d-flex align-items-center justify-content-center">' +
+                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+                                    '<div class="ms-3">' +
+                                    '<div class="user-meta-info">' +
+                                    '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
+                                    '<span class="user-work fs-3" data-occupation="' + row.create_by + '">' + row.create_by + '</span>' +
+                                    '</div></div></div>';
+                            } else {
+                                disp = "";
                             }
                         }
                         return disp;
                     },
                 },
                 {
-                    title:'Action',
+                    title: 'Status',
                     className: 'text-center',
-                    data:'swd_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            disp = '<button type="button" onclick="editDetailModal(\''+row.swd_app_lv+'\',\''+row.su_id+'\',\''+row.sat_id+'\',\''+row.swd_id+'\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditWorkflowDetail">'+
+                    data: 'swd_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.swd_status) {
+                                disp = '<a onclick="change_swd_status(' + row.swd_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+                            } else {
+                                disp = '<a onclick="change_swd_status(' + row.swd_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                            }
+                        }
+                        return disp;
+                    },
+                },
+                {
+                    title: 'Action',
+                    className: 'text-center',
+                    data: 'swd_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<button type="button" onclick="editDetailModal(\'' + row.swd_app_lv + '\',\'' + row.su_id + '\',\'' + row.sat_id + '\',\'' + row.swd_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditWorkflowDetail">' +
                                 '<i class="ti ti-pencil me-1"></i>Edit</button>';
                         }
                         return disp;
                     }
-            }]
-		});
-        detailTable.on('order.dt search.dt', function () {
+                }
+            ]
+        });
+        detailTable.on('order.dt search.dt', function() {
             let i = 1;
-            detailTable.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
+            detailTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
                 this.data(i++);
             });
         }).draw();
-        setInterval(function (){
-            detailTable.ajax.reload( null, false );
-        }, 1000 );
+        setInterval(function() {
+            detailTable.ajax.reload(null, false);
+        }, 60000);
     });
-    $(document).ready(function (){
-        if ( $.fn.DataTable.isDataTable('#tblWorkflowGroup') ) {
+    $(document).ready(function() {
+        if ($.fn.DataTable.isDataTable('#tblWorkflowGroup')) {
             $('#tblWorkflowGroup').DataTable().destroy();
         }
-		var dataTable = $('#tblWorkflowGroup').DataTable({
-			ajax: {
-				url: API_URL+'workflow_group/table'
-			},
+        var dataTable = $('#tblWorkflowGroup').DataTable({
+            ajax: {
+                url: API_URL + 'workflow_group/table'
+            },
             columnDefs: [{
-					searchable: true,
-					orderable: false,
-					targets: 0,
-				},
-			],
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
             bSort: false,
-			order: [[1, 'asc']],
-			columns: [{
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
                     className: 'text-center',
-                    data:'swg_id'
+                    data: 'swg_id'
                 },
                 {
                     className: 'text-center',
-                    data:'swg_name'
+                    data: 'swg_name'
                 },
                 {
                     className: 'text-center',
-                    data:'swg_max_lv'
+                    data: 'swg_max_lv'
                 },
                 {
                     className: 'text-center',
-                    data:'update_date'
+                    data: 'create_date'
                 },
                 {
                     className: 'text-center',
-                    data:'update_by',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.update_by!=""){
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/'+row.update_by+'.jpg';
-                                if(!is_cached(img_ok)){img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';}
-                                disp = '<div class="d-flex align-items-center">'+
-                                    '<img src="'+img_ok+'" alt="avatar" class="rounded-circle avatar" width="35">'+
-                                    '<div class="ms-3">'+
-                                        '<div class="user-meta-info">'+
-                                            '<h6 class="user-name mb-0" data-name="'+row.su_fname+' '+row.su_lname+'">'+row.su_fname+'</h6>'+
-                                            '<span class="user-work fs-3" data-occupation="'+row.update_by+'">'+row.update_by+'</span>'+
-                                '</div></div></div>';
-                            }else{disp="";}
-                        }
-                        return disp;
-                    },
-                },
-                {
-                    className: 'text-center',
-                    data:'swg_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.swg_status){
-                                disp = '<a onclick="change_swg_status('+row.swg_id+',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            }else{
-                                disp = '<a onclick="change_swg_status('+row.swg_id+',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                    data: 'create_by',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.create_by != "") {
+                                let emp_code = row.create_by.substring(2, 7);
+                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
+                                disp = '<div class="d-flex align-items-center justify-content-center">' +
+                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+                                    '<div class="ms-3">' +
+                                    '<div class="user-meta-info">' +
+                                    '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
+                                    '<span class="user-work fs-3" data-occupation="' + row.create_by + '">' + row.create_by + '</span>' +
+                                    '</div></div></div>';
+                            } else {
+                                disp = "";
                             }
                         }
                         return disp;
@@ -916,25 +939,43 @@
                 },
                 {
                     className: 'text-center',
-                    data:'swg_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            disp = '<button type="button" onclick="editModal(\''+row.swg_name+'\',\''+row.swg_id+'\',\''+row.swg_max_lv+'\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditWorkflowGroup">'+
+                    data: 'swg_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.swg_status) {
+                                disp = '<a onclick="change_swg_status(' + row.swg_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+                            } else {
+                                disp = '<a onclick="change_swg_status(' + row.swg_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                            }
+                        }
+                        return disp;
+                    },
+                },
+                {
+                    className: 'text-center',
+                    data: 'swg_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<button type="button" onclick="editModal(\'' + row.swg_name + '\',\'' + row.swg_id + '\',\'' + row.swg_max_lv + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditWorkflowGroup">' +
                                 '<i class="ti ti-pencil me-1"></i>Edit</button>';
                         }
                         return disp;
                     }
-            }]
-		});
-        dataTable.on('order.dt search.dt', function () {
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
             let i = 1;
-            dataTable.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
                 this.data(i++);
             });
         }).draw();
 
-		setInterval(function (){
-			dataTable.ajax.reload( null, false );
-		}, 1000 );
-	});
+        setInterval(function() {
+            dataTable.ajax.reload(null, false);
+        }, 50000);
+    });
 </script>

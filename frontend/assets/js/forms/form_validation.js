@@ -25,6 +25,15 @@ function getTimeNow() {
     let formattedDate = year + '/' + month + '/' + day + ' ' + hour + ':' + min + ':' + sec
     return formattedDate
 }
+function addDaysToDate(date, days) {
+    let result = new Date(date);
+    result.setDate(result.getDate() + days);
+    let year = result.getFullYear();
+    let month = String(result.getMonth() + 1).padStart(2, '0');
+    let day = String(result.getDate()).padStart(2, '0');
+
+    return `${year}/${month}/${day}`;
+}
 function getTwoDigitYear() {
     const currentTime = new Date();
     let year = currentTime.getFullYear().toString()
@@ -36,7 +45,6 @@ async function getLastId(url) {
             type: 'GET',
             url: url,
         });
-        // console.log("🚀 ~ getLastId ~ result:", result)
         return result;
     } catch (err) {
         console.log(err);
@@ -620,23 +628,25 @@ async function swd_validate(formType) {
                     return false;
                 } else {
                     form_ok(appType);
-                    unique_data = {
-                        "swd_app_lv": parseInt(appLv.value),
-                        "swg_id": parseInt(swg_id.value),
-                        "swd_id": id
-                    }
-                    try {
-                        var chk_unique = await is_unique(unique_data, url);
-                        if (chk_unique) {
-                            form_err(appLv, "*approve level is Duplicate");
-                            return false;
-                        } else {
-                            form_ok(appLv);
-                            return true;
-                        }
-                    } catch (err) {
-                        console.log(err); // Handle error
-                    }
+                    // unique_data = {
+                    //     "swd_app_lv": parseInt(appLv.value),
+                    //     "swg_id": parseInt(swg_id.value),
+                    //     "swd_id": id
+                    // }
+                    // try {
+                    //     var chk_unique = await is_unique(unique_data, url);
+                    //     if (chk_unique) {
+                    //         form_err(appLv, "*approve level is Duplicate");
+                    //         return false;
+                    //     } else {
+                    //         form_ok(appLv);
+                    //         return true;
+                    //     }
+                    // } catch (err) {
+                    //     console.log(err); // Handle error
+                    // }
+                    form_ok(appLv);
+                    return true;
                 }
             }
         }
@@ -887,6 +897,120 @@ async function Feasibility_validate(formType) {
                     } else {
                         form_ok(duedate);
                         return true;
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+async function Rfq_validate(formType) {
+    var ir_customer, ir_ref_nbc, ir_pro_life, ir_sop, refcon, ir_ref, id, url;
+    var fileInput = document.getElementById('inpFile');
+    var files = fileInput.files;
+
+    url = API_URL + "rfq/last_id";
+    ir_ref = "RFQ-SM-" + getTwoDigitYear() + "-";
+    if (formType == "add") {
+        ir_customer = document.add_form.ir_customer
+        ir_ref_nbc = document.add_form.ir_ref_nbc
+        ir_pro_life = document.add_form.ir_pro_life
+        ir_sop = document.add_form.ir_sop
+        ir_file1 = document.add_form.ir_file
+        refcon = document.getElementById('add_ir_ref')
+        id = 0
+    } else {
+        if_customer = document.edit_form.if_customer
+        if_import_tran = document.edit_form.if_import_tran
+        if_part_no = document.edit_form.if_part_no
+        if_part_name = document.edit_form.if_part_name
+        mrt_id = document.edit_form.mrt_id
+        let getid = document.edit_form.if_id
+        id = parseInt(getid.value)
+    }
+
+    if (is_empty(ir_customer.value)) {
+        form_err(ir_customer, "*Please Enter Customer");
+        $('#navpill-111').addClass('active show');
+        $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
+        $('#navpill-222').removeClass('active show');
+        $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
+        return false;
+    } else {
+        form_ok(ir_customer);
+        if (is_empty(ir_ref_nbc.value)) {
+            form_err(ir_ref_nbc, "*Please Enter Ref. NBC.");
+            $('#navpill-111').addClass('active show');
+            $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
+            $('#navpill-222').removeClass('active show');
+            $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
+            return false;
+        } else {
+            form_ok(ir_ref_nbc);
+            if (is_empty(ir_pro_life.value)) {
+                form_err(ir_pro_life, "*Please Enter Project Life");
+                $('#navpill-111').addClass('active show');
+                $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
+                $('#navpill-222').removeClass('active show');
+                $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
+                return false;
+            } else {
+                form_ok(ir_pro_life);
+                if (is_empty(ir_sop.value)) {
+                    form_err(ir_sop, "*Please Enter Program Timing Info. (SOP)");
+                    $('#navpill-111').removeClass('active show');
+                    $('a[href="#navpill-111"]').removeClass('active').attr('aria-selected', 'false');
+                    $('#navpill-222').addClass('active show');
+                    $('a[href="#navpill-222"]').addClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
+                    return false;
+                } else {
+                    form_ok(ir_sop);
+                    if (files.length == 0) {
+                        form_err(fileInput, "*Please Upload File");
+                        return false;
+                    } else {
+                        form_ok(fileInput);
+                        var fileArr = [];
+                        for (var i = 0; i < files.length; i++) {
+                            fileArr.push(files[i].name);
+                        }
+                        if (formType == "add") {
+                            try {
+                                var last_id = await getLastId(url);
+                                if (typeof last_id['last_id'] != "number") {
+                                    form_err(refcon, "*Error generate reference no.");
+                                    return false;
+                                } else {
+                                    form_ok(refcon);
+                                    if (++last_id['last_id'] < 10) {
+                                        if (last_id['last_id'] == 0) {
+                                            ir_ref += "001";
+                                        } else {
+                                            ir_ref += "00" + last_id['last_id'];
+                                        }
+                                    } else if (last_id['last_id'] < 100) {
+                                        ir_ref += "0" + last_id['last_id'];
+                                    } else {
+                                        ir_ref += last_id['last_id'];
+                                    }
+                                    refcon.value = ir_ref;
+                                    // console.log("ir_ref: " + ir_ref);
+                                    return true, fileArr;
+                                }
+                            } catch (err) {
+                                console.log(err); // Handle error
+                            }
+                        } else {
+                            var duedate = document.edit_form.if_duedate;
+                            if (is_empty(duedate.value)) {
+                                form_err(duedate, "*Please Enter Due date");
+                                return false;
+                            } else {
+                                form_ok(duedate);
+                                return true;
+                            }
+                        }
                     }
                 }
 

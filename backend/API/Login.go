@@ -110,11 +110,13 @@ func Login(c *gin.Context) {
 			userPlant = 2
 		}
 
-		if accountsExp[0].SEC_CD == "" {
-			strDept = "12"
-		} else {
-			strDept = accountsExp[0].SEC_CD
-		}
+		// if accountsExp[0].SEC_CD == "" {
+		// 	strDept = "12"
+		// } else {
+		// 	strDept = accountsExp[0].SEC_CD
+		// }
+
+		strDept = "12"
 
 		deptID, errDept := strconv.Atoi(strDept)
 		if errDept != nil {

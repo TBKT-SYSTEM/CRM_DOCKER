@@ -283,19 +283,19 @@
                             <tr>
                                 <td></td>
                                 <td class="full-border text-center" style="background-color: LightGreen;">Green</td>
-                                <td class="full-border chk_score" id="chk_green"></td>
+                                <td class="full-border text-center chk_score" id="chk_green"></td>
                                 <td colspan="17">Feasible&No Risk (Score = 90-100) Product can be produced as specified with no revisions.</td>
                             </tr>
                             <tr>
                                 <td></td>
                                 <td class="full-border text-center" style="background-color: Yellow;">Yellow</td>
-                                <td class="full-border chk_score" id="chk_yellow"></td>
+                                <td class="full-border text-center chk_score" id="chk_yellow"></td>
                                 <td colspan="17">Yellow = Feasible&NoRisk (Score 70-89) Need recommended or Other requirment (see attached).</td>
                             </tr>
                             <tr>
                                 <td></td>
                                 <td class="full-border text-center" style="background-color: Red;">Red</td>
-                                <td class="full-border chk_score" id="chk_red"></td>
+                                <td class="full-border text-center chk_score" id="chk_red"></td>
                                 <td colspan="17">Red = Not Feasible&Risk (Score < 69) Design revision required to produce product within the specified</td>
                             </tr>
                             <tr height="25px"></tr>
@@ -303,7 +303,14 @@
                             <tr>
                                 <td colspan="20" style="font-weight: bold;font-size: 20px">Sign-Off</td>
                             </tr>
-                            <tr height="25px"></tr>
+                            <!-- Sign Group1 -->
+                            <tr class="text-center">
+                                <td colspan="2"></td>
+                                <td class="" colspan="7"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="2"></td>
+                                <td class="" colspan="7"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="2"></td>
+                            </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td colspan="7" class="b-top text-center">Production Engineering</td>
@@ -311,7 +318,14 @@
                                 <td colspan="7" class="b-top text-center">Research and Development</td>
                                 <td colspan="2"></td>
                             </tr>
-                            <tr height="25px"></tr>
+                            <!-- Sign Group2 -->
+                            <tr class="text-center">
+                                <td colspan="2"></td>
+                                <td class="" colspan="7"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="2"></td>
+                                <td class="" colspan="7"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="2"></td>
+                            </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td colspan="7" class="b-top text-center">Sales and Marketing</td>
@@ -319,7 +333,14 @@
                                 <td colspan="7" class="b-top text-center">Purchasing</td>
                                 <td colspan="2"></td>
                             </tr>
-                            <tr height="25px"></tr>
+                            <!-- Sign Group3 -->
+                            <tr class="text-center">
+                                <td colspan="2"></td>
+                                <td class="" colspan="7"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="2"></td>
+                                <td class="" colspan="7"><img src="\assets\images\uploaded\signature\51SST60_signature.png" alt="" width="160px" height="80px"></td>
+                                <td colspan="2"></td>
+                            </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td colspan="7" class="b-top text-center">Production Control</td>
@@ -330,7 +351,7 @@
                             <tr height="20px"></tr>
                             <tr>
                                 <td colspan="15"></td>
-                                <td colspan="5">FM-S&M-015/02/19 JAN 2018</td>
+                                <td class="text-end" colspan="5">FM-S&M-015/02/19 JAN 2018</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -1079,15 +1100,12 @@
                     className: 'text-center',
                     data: 'update_by',
                     "render": function(data, type, row) {
-                        let emp_code = row.update_by.substring(2, 7);
                         if (type === 'display') {
                             if (row.update_by != "") {
+                                let emp_code = row.update_by.substring(2, 7);
                                 let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
-                                if (!is_cached(img_ok)) {
-                                    img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';
-                                }
-                                disp = '<div class="d-flex align-items-center">' +
-                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+                                disp = '<div class="d-flex align-items-center justify-content-center">' +
+                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35" onerror="this.onerror=null;this.src=\'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png\';">' +
                                     '<div class="ms-3">' +
                                     '<div class="user-meta-info">' +
                                     '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
