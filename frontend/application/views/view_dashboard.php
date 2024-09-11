@@ -116,7 +116,6 @@
                         <div class="card-body p-4">
                             <div class="d-sm-flex d-block align-items-center justify-content-between mb-2">
                                 <div class="mb-2 mb-sm-0 col-lg-12" id="month_click">
-
                                 </div>
                             </div>
                             <div class="row align-items-center">
@@ -153,7 +152,7 @@
                                 <div class="col-12">
                                     <p class="card-title mb-3 fw-semibold text-center"><u>STATUS</u></p>
                                 </div>
-                                <div class="col-12 d-flex align-items-center justify-content-center" id="dashStatus">
+                                <div class="col-12 d-flex align-items-center justify-content-around" id="dashStatus">
                                 </div>
                             </div>
                         </div>

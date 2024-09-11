@@ -7,9 +7,13 @@ RUN go mod download
 
 COPY . .
 
+# Install nodemon
+RUN apk add --no-cache npm \
+    && npm install -g nodemon
 RUN go build -o main .
 # RUN go run .
 
 EXPOSE 8080
 
-CMD ["./main"]
+CMD ["nodemon", "--exec", "go run .", "--signal", "SIGTERM"]
+

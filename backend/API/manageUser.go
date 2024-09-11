@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -81,6 +82,10 @@ func ListUserTable(c *gin.Context) {
 	var objData UserData
 	objData.Data = objUserArray
 	c.IndentedJSON(http.StatusOK, objData)
+}
+
+func ListUserTable2(c *gin.Context) {
+	fmt.Println("1235331231")
 }
 func ListUserById(c *gin.Context) {
 	var objUser User

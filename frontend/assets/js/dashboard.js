@@ -402,7 +402,7 @@ function checkDashStatus(status) {
   if (status == 'DONE') {
     return `<p class="fw-semibold text-center text-success" style="font-size: 30px;"><u>ALL DONE</u></p>`
   } else if (status == 'PENDING') {
-    return `<div class="col-lg-3 position-relative" id="SST60">
+    return `<div class="position-relative" id="SST60">
                 <img src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/SST60.jpg" alt="Avatar" class="img-fluid-status rounded-circle" width="100" height="100" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';">
                 <div class="status-indicator online pulse"></div>
                 <div class="tooltip-custom text-center fw-semibold" id="tooltip">
@@ -412,7 +412,7 @@ function checkDashStatus(status) {
                     <p class="text-success">07 Jul 24</p>
                 </div>
             </div>
-            <div class="col-lg-3 position-relative" id="K0084">
+            <div class="position-relative" id="K0084">
                 <img src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/K0084.jpg" alt="Avatar" class="img-fluid-status rounded-circle" width="100" height="100" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';">
                 <div class="status-indicator pending pulse"></div>
                 <div class="tooltip-custom text-center fw-semibold" id="tooltip">
@@ -422,7 +422,7 @@ function checkDashStatus(status) {
                     <p class="text-secondary">Waiting...</p>
                 </div>
             </div>
-            <div class="col-lg-3 position-relative" id="K0071">
+            <div class="position-relative" id="K0071">
                 <img src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/K0071.jpg" alt="Avatar" class="img-fluid-status rounded-circle" width="100" height="100" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';">
                 <div class="status-indicator pending pulse"></div>
                 <div class="tooltip-custom text-center fw-semibold" id="tooltip">
@@ -432,7 +432,7 @@ function checkDashStatus(status) {
                     <p class="text-secondary">Waiting...</p>
                 </div>
             </div>
-            <div class="col-lg-3 position-relative" id="K0070">
+            <div class="position-relative" id="K0070">
                 <img src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/K0070.jpg" alt="Avatar" class="img-fluid-status rounded-circle" width="100" height="100" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';">
                 <div class="status-indicator pending pulse"></div>
                 <div class="tooltip-custom text-center fw-semibold" id="tooltip">
@@ -443,7 +443,7 @@ function checkDashStatus(status) {
                 </div>
             </div>`
   } else if (status == 'DELAYED') {
-    return `<div class="col-lg-3 position-relative" id="SST60">
+    return `<div class="position-relative" id="SST60">
                 <img src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/SST60.jpg" alt="Avatar" class="img-fluid-status rounded-circle" width="100" height="100" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';">
                 <div class="status-indicator online pulse"></div>
                 <div class="tooltip-custom text-center fw-semibold" id="tooltip">
@@ -453,7 +453,7 @@ function checkDashStatus(status) {
                     <p class="text-success">07 Jul 24</p>
                 </div>
             </div>
-            <div class="col-lg-3 position-relative" id="K0084">
+            <div class="position-relative" id="K0084">
                 <img src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/K0084.jpg" alt="Avatar" class="img-fluid-status rounded-circle" width="100" height="100" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';">
                 <div class="status-indicator online pulse"></div>
                 <div class="tooltip-custom text-center fw-semibold" id="tooltip">
@@ -463,7 +463,7 @@ function checkDashStatus(status) {
                     <p class="text-success">07 Jul 24</p>
                 </div>
             </div>
-            <div class="col-lg-3 position-relative" id="K0071">
+            <div class="position-relative" id="K0071">
                 <img src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/K0071.jpg" alt="Avatar" class="img-fluid-status rounded-circle" width="100" height="100" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';">
                 <div class="status-indicator online pulse"></div>
                 <div class="tooltip-custom text-center fw-semibold" id="tooltip">
@@ -473,7 +473,7 @@ function checkDashStatus(status) {
                     <p class="text-success">07 Jul 24</p>
                 </div>
             </div>
-            <div class="col-lg-3 position-relative" id="K0070">
+            <div class="position-relative" id="K0070">
                 <img src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/K0070.jpg" alt="Avatar" class="img-fluid-status rounded-circle" width="100" height="100" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';">
                 <div class="status-indicator deleyed pulse"></div>
                 <div class="tooltip-custom text-center fw-semibold" id="tooltip">
