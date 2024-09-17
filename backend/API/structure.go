@@ -310,18 +310,20 @@ type Feasibility struct {
 }
 
 type Feasibility1 struct {
-	If_id          int                 `json:"if_id"`
-	If_ref         string              `json:"if_ref"`
-	If_customer    string              `json:"if_customer"`
-	If_import_tran int                 `json:"if_import_tran"`
-	If_group_part  []map[string]string `json:"if_group_part"`
-	Mrt_id         int                 `json:"mrt_id"`
-	If_duedate     string              `json:"if_duedate"`
-	If_status      int                 `json:"if_status"`
-	Create_date    string              `json:"create_date"`
-	Update_date    string              `json:"update_date"`
-	Create_by      string              `json:"create_by"`
-	Update_by      string              `json:"update_by"`
+	If_id           int                 `json:"if_id"`
+	If_doc_no       string              `json:"if_doc_no"`
+	If_ref          string              `json:"if_ref"`
+	If_customer     string              `json:"if_customer"`
+	If_customer_new string              `json:"if_customer_new"`
+	If_import_tran  int                 `json:"if_import_tran"`
+	If_group_part   []map[string]string `json:"if_group_part"`
+	Mrt_id          int                 `json:"mrt_id"`
+	If_duedate      string              `json:"if_duedate"`
+	If_status       int                 `json:"if_status"`
+	Create_date     string              `json:"create_date"`
+	Update_date     string              `json:"update_date"`
+	Create_by       string              `json:"create_by"`
+	Update_by       string              `json:"update_by"`
 }
 
 type Rfq struct {
@@ -440,6 +442,16 @@ type RequirementType struct {
 	Mrt_id      int    `json:"mrt_id"`
 	Mrt_name    string `json:"mrt_name"`
 	Mrt_status  int    `json:"mrt_status"`
+	Create_date string `json:"create_date"`
+	Update_date string `json:"update_date"`
+	Create_by   string `json:"create_by"`
+	Update_by   string `json:"update_by"`
+}
+
+type RequirementCus struct {
+	Mct_id      int    `json:"mct_id"`
+	Mct_name    string `json:"mct_name"`
+	Mct_status  int    `json:"mct_status"`
 	Create_date string `json:"create_date"`
 	Update_date string `json:"update_date"`
 	Create_by   string `json:"create_by"`

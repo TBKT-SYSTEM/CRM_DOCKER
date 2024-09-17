@@ -89,9 +89,24 @@ function form_err(element, message) {
     element.nextElementSibling.innerHTML = message;
     element.focus();
 }
+function form_errCus(element1, element2, message) {
+    element2.style.border = "1px solid #ff0000";
+    element2.nextElementSibling.style.display = "block";
+    element2.nextElementSibling.innerHTML = message;
+    element1.style.border = "1px solid #ff0000";
+    element1.nextElementSibling.style.display = "block";
+    element1.nextElementSibling.innerHTML = message;
+    element1.focus();
+}
 function form_ok(element) {
     element.style.border = "1px solid #d1d3e2";
     element.nextElementSibling.style.display = "none";
+}
+function form_okCus(element1, element2) {
+    element2.style.border = "1px solid #d1d3e2";
+    element2.nextElementSibling.style.display = "none";
+    element1.style.border = "1px solid #d1d3e2";
+    element1.nextElementSibling.style.display = "none";
 }
 
 // validate forms ----------------------
@@ -746,28 +761,29 @@ async function edit_partno(data) {
 }
 
 async function Feasibility_validate(formType) {
-    var if_customer, if_import_tran, if_part_no, if_part_name, mrt_id, if_ref, refcon, id, url;
+
+    var if_customer, if_customer_new, if_import_tran, mrt_id, if_ref, refcon ,doc_no , id, url;
     url = API_URL + "feasibility/last_id";
-    if_ref = "RFQ-SM-" + getTwoDigitYear() + "-";
+    if_ref = "FM-S&M-" + getTwoDigitYear() + "-";
     if (formType == "add") {
         if_customer = document.add_form.if_customer
         if_import_tran = document.add_form.if_import_tran
-        if_part_no = document.add_form.if_part_no
-        if_part_name = document.add_form.if_part_name
+        if_customer_new = document.add_form.if_customer_new
         mrt_id = document.add_form.mrt_id
         if_qty_part_no = document.add_form.if_qty_part_no
-        refcon = document.getElementById("add_if_ref")
+        // refcon = document.getElementById("add_if_ref")
+        doc_no = document.getElementById("doc_no")
         id = 0
     } else {
         if_customer = document.edit_form.if_customer
         if_import_tran = document.edit_form.if_import_tran
-        if_part_no = document.edit_form.if_part_no
-        if_part_name = document.edit_form.if_part_name
         mrt_id = document.edit_form.mrt_id
         refcon = document.getElementById("edit_if_ref")
+        doc_no = document.getElementById("doc_no")
         let getid = document.edit_form.if_id
         id = parseInt(getid.value)
     }
+
     var partInsert = [];
     var partNoInputs = $('#form_part_no input[name="if_part_no[]"]');
     var partNameInputs = $('#form_part_no input[name="if_part_name[]"]');
@@ -779,127 +795,135 @@ async function Feasibility_validate(formType) {
             partInsert.push({ ['partNo' + (index + 1)]: partNo, ['partName' + (index + 1)]: partName });
         }
     });
-    if (is_empty(if_customer.value)) {
-        form_err(if_customer, "*Please Enter Customer");
+
+    if (!is_empty(if_customer.value) && !is_empty(if_customer_new.value)) {
+        form_errCus(if_customer, if_customer_new, "*Please select 1 type of customer.");
         $('#navpill-111').addClass('active show');
         $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
         $('#navpill-222').removeClass('active show');
         $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
         return false;
     } else {
-        form_ok(if_customer);
-        if (is_empty(if_import_tran.value)) {
-            form_err(if_import_tran, "*Please Enter Import From");
+        if (is_empty(if_customer.value) && is_empty(if_customer_new.value)) {
+            form_errCus(if_customer, if_customer_new, "*Please select 1 type of customer.");
             $('#navpill-111').addClass('active show');
             $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
             $('#navpill-222').removeClass('active show');
             $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
             return false;
         } else {
-            form_ok(if_import_tran);
-            if (is_empty(mrt_id.value)) {
-                form_err(mrt_id, "*Please Enter Requirement");
+            form_okCus(if_customer, if_customer_new);
+            if (is_empty(if_import_tran.value)) {
+                form_err(if_import_tran, "*Please Enter Import From");
                 $('#navpill-111').addClass('active show');
                 $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
                 $('#navpill-222').removeClass('active show');
                 $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
                 return false;
             } else {
-                form_ok(mrt_id);
-                if (formType == "add") {
-                    if (is_empty(if_qty_part_no.value)) {
-                        form_err(if_qty_part_no, "*Please Enter Quentity Part No.");
-                        $('#navpill-111').removeClass('active show');
-                        $('a[href="#navpill-111"]').removeClass('active').attr('aria-selected', 'false');
-                        $('#navpill-222').addClass('active show');
-                        $('a[href="#navpill-222"]').addClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
-                        return false;
-                    } else {
-                        if (partInsert.length == 0) {
-                            let indexCount = $('#inpQtyPartNo').val();
-
-                            for (let i = 0; i < indexCount; i++) {
-                                let partNo = document.getElementById('inpPartNo' + i);
-                                let partName = document.getElementById('inpPartName' + i);
-
-                                if (is_empty(partNo.value)) {
-                                    form_err(partNo, "*Please Enter Part No.");
-                                } else {
-                                    form_ok(partNo);
-                                }
-                                if (is_empty(partName.value)) {
-                                    form_err(partName, "*Please Enter Part Name");
-                                } else {
-                                    form_ok(partName);
-                                }
-                            }
+                form_ok(if_import_tran);
+                if (is_empty(mrt_id.value)) {  
+                    form_err(mrt_id, "*Please Enter Requirement");
+                    $('#navpill-111').addClass('active show');
+                    $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
+                    $('#navpill-222').removeClass('active show');
+                    $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
+                    return false;
+                } else {
+                    form_ok(mrt_id);
+                    if (formType == "add") {
+                        if (is_empty(if_qty_part_no.value)) {
+                            form_err(if_qty_part_no, "*Please Enter Quentity Part No.");
+                            $('#navpill-111').removeClass('active show');
+                            $('a[href="#navpill-111"]').removeClass('active').attr('aria-selected', 'false');
+                            $('#navpill-222').addClass('active show');
+                            $('a[href="#navpill-222"]').addClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
+                            return false;
                         } else {
-                            let indexCount = $('#inpQtyPartNo').val();
-                            let partName0 = document.getElementById('inpPartName0');
-                            form_ok(partName0);
+                            if (partInsert.length == 0) {
+                                let indexCount = $('#inpQtyPartNo').val();
 
-                            for (let i = 1; i < indexCount; i++) {
-                                let partNo = document.getElementById('inpPartNo' + i);
-                                let partName = document.getElementById('inpPartName' + i);
+                                for (let i = 0; i < indexCount; i++) {
+                                    let partNo = document.getElementById('inpPartNo' + i);
+                                    let partName = document.getElementById('inpPartName' + i);
 
-                                if (is_empty(partNo.value)) {
-                                    form_err(partNo, "*Please Enter Part No.");
-                                    return false;
-                                } else {
-                                    form_ok(partNo);
+                                    if (is_empty(partNo.value)) {
+                                        form_err(partNo, "*Please Enter Part No.");
+                                    } else {
+                                        form_ok(partNo);
+                                    }
                                     if (is_empty(partName.value)) {
                                         form_err(partName, "*Please Enter Part Name");
-                                        return false;
                                     } else {
                                         form_ok(partName);
                                     }
                                 }
-                            }
-                            if (formType == "add") {
-                                try {
-                                    var last_id = await getLastId(url);
-                                    // console.log('last :', last_id['last_id']);
-                                    if (typeof last_id['last_id'] != "number") {
-                                        form_err(refcon, "*Error generate reference no.");
+                            } else {
+                                let indexCount = $('#inpQtyPartNo').val();
+                                let partName0 = document.getElementById('inpPartName0');
+                                form_ok(partName0);
+
+                                for (let i = 1; i < indexCount; i++) {
+                                    let partNo = document.getElementById('inpPartNo' + i);
+                                    let partName = document.getElementById('inpPartName' + i);
+
+                                    if (is_empty(partNo.value)) {
+                                        form_err(partNo, "*Please Enter Part No.");
                                         return false;
                                     } else {
-                                        form_ok(refcon);
-                                        if (++last_id['last_id'] < 10) {
-                                            if_ref += "00" + last_id['last_id'];
-                                        } else if (last_id['last_id'] < 100) {
-                                            if_ref += "0" + last_id['last_id'];
+                                        form_ok(partNo);
+                                        if (is_empty(partName.value)) {
+                                            form_err(partName, "*Please Enter Part Name");
+                                            return false;
                                         } else {
-                                            if_ref += last_id['last_id'];
+                                            form_ok(partName);
                                         }
-                                        refcon.value = if_ref;
-                                        return true, partInsert;
                                     }
-                                } catch (err) {
-                                    console.log(err); // Handle error
                                 }
-                            } else {
-                                var duedate = document.edit_form.if_duedate;
-                                if (is_empty(duedate.value)) {
-                                    form_err(duedate, "*Please Enter Due date");
-                                    return false;
+                                if (formType == "add") {
+                                    try {
+                                        var last_id = await getLastId(url);
+                                        // console.log('last :', last_id['last_id']);
+                                        if (typeof last_id['last_id'] != "number") {
+                                            return false;
+                                        } else {
+                                            if (++last_id['last_id'] < 10) {
+                                                if_ref += "00" + last_id['last_id'];
+                                            } else if (last_id['last_id'] < 100) {
+                                                if_ref += "0" + last_id['last_id'];
+                                            } else {
+                                                if_ref += last_id['last_id'];
+                                            }
+                                            doc_no.value = if_ref;
+                                            return true, partInsert;
+                                        }
+                                    } catch (err) {
+                                        console.log(err); // Handle error
+                                    }
                                 } else {
-                                    form_ok(duedate);
-                                    return true;
+                                    var duedate = document.edit_form.if_duedate;
+                                    if (is_empty(duedate.value)) {
+                                        form_err(duedate, "*Please Enter Due date");
+                                        return false;
+                                    } else {
+                                        form_ok(duedate);
+                                        return true;
+                                    }
                                 }
                             }
                         }
-                    }
-                } else {
-                    var duedate = document.edit_form.if_duedate;
-                    if (is_empty(duedate.value)) {
-                        form_err(duedate, "*Please Enter Due date");
-                        return false;
                     } else {
-                        form_ok(duedate);
-                        return true;
+                        var duedate = document.edit_form.if_duedate;
+                        if (is_empty(duedate.value)) {
+                            form_err(duedate, "*Please Enter Due date");
+                            return false;
+                        } else {
+                            form_ok(duedate);
+                            return true;
+                        }
                     }
-                }
 
+                }
             }
         }
     }

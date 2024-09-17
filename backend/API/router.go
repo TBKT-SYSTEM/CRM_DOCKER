@@ -113,6 +113,7 @@ func Routy() {
 	router.GET("/option/list_smd/:id", ListMenuDetailById)
 	router.GET("/option/list_swg", ListWorkflowGroup)
 	router.GET("/option/list_mrt", ListRequirementType)
+	router.GET("/option/list_cus", ListRequirementCus)
 	router.GET("/option/list_user", ListUsers)
 	router.GET("/option/list_approve_type", ListApproveType)
 	router.GET("/option/list_department", ListDepartment)

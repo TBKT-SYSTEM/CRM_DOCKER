@@ -1057,6 +1057,53 @@ func ListRequirementType(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, objRequirmentList)
 }
+
+func ListRequirementCus(c *gin.Context) {
+	var objRequirmentList []RequirementCus
+	objListRequirement, err := db.Query("SELECT * FROM `mst_customer` WHERE mct_status=1")
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	defer objListRequirement.Close()
+	for objListRequirement.Next() {
+		var objRequire RequirementCus
+		var strCreateDate sql.NullString
+		var strUpdateDate sql.NullString
+		var strCreateBy sql.NullString
+		var strUpdateBy sql.NullString
+		err := objListRequirement.Scan(&objRequire.Mct_id, &objRequire.Mct_name, &objRequire.Mct_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+		if strCreateDate.Valid {
+			objRequire.Create_date = strCreateDate.String
+		}
+		if strUpdateDate.Valid {
+			objRequire.Update_date = strUpdateDate.String
+		}
+		if strCreateBy.Valid {
+			objRequire.Create_by = strCreateBy.String
+		}
+		if strUpdateBy.Valid {
+			objRequire.Update_by = strUpdateBy.String
+		}
+		objRequirmentList = append(objRequirmentList, objRequire)
+	}
+	err = objListRequirement.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, objRequirmentList)
+}
 func ListWorkflowGroup(c *gin.Context) {
 	var objWorkflowGroupList []WorkflowGroup
 	objListWorkflowg, err := db.Query("SELECT * FROM `sys_workflow_group` WHERE swg_status=1")

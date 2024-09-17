@@ -282,13 +282,59 @@ func FeasibilityLastid(c *gin.Context) {
 }
 func InsertFeasibility(c *gin.Context) {
 	var objFeasibility Feasibility1
+	var CustomerId sql.NullString
+	var strIrRef sql.NullString
+	var mctName string
 
 	if err := c.BindJSON(&objFeasibility); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	objResult, err := db.Exec("INSERT INTO info_feasibility(if_ref,if_customer,if_import_tran,mrt_id,if_duedate,create_date,update_date,create_by,update_by) VALUES(?,?,?,?,?,?,?,?,?)", objFeasibility.If_ref, objFeasibility.If_customer, objFeasibility.If_import_tran, objFeasibility.Mrt_id, objFeasibility.If_duedate, objFeasibility.Create_date, objFeasibility.Update_date, objFeasibility.Create_by, objFeasibility.Update_by)
+	if objFeasibility.If_ref != "" {
+		strIrRef.String = objFeasibility.If_ref
+	}
+
+	if objFeasibility.If_customer_new != "" {
+		query := "INSERT INTO mst_customer (mct_name,mct_status,create_date,update_date,create_by,update_by) VALUES (?,?,?,?,?,?)"
+
+		result, err := db.Exec(query, objFeasibility.If_customer_new, 1, objFeasibility.Create_date, objFeasibility.Update_date, objFeasibility.Create_by, objFeasibility.Update_by)
+
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert customer: " + err.Error()})
+			return
+		}
+
+		lastInsertID, err := result.LastInsertId()
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve last insert ID: " + err.Error()})
+			return
+		}
+
+		getCustomerName := "SELECT mct_name FROM mst_customer WHERE mct_id = ?"
+		errGetCus := db.QueryRow(getCustomerName, lastInsertID).Scan(&mctName)
+
+		if errGetCus != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve customer name: " + errGetCus.Error()})
+			return
+		}
+		CustomerId.String = mctName
+		CustomerId.Valid = true
+
+	} else {
+		getCustomerName := "SELECT mct_name FROM mst_customer WHERE mct_id = ?"
+		errGetCus := db.QueryRow(getCustomerName, objFeasibility.If_customer).Scan(&mctName)
+
+		if errGetCus != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve customer name: " + errGetCus.Error()})
+			return
+		}
+
+		CustomerId.String = mctName
+		CustomerId.Valid = true
+	}
+
+	objResult, err := db.Exec("INSERT INTO info_feasibility(if_doc_no, if_ref, if_customer, if_import_tran, mrt_id, if_duedate, create_date, update_date, create_by, update_by) VALUES(?,?,?,?,?,?,?,?,?,?)", objFeasibility.If_doc_no, strIrRef, CustomerId, objFeasibility.If_import_tran, objFeasibility.Mrt_id, objFeasibility.If_duedate, objFeasibility.Create_date, objFeasibility.Update_date, objFeasibility.Create_by, objFeasibility.Update_by)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return

@@ -146,7 +146,7 @@
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="mb-3 row align-items-center">
-                                                    <label for="inpWeight" class="form-label fw-semibold col col-form-label">Weight</label>
+                                                    <label for="inpWeight" class="form-label fw-semibold col-sm-1 col-form-label">Weight</label>
                                                     <div class="col-sm-3">
                                                         <input type="number" id="inpWeight" class="form-control" placeholder="Enter Weight">
                                                         <span class="form_error"></span>
@@ -692,7 +692,7 @@
                     data:'mc_title',
                     render: function (data, type, row) {
                         if (type === 'display') {
-                            disp = '<div class="text-overflow-ellipsis">'+data+'</div>';
+                            disp = '<div class="text-warp">'+data+'</div>';
                         }
                         return disp;
                     }
@@ -782,7 +782,7 @@
                     data:'mc_title',
                     render: function (data, type, row) {
                         if (type === 'display') {
-                            disp = '<div class="text-overflow-ellipsis">'+data+'</div>';
+                            disp = '<div class="text-warp">'+data+'</div>';
                         }
                         return disp;
                     }
@@ -851,6 +851,6 @@
 		setInterval(function (){
 			dataTable.ajax.reload( null, false );
 			inchargeTable.ajax.reload( null, false );
-		}, 1000 );
+		}, 600000 );
 	});
 </script>
