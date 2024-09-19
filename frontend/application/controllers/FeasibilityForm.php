@@ -42,6 +42,16 @@ class FeasibilityForm extends CI_Controller {
 		$this->another_js .= "<script src='" . base_url() . "assets/js/datatable/datatable-basic.init.js'></script>";
         $this->render_view('view_formFeasibility');
     }
+	public function addFeasibility() {
+		$this->another_js = "<script src='" . base_url() . "assets/libs/datatables.net/js/jquery.dataTables.min.js'></script>";
+		$this->another_js .= "<script src='" . base_url() . "assets/js/datatable/datatable-basic.init.js'></script>";
+        $this->render_view('view_makeFeasibility');
+    }
+	public function editFeasibility() {
+		$this->another_js = "<script src='" . base_url() . "assets/libs/datatables.net/js/jquery.dataTables.min.js'></script>";
+		$this->another_js .= "<script src='" . base_url() . "assets/js/datatable/datatable-basic.init.js'></script>";
+        $this->render_view('view_editFeasibility');
+    }
 	public function uploadImage(){
 		if(!empty($_FILES["picture"]["name"])){
 			$tempFileLogo = $_FILES['picture']['tmp_name'];

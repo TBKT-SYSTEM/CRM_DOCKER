@@ -260,6 +260,7 @@ type FeasibilityData struct {
 }
 type FeasibilityTable struct {
 	If_id          int    `json:"if_id"`
+	If_doc_no      string `json:"if_doc_no"`
 	If_ref         string `json:"if_ref"`
 	If_customer    string `json:"if_customer"`
 	If_import_tran int    `json:"if_import_tran"`
@@ -324,6 +325,8 @@ type Feasibility1 struct {
 	Update_date     string              `json:"update_date"`
 	Create_by       string              `json:"create_by"`
 	Update_by       string              `json:"update_by"`
+	Su_id           string              `json:"su_id"`
+	Doc_type        int                 `json:"doc_type"`
 }
 
 type Rfq struct {

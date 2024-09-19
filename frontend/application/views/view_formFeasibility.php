@@ -38,9 +38,12 @@
                                 </div>
                             </div>
                             <div class="col-md-5 text-end">
-                                <button type="button" class="btn bg-primary-subtle text-primary" data-bs-toggle="modal" data-bs-target="#mdlRegister">
+                                <!-- <button type="button" class="btn bg-primary-subtle text-primary" data-bs-toggle="modal" data-bs-target="#mdlRegister">
                                     <i class="ti ti-Feasibility-plus me-2"></i> Add Feasibility
-                                </button>
+                                </button> -->
+                                <a href="<?php echo base_url() ?>FeasibilityForm/addFeasibility" class="btn bg-primary-subtle text-primary">
+                                    <i class="ti ti-Feasibility-plus me-2"></i> Add Feasibility
+                                </a>
                             </div>
                         </div>
                         <div class="row border" style="padding: 15px;">
@@ -1123,8 +1126,9 @@
                     data: 'if_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<button type="button" onclick="editModal(\'' + row.if_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
-                                '<i class="ti ti-pencil me-1"></i> Edit </button>';
+                            // disp = '<button type="button" onclick="editModal(\'' + row.if_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
+                            //     '<i class="ti ti-pencil me-1"></i> Edit </button>';
+                            disp = '<a href="FeasibilityForm/editFeasibility?if_id=' + row.if_id + '" class="btn btn btn-primary" ><i class="ti ti-edit fs-5"></i></a>'
                         }
                         return disp;
                     }

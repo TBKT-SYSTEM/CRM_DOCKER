@@ -1,10 +1,10 @@
-<title>CRM | Make Feasibility</title>
+<title>CRM | Edit Feasibility</title>
 <div class="container-fluid">
     <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
         <div class="card-body px-4 py-3">
             <div class="row align-items-center">
                 <div class="col-9">
-                    <h4 class="fw-semibold mb-8">Make Feasibility</h4>
+                    <h4 class="fw-semibold mb-8">Edit Feasibility</h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
@@ -13,7 +13,7 @@
                             <li class="breadcrumb-item">
                                 <a class="text-muted text-decoration-none" href="<?php echo base_url() ?>FeasibilityForm">Feasibility Form</a>
                             </li>
-                            <li class="breadcrumb-item" aria-current="page">Make Feasibility</li>
+                            <li class="breadcrumb-item" aria-current="page">Edit Feasibility</li>
                         </ol>
                     </nav>
                 </div>
@@ -61,7 +61,7 @@
                                                     </div>
                                                     <div class="col">
                                                         <label for="if_ref" class="form-label fw-semibold">Document Reference</label>
-                                                        <input type="text" name="if_ref" id="inpIrRef" value="" class="form-control" placeholder="" disabled>
+                                                        <input type="text" name="if_ref" id="inpIrRef" class="form-control" placeholder="" disabled>
                                                         <span class="form_error"></span>
                                                     </div>
                                                 </div>
@@ -179,86 +179,6 @@
 </div>
 
 <script>
-    async function addFeasibility() {
-        event.preventDefault();
-        let chk = await Feasibility_validate("add");
-        // console.log('check =>',chk);
-        if (chk) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var add_form = {};
-                    $('#add_form').serializeArray().forEach(function(item) {
-
-                        if (item.name == 'if_import_tran' || item.name == 'mrt_id') {
-                            item.value = parseInt(item.value)
-                        }
-
-                        if (item.name == 'if_part_no[]' || item.name == 'if_part_name[]') {
-                            return;
-                        }
-
-                        add_form[item.name] = item.value;
-                    })
-                    add_form["create_date"] = getTimeNow();
-                    add_form["if_duedate"] = addDaysToDate(getTimeNow(), 7).substring(0, 10) + " 11:59:59";
-                    add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-                    add_form["update_date"] = getTimeNow();
-                    add_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-                    add_form["if_group_part"] = chk;
-                    add_form["su_id"] = '<?php echo $this->session->userdata('sessUsrId') ?>';
-                    add_form["doc_type"] = 2;
-                    $.ajax({
-                        type: 'POST',
-                        dataType: 'json',
-                        contentType: 'application/json',
-                        url: API_URL + 'feasibility/insert',
-                        data: JSON.stringify(add_form),
-                        success: function(data) {
-                            if (data.Error != null || data.Error != "") {
-                                Swal.fire({
-                                    html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Feasibility success!</p>",
-                                    icon: 'success',
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown'
-                                    },
-                                    hideClass: {
-                                        popup: 'animate__animated animate__fadeOutUp'
-                                    }
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = "<?= base_url() ?>FeasibilityForm";
-                                    }
-                                });
-                            } else {
-                                Swal.fire({
-                                    html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Feasibility!</p>",
-                                    icon: 'error',
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown'
-                                    },
-                                    hideClass: {
-                                        popup: 'animate__animated animate__fadeOutUp'
-                                    }
-                                })
-                            }
-                        },
-                        error: function(err) {
-                            console.log(err);
-                        }
-                    })
-                }
-            })
-        }
-    }
-
     function listRequirement(id) {
         $.ajax({
             type: 'get',
@@ -315,4 +235,21 @@
         }
         $('#form_part_no').html(html);
     }
+
+    $(document).ready(function() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const if_id = urlParams.get('if_id');
+        
+        $.ajax({
+            type: 'get',
+            url: API_URL + 'feasibility/' + if_id,
+            success: function(result) {
+                let datePart = result.create_date.split(" ")[0]
+                let formattedDate = datePart.replace(/-/g, '/');
+                $('#inpDate').val(formattedDate);
+            }
+        })
+
+    });
 </script>

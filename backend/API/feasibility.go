@@ -187,7 +187,9 @@ func ListFeasibilityTable(c *gin.Context) {
 		var strUpdateDate sql.NullString
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
-		err := objListFeasibility.Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
+		var strIrRef sql.NullString
+		var strDocNo sql.NullString
+		err := objListFeasibility.Scan(&objFeasibility.If_id, &strDocNo, &strIrRef, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy, &objFeasibility.Mrt_name, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -221,6 +223,12 @@ func ListFeasibilityTable(c *gin.Context) {
 		if strUpdateBy.Valid {
 			objFeasibility.Update_by = strUpdateBy.String
 		}
+		if strDocNo.Valid {
+			objFeasibility.If_doc_no = strDocNo.String
+		}
+		if strIrRef.Valid {
+			objFeasibility.If_ref = strIrRef.String
+		}
 		objFeasibilityList = append(objFeasibilityList, objFeasibility)
 	}
 	err = objListFeasibility.Err()
@@ -244,7 +252,8 @@ func ListFeasibility(c *gin.Context) {
 	var strUpdateDate sql.NullString
 	var strCreateBy sql.NullString
 	var strUpdateBy sql.NullString
-	err := db.QueryRow("SELECT * FROM `info_feasibility` WHERE if_id= ?", iId).Scan(&objFeasibility.If_id, &objFeasibility.If_ref, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
+	var strDocNo sql.NullString
+	err := db.QueryRow("SELECT * FROM `info_feasibility` WHERE if_id= ?", iId).Scan(&objFeasibility.If_id, &strDocNo, &objFeasibility.If_ref, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -266,6 +275,9 @@ func ListFeasibility(c *gin.Context) {
 	if strUpdateBy.Valid {
 		objFeasibility.Update_by = strUpdateBy.String
 	}
+	if strDocNo.Valid {
+		objFeasibility.If_doc_no = strDocNo.String
+	}
 	c.IndentedJSON(http.StatusOK, objFeasibility)
 }
 
@@ -280,6 +292,7 @@ func FeasibilityLastid(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, objLastId)
 }
+
 func InsertFeasibility(c *gin.Context) {
 	var objFeasibility Feasibility1
 	var CustomerId sql.NullString
@@ -423,18 +436,93 @@ func InsertFeasibility(c *gin.Context) {
 				})
 				return
 			} else {
-				c.IndentedJSON(http.StatusOK, gin.H{
-					"insertID":           iMaxId,
-					"insertPartID":       iMaxPartId,
-					"TotalConsideration": len(objConsiderationCount),
-					"Error":              nil,
-				})
+				var results []struct {
+					Swd_app_lv int
+					Su_id      int
+					Fullname   string
+					Sd_id      int
+					Sd_name    string
+					Swg_id     int
+					Swg_name   string
+				}
+
+				query := "SELECT swd.swd_app_lv, swd.su_id, CONCAT(su.su_fname, ' ', su.su_lname) AS fullname, swd.sd_id, sd.sd_name, swd.swg_id, swg.swg_name FROM sys_workflow_detail swd LEFT JOIN sys_workflow_group swg ON swd.swg_id = swg.swg_id LEFT JOIN sys_department sd ON swd.sd_id = sd.sd_id LEFT JOIN sys_user su ON swd.su_id = su.su_id WHERE swg.swg_id = ?"
+				rows, err := db.Query(query, objFeasibility.Doc_type)
+				if err != nil {
+					c.IndentedJSON(http.StatusInternalServerError, gin.H{
+						"Error": err.Error(),
+					})
+					return
+				}
+				defer rows.Close()
+
+				for rows.Next() {
+					var result struct {
+						Swd_app_lv int
+						Su_id      int
+						Fullname   string
+						Sd_id      int
+						Sd_name    string
+						Swg_id     int
+						Swg_name   string
+					}
+					if err := rows.Scan(&result.Swd_app_lv, &result.Su_id, &result.Fullname, &result.Sd_id, &result.Sd_name, &result.Swg_id, &result.Swg_name); err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{
+							"Error": err.Error(),
+						})
+						return
+					}
+					results = append(results, result)
+				}
+
+				var sql string = "INSERT INTO sys_approval (sal_doc_no, su_id, swd_app_lv, sal_approval_flag, create_date, update_date, create_by, update_by, sal_action) VALUES "
+				values := []string{}
+
+				for _, i := range results {
+					value := fmt.Sprintf("('%s', %d, %d, '%s', '%s', '%s', '%s', '%s', %d)",
+						objFeasibility.If_doc_no,
+						i.Su_id,
+						i.Swd_app_lv,
+						"waiting",
+						objFeasibility.Create_date,
+						objFeasibility.Update_date,
+						objFeasibility.Create_by,
+						objFeasibility.Update_by,
+						0)
+					values = append(values, value)
+				}
+
+				sql += strings.Join(values, ",")
+
+				objResultFlow, err := db.Exec(sql)
+				if err != nil {
+					c.IndentedJSON(http.StatusInternalServerError, gin.H{
+						"Error": err.Error(),
+					})
+				}
+
+				ResultFlow, err := objResultFlow.LastInsertId()
+				if err != nil {
+					c.IndentedJSON(http.StatusInternalServerError, gin.H{
+						"Error": err.Error(),
+					})
+					return
+				} else {
+					c.IndentedJSON(http.StatusOK, gin.H{
+						"insertID":           iMaxId,
+						"insertPartID":       iMaxPartId,
+						"TotalConsideration": len(objConsiderationCount),
+						"insertFlowID":       ResultFlow,
+						"Error":              nil,
+					})
+				}
 			}
 
 		}
 
 	}
 }
+
 func UpdatePartNoFeasibility(c *gin.Context) {
 
 	var rawData []map[string]interface{}
