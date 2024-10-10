@@ -31,24 +31,23 @@ type UserData struct {
 	Data []UserTable `json:"data"`
 }
 type UserTable struct {
-	Su_id       int    `json:"su_id"`
-	Su_fname    string `json:"su_fname"`
-	Su_lname    string `json:"su_lname"`
-	Su_email    string `json:"su_email"`
-	Su_emp_code string `json:"su_emp_code"`
-	Su_password string `json:"su_password"`
-	Su_tel      string `json:"su_tel"`
-	Su_img_path string `json:"su_img_path"`
-	Su_img_name string `json:"su_img_name"`
-	Spg_id      int    `json:"spg_id"`
-	Spg_name    string `json:"spg_name"`
-	Sd_id       int    `json:"sd_id"`
-	Spc_id      int    `json:"spc_id"`
-	Su_status   int    `json:"su_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	Su_id           int    `json:"su_id"`
+	Spg_id          int    `json:"spg_id"`
+	Su_username     string `json:"su_username"`
+	Su_password     string `json:"su_password"`
+	Su_firstname    string `json:"su_firstname"`
+	Su_lastname     string `json:"su_lastname"`
+	Su_email        string `json:"su_email"`
+	Sd_id           int    `json:"sd_id"`
+	Su_sign_path    string `json:"su_sign_path"`
+	Su_sign_file    string `json:"su_sign_file"`
+	Su_status       int    `json:"su_status"`
+	Create_date     string `json:"su_created_date"`
+	Update_date     string `json:"su_updated_date"`
+	Create_by       string `json:"su_created_by"`
+	Update_by       string `json:"su_updated_by"`
+	Su_last_accress string `json:"su_last_access"`
+	Spg_name        string `json:"spg_name"`
 }
 type User struct {
 	Su_id       int    `json:"su_id"`
@@ -70,25 +69,62 @@ type User struct {
 	Update_by   string `json:"update_by"`
 }
 type UserSession struct {
-	Su_id       int    `json:"su_id"`
-	Su_fname    string `json:"su_fname"`
-	Su_lname    string `json:"su_lname"`
-	Su_email    string `json:"su_email"`
-	Su_emp_code string `json:"su_emp_code"`
-	Su_password string `json:"su_password"`
-	Su_tel      string `json:"su_tel"`
-	Su_img_path string `json:"su_img_path"`
-	Su_img_name string `json:"su_img_name"`
-	Spg_id      int    `json:"spg_id"`
-	Sd_id       int    `json:"sd_id"`
-	Spc_id      int    `json:"spc_id"`
-	Su_status   int    `json:"su_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
-	Sd_name     string `json:"sd_name"`
-	Spg_name    string `json:"spg_name"`
+	Su_id           int    `json:"su_id"`
+	Spg_id          int    `json:"spg_id"`
+	Su_username     string `json:"su_username"`
+	Su_password     string `json:"su_password"`
+	Su_firstname    string `json:"su_firstname"`
+	Su_lastname     string `json:"su_lastname"`
+	Su_email        string `json:"su_email"`
+	Sd_id           int    `json:"sd_id"`
+	Su_sign_path    string `json:"su_sign_path"`
+	Su_sign_file    string `json:"su_sign_file"`
+	Su_status       int    `json:"su_status"`
+	Create_date     string `json:"su_created_date"`
+	Update_date     string `json:"su_updated_date"`
+	Create_by       string `json:"su_created_by"`
+	Update_by       string `json:"su_updated_by"`
+	Su_last_accress string `json:"su_last_access"`
+	Sd_dept_name    string `json:"sd_dept_name"`
+	Spg_name        string `json:"spg_name"`
+}
+type Users struct {
+	Su_id           int    `json:"su_id"`
+	Spg_id          int    `json:"spg_id"`
+	Su_username     string `json:"su_username"`
+	Su_password     string `json:"su_password"`
+	Su_firstname    string `json:"su_firstname"`
+	Su_lastname     string `json:"su_lastname"`
+	Su_email        string `json:"su_email"`
+	Sd_id           int    `json:"sd_id"`
+	Su_sign_path    string `json:"su_sign_path"`
+	Su_sign_file    string `json:"su_sign_file"`
+	Su_status       int    `json:"su_status"`
+	Create_date     string `json:"su_created_date"`
+	Update_date     string `json:"su_updated_date"`
+	Create_by       string `json:"su_created_by"`
+	Update_by       string `json:"su_updated_by"`
+	Su_last_accress string `json:"su_last_access"`
+}
+type UsersSession struct {
+	Su_id           int    `json:"su_id"`
+	Spg_id          int    `json:"spg_id"`
+	Su_username     string `json:"su_username"`
+	Su_password     string `json:"su_password"`
+	Su_firstname    string `json:"su_firstname"`
+	Su_lastname     string `json:"su_lastname"`
+	Su_email        string `json:"su_email"`
+	Sd_id           int    `json:"sd_id"`
+	Su_sign_path    string `json:"su_sign_path"`
+	Su_sign_file    string `json:"su_sign_file"`
+	Su_status       int    `json:"su_status"`
+	Create_date     string `json:"su_created_date"`
+	Update_date     string `json:"su_updated_date"`
+	Create_by       string `json:"su_created_by"`
+	Update_by       string `json:"su_updated_by"`
+	Su_last_accress string `json:"su_last_access"`
+	Sd_dept_name    string `json:"sd_dept_name"`
+	Spg_name        string `json:"spg_name"`
 }
 
 type Signature struct {
@@ -233,26 +269,30 @@ type DepartmentData struct {
 	Data []DepartmentTable `json:"data"`
 }
 type DepartmentTable struct {
-	Sd_id       int    `json:"sd_id"`
-	Sd_name     string `json:"sd_name"`
-	Sd_status   int    `json:"sd_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
-	Su_fname    string `json:"su_fname"`
-	Su_lname    string `json:"su_lname"`
-	Su_img_path string `json:"su_img_path"`
-	Su_img_name string `json:"su_img_name"`
+	Sd_id        int    `json:"sd_id"`
+	Sd_dept_name string `json:"sd_dept_name"`
+	Sd_plant_cd  int    `json:"sd_plant_cd"`
+	Sd_dept_cd   string `json:"sd_dept_cd"`
+	Sd_status    int    `json:"sd_status"`
+	Create_date  string `json:"sd_created_date"`
+	Create_by    string `json:"sd_created_by"`
+	Update_date  string `json:"sd_updated_date"`
+	Update_by    string `json:"sd_updated_by"`
+	Su_fname     string `json:"su_fname"`
+	Su_lname     string `json:"su_lname"`
+	Su_img_path  string `json:"su_img_path"`
+	Su_img_name  string `json:"su_img_name"`
 }
 type Department struct {
 	Sd_id       int    `json:"sd_id"`
-	Sd_name     string `json:"sd_name"`
+	Sd_plant_cd int    `json:"sd_plant_cd"`
+	Sd_name_cd  string `json:"sd_dept_cd"`
+	Sd_name     string `json:"sd_dept_name"`
 	Sd_status   int    `json:"sd_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	Create_date string `json:"sd_created_date"`
+	Update_date string `json:"sd_updated_date"`
+	Create_by   string `json:"sd_created_by"`
+	Update_by   string `json:"sd_updated_by"`
 }
 
 type FeasibilityData struct {
@@ -451,6 +491,16 @@ type RequirementType struct {
 	Update_by   string `json:"update_by"`
 }
 
+type ImportFrom struct {
+	Mif_id      int    `json:"mif_id"`
+	Mif_name    string `json:"mif_name"`
+	Mif_status  int    `json:"mif_status"`
+	Create_date string `json:"create_date"`
+	Update_date string `json:"update_date"`
+	Create_by   string `json:"create_by"`
+	Update_by   string `json:"update_by"`
+}
+
 type RequirementCus struct {
 	Mct_id      int    `json:"mct_id"`
 	Mct_name    string `json:"mct_name"`
@@ -465,62 +515,63 @@ type WorkflowGroupData struct {
 	Data []WorkflowGroupTable `json:"data"`
 }
 type WorkflowGroupTable struct {
-	Swg_id      int    `json:"swg_id"`
-	Swg_name    string `json:"swg_name"`
-	Swg_max_lv  int    `json:"swg_max_lv"`
-	Swg_status  int    `json:"swg_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
-	Su_fname    string `json:"su_fname"`
-	Su_lname    string `json:"su_lname"`
-	Su_img_path string `json:"su_img_path"`
-	Su_img_name string `json:"su_img_name"`
+	Swg_id       int    `json:"swg_id"`
+	Sd_id        int    `json:"sd_id"`
+	Swg_max_lv   int    `json:"swg_max_level"`
+	Swg_status   int    `json:"swg_status"`
+	Create_date  string `json:"swg_created_date"`
+	Update_date  string `json:"swg_updated_date"`
+	Create_by    string `json:"swg_created_by"`
+	Update_by    string `json:"swg_updated_by"`
+	Su_fname     string `json:"su_fname"`
+	Su_lname     string `json:"su_lname"`
+	Sd_dept_name string `json:"sd_dept_name"`
+	Sd_dept_cd   string `json:"sd_dept_cd"`
 }
 type WorkflowGroup struct {
-	Swg_id      int    `json:"swg_id"`
-	Swg_name    string `json:"swg_name"`
-	Swg_max_lv  int    `json:"swg_max_lv"`
-	Swg_status  int    `json:"swg_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	Swg_id       int    `json:"swg_id"`
+	Sd_id        int    `json:"sd_id"`
+	Swg_max_lv   int    `json:"swg_max_level"`
+	Swg_status   int    `json:"swg_status"`
+	Create_date  string `json:"swg_created_date"`
+	Update_date  string `json:"swg_updated_date"`
+	Create_by    string `json:"swg_created_by"`
+	Update_by    string `json:"swg_updated_by"`
+	Sd_dept_name string `json:"sd_dept_name"`
 }
 type WorkflowDetailData struct {
 	Data []WorkflowDetailTable `json:"data"`
 }
 type WorkflowDetailTable struct {
-	Swd_id      int    `json:"swd_id"`
-	Swd_app_lv  int    `json:"swd_app_lv"`
-	Su_id       int    `json:"su_id"`
-	Swg_id      int    `json:"swg_id"`
-	Sat_id      int    `json:"sat_id"`
-	Swd_status  int    `json:"swd_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
-	Fullname    string `json:"fullname"`
-	Swg_name    string `json:"swg_name"`
-	Sat_name    string `json:"sat_name"`
-	Su_fname    string `json:"su_fname"`
-	Su_lname    string `json:"su_lname"`
-	Su_img_path string `json:"su_img_path"`
-	Su_img_name string `json:"su_img_name"`
+	Swd_id       int    `json:"swd_id"`
+	Swd_level_no int    `json:"swd_level_no"`
+	Su_id        int    `json:"su_id"`
+	Swg_id       int    `json:"swg_id"`
+	Sat_id       int    `json:"sat_id"`
+	Swd_status   int    `json:"swd_status"`
+	Create_date  string `json:"create_date"`
+	Update_date  string `json:"update_date"`
+	Create_by    string `json:"create_by"`
+	Update_by    string `json:"update_by"`
+	Fullname     string `json:"fullname"`
+	Sd_id        int    `json:"sd_id"`
+	Sat_name     string `json:"sat_name"`
+	Su_fname     string `json:"su_fname"`
+	Su_lname     string `json:"su_lname"`
+	Su_img_path  string `json:"su_img_path"`
+	Su_img_name  string `json:"su_img_name"`
 }
 type WorkflowDetail struct {
-	Swd_id      int    `json:"swd_id"`
-	Swd_app_lv  int    `json:"swd_app_lv"`
-	Su_id       int    `json:"su_id"`
-	Swg_id      int    `json:"swg_id"`
-	Sat_id      int    `json:"sat_id"`
-	Swd_status  int    `json:"swd_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	Swd_id       int    `json:"swd_id"`
+	Swd_level_no int    `json:"swd_level_no"`
+	Su_id        int    `json:"su_id"`
+	Swg_id       int    `json:"swg_id"`
+	Sat_id       int    `json:"sat_id"`
+	Swd_status   int    `json:"swd_status"`
+	Create_date  string `json:"swd_created_date"`
+	Update_date  string `json:"swd_updated_date"`
+	Create_by    string `json:"swd_created_by"`
+	Update_by    string `json:"swd_updated_by"`
 }
 type ApproveType struct {
 	Sat_id      int    `json:"sat_id"`
@@ -535,18 +586,18 @@ type ConsiderationData struct {
 	Data []ConsiderationTable `json:"data"`
 }
 type ConsiderationTable struct {
-	Mc_id       int     `json:"mc_id"`
-	Mc_title    string  `json:"mc_title"`
-	Mc_weight   float64 `json:"mc_weight"`
-	Mc_status   int     `json:"mc_status"`
-	Create_date string  `json:"create_date"`
-	Update_date string  `json:"update_date"`
-	Create_by   string  `json:"create_by"`
-	Update_by   string  `json:"update_by"`
-	Su_fname    string  `json:"su_fname"`
-	Su_lname    string  `json:"su_lname"`
-	Su_img_path string  `json:"su_img_path"`
-	Su_img_name string  `json:"su_img_name"`
+	Mc_id        int     `json:"mc_id"`
+	Mc_title     string  `json:"mc_title"`
+	Mc_weight    float64 `json:"mc_weight"`
+	Mc_status    int     `json:"mc_status"`
+	Create_date  string  `json:"create_date"`
+	Update_date  string  `json:"update_date"`
+	Create_by    string  `json:"create_by"`
+	Update_by    string  `json:"update_by"`
+	Su_fname     string  `json:"su_firstname"`
+	Su_lname     string  `json:"su_lastname"`
+	Su_sign_path string  `json:"su_sign_path"`
+	Su_sign_file string  `json:"su_sign_file"`
 }
 type Consideration struct {
 	Mc_id       int     `json:"mc_id"`

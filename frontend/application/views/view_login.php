@@ -28,11 +28,11 @@
                                     <img src="<?php echo base_url() ?>assets/images/logos/crm_icon.png" height="120" alt="">
                                 </div>
 
-                                <p class="text-center" style="font-size: 9px;">© 2024 TBK Technology (Thailand) Company Limited. All rights reserved.</p>
+                                <p class="text-center" style="font-size: 9px;">© 2024 TBKK (Thailand) Company Limited. All rights reserved.</p>
                                 <form id="form_login" name="form_login">
                                     <div class="mb-3">
                                         <label for="InputUsername" class="form-label">Username</label>
-                                        <input type="text" class="form-control" id="InputUsername" name="su_emp_code">
+                                        <input type="text" class="form-control" id="InputUsername" name="su_username">
                                         <span class="form_error"></span>
                                     </div>
                                     <div class="mb-4">
@@ -40,7 +40,7 @@
                                         <input type="password" class="form-control" id="InputPassword1" name="su_password">
                                         <span class="form_error"></span>
                                     </div>
-                                    <a onclick="login()" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</a>
+                                    <a onclick="login()" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2" id="btnSignIn">Sign In</a>
                                     <!-- <div class="d-flex align-items-center justify-content-center">
                                         <p class="fs-4 mb-0 fw-bold">New to CRM?</p>
                                         <a class="text-primary fw-bold ms-2" href="./authentication-register.html">Create an account</a>
@@ -76,7 +76,7 @@
                     <form id="forgot_pass" name="forgot_pass">
                         <div class="mb-3">
                             <label for="emp_code" class="form-label fw-semibold col-sm-3 col-form-label">Code</label>
-                            <input type="text" class="form-control" id="emp_code" name="su_emp_code" placeholder="Employee code">
+                            <input type="text" class="form-control" id="emp_code" name="su_username" placeholder="Employee code">
                             <span class="form_error"></span>
                         </div>
                 </div>
@@ -105,13 +105,19 @@
 <script>
     async function login() {
         event.preventDefault();
+        var divLoad = `<div class="d-flex justify-content-center align-items-center gap-2">
+                            <span>Sign In</span>
+                            <div class="spinner-border text-light" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>`;
+        $('#btnSignIn').html(divLoad);
         let chk = await login_validate();
         if (chk) {
             var login_data = {};
             $('#form_login').serializeArray().map(function(x) {
                 login_data[x.name] = x.value;
             });
-            // console.log(login_data);
             $.ajax({
                 type: 'post',
                 dataType: 'json',
@@ -119,7 +125,7 @@
                 url: API_URL + 'login/login',
                 data: JSON.stringify(login_data),
                 success: function(result) {
-                    console.log(result);
+                    // console.log(result);
                     if (typeof result == "string") {
                         Swal.fire({
                             html: result,
@@ -128,6 +134,7 @@
                                 popup: 'animate__animated animate__fadeInDown'
                             }
                         })
+                        $('#btnSignIn').text('Sign In');
                     } else {
                         $.ajax({
                             type: 'post',
@@ -136,6 +143,7 @@
                             data: result,
                             success: function(res) {
                                 window.location = "<?php echo base_url('Dashboard'); ?>";
+                                $('#btnSignIn').text('Sign In');
                             }
                         })
                     }
@@ -148,7 +156,7 @@
         let chk = await forgot_validate();
         if (chk) {
             var forgot_form = {};
-            forgot_form["su_emp_code"] = $('#emp_code').val();
+            forgot_form["su_username"] = $('#emp_code').val();
             $.ajax({
                 type: 'POST',
                 dataType: 'json',

@@ -58,10 +58,10 @@
                                                         <select class="form-control" id="selTitle">
                                                             <option value="" selected disabled>Choose title</option>
                                                             <?php
-                                                                $option_consider = $this->ManageBackend->list_option("option/list_mc");
-                                                                foreach($option_consider as $consider){
-                                                                    echo '<option value="'.$consider['mc_id'].'">'.$consider['mc_title'].'</option>';
-                                                                }
+                                                            $option_consider = $this->ManageBackend->list_option("option/list_mc");
+                                                            foreach ($option_consider as $consider) {
+                                                                echo '<option value="' . $consider['mc_id'] . '">' . $consider['mc_title'] . '</option>';
+                                                            }
                                                             ?>
                                                         </select>
                                                         <span class="form_error"></span>
@@ -75,10 +75,10 @@
                                                         <select class="form-control" id="selDept">
                                                             <option value="" selected disabled>Choose department</option>
                                                             <?php
-                                                                $option_dept = $this->ManageBackend->list_option("option/list_department");
-                                                                foreach($option_dept as $dept){
-                                                                    echo '<option value="'.$dept['sd_id'].'">'.$dept['sd_name'].'</option>';
-                                                                }
+                                                            $option_dept = $this->ManageBackend->list_option("option/list_department");
+                                                            foreach ($option_dept as $dept) {
+                                                                echo '<option value="' . $dept['sd_id'] . '">' . $dept['sd_dept_name'] . '</option>';
+                                                            }
                                                             ?>
                                                         </select>
                                                         <span class="form_error"></span>
@@ -102,7 +102,7 @@
                                                 </div>
                                             </div>
                                             <div class="table-responsive">
-                                                <table id="tblIncharge" class="dataTable table  table-bordered text-nowrap align-middle ">
+                                                <table id="tblIncharge" class="dataTable table  table-bordered text-wrap align-middle w-100">
                                                     <thead>
                                                         <!-- start row -->
                                                         <tr>
@@ -170,7 +170,7 @@
                                                 </div>
                                             </div>
                                             <div class="table-responsive">
-                                                <table id="tblConsideration" class="dataTable table  table-bordered text-nowrap align-middle " style="width: 100%;">
+                                                <table id="tblConsideration" class="dataTable table  table-bordered text-wrap align-middle " style="width: 100%;">
                                                     <thead>
                                                         <!-- start row -->
                                                         <tr>
@@ -288,11 +288,11 @@
     </div>
 </div>
 <script>
-    async function addConsider(){
-		event.preventDefault();
+    async function addConsider() {
+        event.preventDefault();
         let chk = await mc_validate("add");
         // console.log(chk);
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -313,11 +313,11 @@
                         type: 'POST',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'consideration/insert',
+                        url: API_URL + 'consideration/insert',
                         data: JSON.stringify(add_form),
-                        success: function(data){
+                        success: function(data) {
                             // console.log(data);
-                            if(data!=false){
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Consideration  success!</p>",
                                     icon: 'success',
@@ -331,7 +331,9 @@
                                 $('#inpTitle').val("")
                                 $('#inpWeight').val("")
                                 $('#inpTotal').val("")
-                            }else{
+                                var table = $('#tblConsideration').DataTable();
+                                table.ajax.reload(null, false);
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Consideration !</p>",
                                     icon: 'error',
@@ -342,19 +344,23 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 })
+                                var table = $('#tblConsideration').DataTable();
+                                table.ajax.reload(null, false);
                             }
                         },
-                        error: function(err){console.log(err);}
+                        error: function(err) {
+                            console.log(err);
+                        }
                     })
                 }
             })
 
         }
-	}
-    async function editConsider(){
-		event.preventDefault();
+    }
+    async function editConsider() {
+        event.preventDefault();
         let chk = await mc_validate("edit");
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -367,9 +373,9 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#edit_formConsider').serializeArray().forEach(function(item) {
-                        if(item.name == 'mc_id'){
+                        if (item.name == 'mc_id') {
                             item.value = parseInt(item.value)
-                        }else if(item.name == 'mc_weight'){
+                        } else if (item.name == 'mc_weight') {
                             item.value = parseFloat(item.value)
                         }
                         edit_form[item.name] = item.value;
@@ -381,34 +387,45 @@
                         type: 'PUT',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'consideration/update',
+                        url: API_URL + 'consideration/update',
                         data: JSON.stringify(edit_form),
-                        success: function(data){
-                            if(data!=false){
+                        success: function(data) {
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Consideration  success!</p>",
                                     icon: 'success',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
+                                }).then((result) => {
+                                    $('#mdlEditConsideration').modal('hide');
+                                    var table = $('#tblConsideration').DataTable();
+                                    table.ajax.reload(null, false);
                                 })
-                            }else{
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Consideration !</p>",
                                     icon: 'error',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
+                                }).then((result) => {
+                                    $('#mdlEditConsideration').modal('hide');
+                                    var table = $('#tblConsideration').DataTable();
+                                    table.ajax.reload(null, false);
                                 })
                             }
                         },
-                        error: function(err){console.log(err)}
+                        error: function(err) {
+                            console.log(err)
+                        }
                     })
                 }
             })
         }
-	}
-    function change_mc_status(id,status){
+    }
+
+    function change_mc_status(id, status) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -422,15 +439,17 @@
                 var status_form = {};
                 status_form["mc_id"] = id;
                 status_form["mc_status"] = status;
+                status_form["update_date"] = getTimeNow();
+                status_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                 $.ajax({
                     type: 'PUT',
-					dataType: 'json',
+                    dataType: 'json',
                     contentType: 'application/json',
-                    url: API_URL+'consideration/change_status',
+                    url: API_URL + 'consideration/change_status',
                     data: JSON.stringify(status_form),
-                    success: function(data){
+                    success: function(data) {
                         // console.log(data);
-                        if(data!=false){
+                        if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status Consideration  success!</p>",
                                 icon: 'success',
@@ -441,7 +460,9 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
-                        }else{
+                            var table = $('#tblConsideration').DataTable();
+                            table.ajax.reload(null, false);
+                        } else {
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status Consideration !</p>",
                                 icon: 'error',
@@ -452,17 +473,21 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
+                            var table = $('#tblConsideration').DataTable();
+                            table.ajax.reload(null, false);
                         }
                     },
-                    error: function(err){console.log(err);}
+                    error: function(err) {
+                        console.log(err);
+                    }
                 })
             }
         })
     }
-    async function addIncharge(){
-		event.preventDefault();
+    async function addIncharge() {
+        event.preventDefault();
         let chk = await incharge_validate("add");
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -483,11 +508,11 @@
                         type: 'POST',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'incharge/insert',
+                        url: API_URL + 'incharge/insert',
                         data: JSON.stringify(add_form),
-                        success: function(data){
+                        success: function(data) {
                             // console.log(data);
-                            if(data!=false){
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Incharge success!</p>",
                                     icon: 'success',
@@ -498,7 +523,9 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 })
-                            }else{
+                                var dataTable = $('#tblIncharge').DataTable();
+                                dataTable.ajax.reload(null, false);
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Incharge!</p>",
                                     icon: 'error',
@@ -509,19 +536,23 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 })
+                                var dataTable = $('#tblIncharge').DataTable();
+                                dataTable.ajax.reload(null, false);
                             }
                         },
-                        error: function(err){console.log(err);}
+                        error: function(err) {
+                            console.log(err);
+                        }
                     })
                 }
             })
 
         }
-	}
-    async function editIncharge(){
-		event.preventDefault();
+    }
+    async function editIncharge() {
+        event.preventDefault();
         let chk = await incharge_validate("edit");
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -534,46 +565,58 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#frmEditConsideration').serializeArray().forEach(function(item) {
-                        if(item.name == 'mc_id' || item.name == 'sd_id' || item.name == 'mci_id'){
+                        if (item.name == 'mc_id' || item.name == 'sd_id' || item.name == 'mci_id') {
                             item.value = parseInt(item.value)
                         }
                         edit_form[item.name] = item.value;
                     })
                     edit_form["update_date"] = getTimeNow();
                     edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-    
+
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'incharge/update',
+                        url: API_URL + 'incharge/update',
                         data: JSON.stringify(edit_form),
-                        success: function(data){
-                            if(data!=false){
+                        success: function(data) {
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Incharge success!</p>",
                                     icon: 'success',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
+                                }).then((result) => {
+                                    $('#mdlEditIncharge').modal('hide');
+                                    var dataTable = $('#tblIncharge').DataTable();
+                                    dataTable.ajax.reload(null, false);
                                 })
-                            }else{
+
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Incharge!</p>",
                                     icon: 'error',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
+                                }).then((result) => {
+                                    $('#mdlEditIncharge').modal('hide');
+                                    var dataTable = $('#tblIncharge').DataTable();
+                                    dataTable.ajax.reload(null, false);
                                 })
                             }
                         },
-                        error: function(err){console.log(err)}
+                        error: function(err) {
+                            console.log(err)
+                        }
                     })
                 }
             })
         }
-	}
-    function change_mci_status(id,status){
+    }
+
+    function change_mci_status(id, status) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -587,15 +630,17 @@
                 var status_form = {};
                 status_form["mci_id"] = id;
                 status_form["mci_status"] = status;
+                status_form["update_date"] = getTimeNow();
+                status_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                 $.ajax({
                     type: 'PUT',
-					dataType: 'json',
+                    dataType: 'json',
                     contentType: 'application/json',
-                    url: API_URL+'incharge/change_status',
+                    url: API_URL + 'incharge/change_status',
                     data: JSON.stringify(status_form),
-                    success: function(data){
+                    success: function(data) {
                         // console.log(data);
-                        if(data!=false){
+                        if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status Incharge success!</p>",
                                 icon: 'success',
@@ -606,7 +651,9 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
-                        }else{
+                            var dataTable = $('#tblIncharge').DataTable();
+                            dataTable.ajax.reload(null, false);
+                        } else {
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status Incharge!</p>",
                                 icon: 'error',
@@ -617,123 +664,134 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
+                            var dataTable = $('#tblIncharge').DataTable();
+                            dataTable.ajax.reload(null, false);
                         }
                     },
-                    error: function(err){console.log(err);}
+                    error: function(err) {
+                        console.log(err);
+                    }
                 })
             }
         })
     }
-// modal --------------------------------------
-	function editModal(title,weight,id){
-		event.preventDefault();
-		$('#edtTitle').val(title);
-		$('#edtWeight').val(weight);
-		$('#edtConsiderationId').val(id);
-	}
-    function editDetailModal(mc_id,sd_id,id){
-		event.preventDefault();
-		$('#Incharge_id').val(id);
+    // modal --------------------------------------
+    function editModal(title, weight, id) {
+        event.preventDefault();
+        $('#edtTitle').val(title);
+        $('#edtWeight').val(weight);
+        $('#edtConsiderationId').val(id);
+    }
+
+    function editDetailModal(mc_id, sd_id, id) {
+        event.preventDefault();
+        $('#Incharge_id').val(id);
         editConsiderationOption(mc_id);
         editDepartmentOption(sd_id);
-	}
-    function editConsiderationOption(id){
+    }
+
+    function editConsiderationOption(id) {
         $.ajax({
             type: 'get',
-            url: API_URL+'option/list_mc',
-            success: function (result){
+            url: API_URL + 'option/list_mc',
+            success: function(result) {
                 var option_text = '<option value="" selected disabled>Choose consideration</option>';
-                $.each(result, function (key, value){
+                $.each(result, function(key, value) {
                     let sel = "";
-                    if(value.mc_id == id){sel = "selected";}
-                    option_text += '<option value="'+value.mc_id+'" '+sel+'>'+value.mc_title+'</option>';
+                    if (value.mc_id == id) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + value.mc_id + '" ' + sel + '>' + value.mc_title + '</option>';
                 })
                 $('#edtmc').html(option_text);
             }
         })
     }
-    function editDepartmentOption(id){
+
+    function editDepartmentOption(id) {
         $.ajax({
             type: 'get',
-            url: API_URL+'option/list_department',
-            success: function (result){
+            url: API_URL + 'option/list_department',
+            success: function(result) {
                 var option_text = '<option value="" selected disabled>Choose department</option>';
-                $.each(result, function (key, value){
+                $.each(result, function(key, value) {
                     let sel = "";
-                    if(value.sd_id == id){sel = "selected";}
-                    option_text += '<option value="'+value.sd_id+'" '+sel+'>'+value.sd_name+'</option>';
+                    if (value.sd_id == id) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + value.sd_id + '" ' + sel + '>' + value.sd_dept_name + '</option>';
                 })
                 $('#edtDept').html(option_text);
             }
         })
     }
-    $(document).ready(function (){
-        if ( $.fn.DataTable.isDataTable('#tblIncharge') ) {
+    $(document).ready(function() {
+        if ($.fn.DataTable.isDataTable('#tblIncharge')) {
             $('#tblIncharge').DataTable().destroy();
         }
-		var inchargeTable = $('#tblIncharge').DataTable({
-			ajax: {
-				url: API_URL+'incharge/table'
-			},
+        var inchargeTable = $('#tblIncharge').DataTable({
+            ajax: {
+                url: API_URL + 'incharge/table'
+            },
+            responsive: true,
             columnDefs: [{
-					searchable: true,
-					orderable: false,
-					targets: 0,
-				},
-			],
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
             bSort: false,
-			order: [[1, 'asc']],
-			columns: [{
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
                     className: 'text-center',
-                    data:'mci_id'
+                    data: 'mci_id'
                 },
                 {
                     className: 'text-center',
-                    data:'mc_title',
-                    render: function (data, type, row) {
+                    data: 'mc_title',
+                    render: function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<div class="text-warp">'+data+'</div>';
+                            disp = '<div class="text-warp">' + data + '</div>';
                         }
                         return disp;
                     }
                 },
                 {
                     className: 'text-center',
-                    data:'sd_name'
+                    data: 'sd_name'
                 },
                 {
                     className: 'text-center',
-                    data:'update_date'
+                    data: 'update_date'
                 },
                 {
-                    className: 'text-center',
-                    data:'update_by',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.update_by!=""){
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/'+row.update_by+'.jpg';
-                                if(!is_cached(img_ok)){img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';}
-                                disp = '<div class="d-flex align-items-center">'+
-                                    '<img src="'+img_ok+'" alt="avatar" class="rounded-circle avatar" width="35">'+
-                                    '<div class="ms-3">'+
-                                        '<div class="user-meta-info">'+
-                                            '<h6 class="user-name mb-0" data-name="'+row.su_fname+' '+row.su_lname+'">'+row.su_fname+'</h6>'+
-                                            '<span class="user-work fs-3" data-occupation="'+row.update_by+'">'+row.update_by+'</span>'+
+                    className: 'text-center text-nowrap',
+                    data: 'update_by',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            let emp_code = row.update_by.substring(2, 7);
+                            let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
+                            disp = '<div class="d-flex align-items-center justify-content-center">' +
+                                '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35" onerror="this.onerror=null;this.src=\'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png\';">' +
+                                '<div class="ms-3">' +
+                                '<div class="user-meta-info">' +
+                                '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + ' ' + row.su_lname + '</h6>' +
+                                '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
                                 '</div></div></div>';
-                            }else{disp="";}
                         }
                         return disp;
                     },
                 },
                 {
                     className: 'text-center',
-                    data:'mci_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.mci_status){
-                                disp = '<a onclick="change_mci_status('+row.mci_id+',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            }else{
-                                disp = '<a onclick="change_mci_status('+row.mci_id+',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                    data: 'mci_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.mci_status) {
+                                disp = '<a onclick="change_mci_status(' + row.mci_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+                            } else {
+                                disp = '<a onclick="change_mci_status(' + row.mci_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
                             }
                         }
                         return disp;
@@ -741,89 +799,93 @@
                 },
                 {
                     className: 'text-center',
-                    data:'mci_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            disp = '<button type="button" onclick="editDetailModal(\''+row.mc_id+'\',\''+row.sd_id+'\',\''+row.mci_id+'\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditIncharge">'+
+                    data: 'mci_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<button type="button" onclick="editDetailModal(\'' + row.mc_id + '\',\'' + row.sd_id + '\',\'' + row.mci_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditIncharge">' +
                                 '<i class="ti ti-pencil me-1"></i>Edit</button>';
                         }
                         return disp;
                     }
-            }]
-		});
-        inchargeTable.on('order.dt search.dt', function () {
+                }
+            ]
+        });
+        inchargeTable.on('order.dt search.dt', function() {
             let i = 1;
-            inchargeTable.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
+            inchargeTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
                 this.data(i++);
             });
         }).draw();
 
-        if ( $.fn.DataTable.isDataTable('#tblConsideration') ) {
+        if ($.fn.DataTable.isDataTable('#tblConsideration')) {
             $('#tblConsideration').DataTable().destroy();
         }
-		var dataTable = $('#tblConsideration').DataTable({
-			ajax: {
-				url: API_URL+'consideration/table'
-			},
+        var dataTable = $('#tblConsideration').DataTable({
+            ajax: {
+                url: API_URL + 'consideration/table'
+            },
+            responsive: true,
             columnDefs: [{
-					searchable: true,
-					orderable: false,
-					targets: 0,
-				},
-			],
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
             bSort: false,
-			order: [[1, 'asc']],
-			columns: [{
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
                     className: 'text-center',
-                    data:'mc_id'
+                    data: 'mc_id'
                 },
                 {
                     className: 'text-center',
-                    data:'mc_title',
-                    render: function (data, type, row) {
+                    data: 'mc_title',
+                    render: function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<div class="text-warp">'+data+'</div>';
+                            disp = '<div class="text-warp">' + data + '</div>';
                         }
                         return disp;
                     }
                 },
                 {
                     className: 'text-center',
-                    data:'mc_weight'
+                    data: 'mc_weight'
                 },
                 {
                     className: 'text-center',
-                    data:'update_date'
+                    data: 'update_date'
                 },
                 {
                     className: 'text-center',
-                    data:'update_by',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.update_by!=""){
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/'+row.update_by+'.jpg';
-                                if(!is_cached(img_ok)){img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';}
-                                disp = '<div class="d-flex align-items-center">'+
-                                    '<img src="'+img_ok+'" alt="avatar" class="rounded-circle avatar" width="35">'+
-                                    '<div class="ms-3">'+
-                                        '<div class="user-meta-info">'+
-                                            '<h6 class="user-name mb-0" data-name="'+row.su_fname+' '+row.su_lname+'">'+row.su_fname+'</h6>'+
-                                            '<span class="user-work fs-3" data-occupation="'+row.update_by+'">'+row.update_by+'</span>'+
+                    data: 'update_by',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            let emp_code = row.update_by.substring(2, 7);
+                            let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
+                            disp = '<div class="d-flex align-items-center justify-content-center">' +
+                                '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35" onerror="this.onerror=null;this.src=\'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png\';">' +
+                                '<div class="ms-3">' +
+                                '<div class="user-meta-info">' +
+                                '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + ' ' + row.su_lastname + '</h6>' +
+                                '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
                                 '</div></div></div>';
-                            }else{disp="";}
                         }
                         return disp;
                     },
                 },
                 {
                     className: 'text-center',
-                    data:'mc_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.mc_status){
-                                disp = '<a onclick="change_mc_status('+row.mc_id+',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            }else{
-                                disp = '<a onclick="change_mc_status('+row.mc_id+',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                    data: 'mc_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.mc_status) {
+                                disp = '<a onclick="change_mc_status(' + row.mc_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+                            } else {
+                                disp = '<a onclick="change_mc_status(' + row.mc_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
                             }
                         }
                         return disp;
@@ -831,26 +893,30 @@
                 },
                 {
                     className: 'text-center',
-                    data:'mc_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            disp = '<button type="button" onclick="editModal(\''+row.mc_title+'\',\''+row.mc_weight+'\',\''+row.mc_id+'\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditConsideration">'+
+                    data: 'mc_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<button type="button" onclick="editModal(\'' + row.mc_title + '\',\'' + row.mc_weight + '\',\'' + row.mc_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditConsideration">' +
                                 '<i class="ti ti-pencil me-1"></i>Edit</button>';
                         }
                         return disp;
                     }
-            }]
-		});
-        dataTable.on('order.dt search.dt', function () {
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
             let i = 1;
-            dataTable.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
                 this.data(i++);
             });
         }).draw();
 
-		setInterval(function (){
-			dataTable.ajax.reload( null, false );
-			inchargeTable.ajax.reload( null, false );
-		}, 600000 );
-	});
+        setInterval(function() {
+            dataTable.ajax.reload(null, false);
+            inchargeTable.ajax.reload(null, false);
+        }, 600000);
+    });
 </script>

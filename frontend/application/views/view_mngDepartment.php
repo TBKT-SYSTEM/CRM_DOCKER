@@ -50,7 +50,8 @@
                                         <!-- start row -->
                                         <tr>
                                             <th>No.</th>
-                                            <th>Department</th>
+                                            <th>Department Name</th>
+                                            <th>Department Code</th>
                                             <th>Updated Date</th>
                                             <th>Updated By</th>
                                             <th>Status</th>
@@ -85,9 +86,22 @@
                 <form id="add_form" name="add_form">
                     <div class="container-fluid">
                         <div class="mb-3 row align-items-center">
-                            <label for="inpDepartment" class="form-label fw-semibold col-sm-3 col-form-label">Department</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpDepartment" name="sd_name" placeholder="Department Name">
+                            <label for="inpDepartment" class="form-label fw-semibold col-sm-4 col-form-label">Department Name</label>
+                            <div class="col-sm-8 mb-3">
+                                <input type="text" class="form-control" id="inpDepartment" name="sd_dept_name" placeholder="Department Name">
+                                <span class="form_error"></span>
+                            </div>
+                            <label for="inpDepartmentCd" class="form-label fw-semibold col-sm-4 col-form-label">Department Code</label>
+                            <div class="col-sm-8 mb-3">
+                                <input type="text" class="form-control" id="inpDepartmentCd" name="sd_dept_cd" placeholder="Department Code">
+                                <span class="form_error"></span>
+                            </div>
+                            <label for="inpPlant" class="form-label fw-semibold col-sm-4 col-form-label">Plant</label>
+                            <div class="col-sm-8">
+                                <select type="text" class="form-control" id="inpPlant" name="sd_plant_cd">
+                                    <option value="51" selected>Phase 10</option>
+                                    <option value="58">Phase 8</option>
+                                </select>
                                 <span class="form_error"></span>
                             </div>
                         </div>
@@ -120,9 +134,14 @@
                 <form id="edit_form" name="edit_form">
                     <div class="container-fluid">
                         <div class="mb-3 row align-items-center">
-                            <label for="edtDepartment" class="form-label fw-semibold col-sm-3 col-form-label">Department</label>
+                            <label for="edtDepartment" class="form-label fw-semibold col-sm-3 col-form-label">Department Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="edtDepartment" name="sd_name" placeholder="Department Name">
+                                <input type="text" class="form-control" id="edtDepartment" name="sd_dept_name" placeholder="Department Name">
+                                <span class="form_error"></span>
+                            </div>
+                            <label for="edtDepartmentCd" class="form-label fw-semibold col-sm-3 col-form-label">Department Code</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="edtDepartmentCd" name="sd_dept_cd" placeholder="Department Code">
                                 <span class="form_error"></span>
                             </div>
                         </div>
@@ -143,11 +162,11 @@
 </div>
 
 <script>
-    async function adddepartment(){
-		event.preventDefault();
+    async function adddepartment() {
+        event.preventDefault();
         let chk = await department_validate("add");
         // console.log(chk);
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -160,20 +179,24 @@
                 if (result.isConfirmed) {
                     var add_form = {};
                     $('#add_form').serializeArray().forEach(function(item) {
-                        add_form[item.name] = item.value;
+                        if (item.name == 'sd_plant_cd') {
+                            add_form[item.name] = parseInt(item.value); // แปลงเป็นตัวเลข
+                        } else {
+                            add_form[item.name] = item.value;
+                        }
                     })
-                    add_form["create_date"] = getTimeNow();
-                    add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-                    
+                    add_form["sd_created_date"] = getTimeNow();
+                    add_form["sd_created_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'department/insert',
+                        url: API_URL + 'department/insert',
                         data: JSON.stringify(add_form),
-                        success: function(data){
+                        success: function(data) {
                             // console.log(data);
-                            if(data!=false){
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add department success!</p>",
                                     icon: 'success',
@@ -184,7 +207,13 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 })
-                            }else{
+                                $("#inpDepartment").val('');
+                                $("#inpDepartmentCd").val('');
+                                $("#inpPlant").prop('selectedIndex', 0);
+                                var dataTable = $('#tblDepartment').DataTable();
+                                dataTable.ajax.reload(null, false);
+                                $('#mdlRegister').modal('hide');
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add department!</p>",
                                     icon: 'error',
@@ -195,18 +224,26 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 })
+                                $("#inpDepartment").val('');
+                                $("#inpDepartmentCd").val('');
+                                $("#inpPlant").prop('selectedIndex', 0);
+                                var dataTable = $('#tblDepartment').DataTable();
+                                dataTable.ajax.reload(null, false);
+                                $('#mdlRegister').modal('hide');
                             }
                         },
-                        error: function(err){console.log(err);}
+                        error: function(err) {
+                            console.log(err);
+                        }
                     })
                 }
             })
         }
-	}
-    async function editdepartment(){
-		event.preventDefault();
+    }
+    async function editdepartment() {
+        event.preventDefault();
         let chk = await department_validate("edit");
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -219,22 +256,21 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#edit_form').serializeArray().forEach(function(item) {
-                        if(item.name == 'sd_id'){
+                        if (item.name == 'sd_id') {
                             item.value = parseInt(item.value)
                         }
                         edit_form[item.name] = item.value;
                     })
-                    edit_form["update_date"] = getTimeNow();
-                    edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-    
+                    edit_form["sd_updated_date"] = getTimeNow();
+                    edit_form["sd_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'department/update',
+                        url: API_URL + 'department/update',
                         data: JSON.stringify(edit_form),
-                        success: function(data){
-                            if(data!=false){
+                        success: function(data) {
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit department success!</p>",
                                     icon: 'success',
@@ -242,7 +278,10 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 })
-                            }else{
+                                var dataTable = $('#tblDepartment').DataTable();
+                                dataTable.ajax.reload(null, false);
+                                $('#mdlEdits').modal('hide');
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit department!</p>",
                                     icon: 'error',
@@ -250,15 +289,21 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 })
+                                var dataTable = $('#tblDepartment').DataTable();
+                                dataTable.ajax.reload(null, false);
+                                $('#mdlEdits').modal('hide');
                             }
                         },
-                        error: function(err){console.log(err)}
+                        error: function(err) {
+                            console.log(err)
+                        }
                     })
                 }
             })
         }
-	}
-    function change_status(id,status){
+    }
+
+    function change_status(id, status) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -274,13 +319,13 @@
                 status_form["sd_status"] = status;
                 $.ajax({
                     type: 'PUT',
-					dataType: 'json',
+                    dataType: 'json',
                     contentType: 'application/json',
-                    url: API_URL+'department/change_status',
+                    url: API_URL + 'department/change_status',
                     data: JSON.stringify(status_form),
-                    success: function(data){
+                    success: function(data) {
                         // console.log(data);
-                        if(data!=false){
+                        if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status department success!</p>",
                                 icon: 'success',
@@ -291,7 +336,9 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
-                        }else{
+                            var dataTable = $('#tblDepartment').DataTable();
+                            dataTable.ajax.reload(null, false);
+                        } else {
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status department!</p>",
                                 icon: 'error',
@@ -302,76 +349,90 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
+                            var dataTable = $('#tblDepartment').DataTable();
+                            dataTable.ajax.reload(null, false);
                         }
                     },
-                    error: function(err){console.log(err);}
+                    error: function(err) {
+                        console.log(err);
+                    }
                 })
             }
         })
     }
-// modal --------------------------------------
-	function editModal(name,id){
-		event.preventDefault();
-		$('#edtDepartment').val(name);
-		$('#sd_id').val(id);
-	}
-    $(document).ready(function (){
-        if ( $.fn.DataTable.isDataTable('#tblDepartment') ) {
+    // modal --------------------------------------
+    function editModal(name, cd, id) {
+        event.preventDefault();
+        $('#edtDepartment').val(name);
+        $('#edtDepartmentCd').val(cd);
+        $('#sd_id').val(id);
+        console.log(name + ' == ', cd + ' == ', id);
+
+    }
+    $(document).ready(function() {
+        if ($.fn.DataTable.isDataTable('#tblDepartment')) {
             $('#tblDepartment').DataTable().destroy();
         }
-		var dataTable = $('#tblDepartment').DataTable({
-			ajax: {
-				url: API_URL+'department/table'
-			},
+        var dataTable = $('#tblDepartment').DataTable({
+            ajax: {
+                url: API_URL + 'department/table'
+            },
             columnDefs: [{
-					searchable: true,
-					orderable: false,
-					targets: 0,
-				},
-			],
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
             bSort: false,
-			order: [[1, 'asc']],
-			columns: [{
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
                     className: 'text-center',
-                    data:'sd_id'
+                    data: 'sd_id'
                 },
                 {
                     className: 'text-center',
-                    data:'sd_name',
+                    data: 'sd_dept_name',
                 },
                 {
                     className: 'text-center',
-                    data:'update_date'
+                    data: 'sd_dept_cd',
                 },
                 {
                     className: 'text-center',
-                    data:'update_by',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.update_by!=""){
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/'+row.update_by+'.jpg';
-                                if(!is_cached(img_ok)){img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';}
-                                disp = '<div class="d-flex align-items-center">'+
-                                    '<img src="'+img_ok+'" alt="avatar" class="rounded-circle avatar" width="35">'+
-                                    '<div class="ms-3">'+
-                                        '<div class="user-meta-info">'+
-                                            '<h6 class="user-name mb-0" data-name="'+row.su_fname+' '+row.su_lname+'">'+row.su_fname+'</h6>'+
-                                            '<span class="user-work fs-3" data-occupation="'+row.update_by+'">'+row.update_by+'</span>'+
-                                '</div></div></div>';
-                            }else{disp="";}
+                    data: 'sd_updated_date'
+                },
+                {
+                    className: 'text-center',
+                    data: 'sd_updated_by',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.sd_updated_by != "") {
+                                let emp_code = row.sd_updated_by.substring(2, 7);
+                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
+                                disp = '<div class="d-flex align-items-center justify-content-center">' +
+                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35" onerror="this.onerror=null;this.src=\'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png\';">' +
+                                    '<div class="ms-3">' +
+                                    '<div class="user-meta-info">' +
+                                    '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + '</h6>' +
+                                    '<span class="user-work fs-3" data-occupation="' + row.sd_updated_by + '">' + row.sd_updated_by + '</span>' +
+                                    '</div></div></div>';
+                            } else {
+                                disp = "";
+                            }
                         }
                         return disp;
                     },
                 },
                 {
                     className: 'text-center',
-                    data:'sd_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.sd_status){
-                                disp = '<a onclick="change_status('+row.sd_id+',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            }else{
-                                disp = '<a onclick="change_status('+row.sd_id+',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                    data: 'sd_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.sd_status) {
+                                disp = '<a onclick="change_status(' + row.sd_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+                            } else {
+                                disp = '<a onclick="change_status(' + row.sd_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
                             }
                         }
                         return disp;
@@ -379,24 +440,28 @@
                 },
                 {
                     className: 'text-center',
-                    data:'sd_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            disp = '<button type="button" onclick="editModal(\''+row.sd_name+'\',\''+row.sd_id+'\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">'+
+                    data: 'sd_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<button type="button" onclick="editModal(\'' + row.sd_dept_name + '\',\'' + row.sd_dept_cd + '\',\'' + row.sd_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
                                 '<i class="ti ti-pencil me-1"></i> Edit </button>';
                         }
                         return disp;
                     }
-            }]
-		});
-        dataTable.on('order.dt search.dt', function () {
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
             let i = 1;
-            dataTable.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
                 this.data(i++);
             });
         }).draw();
-		setInterval(function (){
-			dataTable.ajax.reload( null, false );
-		}, 1000 );
-	});
+        setInterval(function() {
+            dataTable.ajax.reload(null, false);
+        }, 300000);
+    });
 </script>

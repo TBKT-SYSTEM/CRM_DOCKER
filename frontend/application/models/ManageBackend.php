@@ -29,7 +29,7 @@ class ManageBackend extends CI_Model{
             "la_login_date"=>date("Y-m-d H:i:s")
         );
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, API_BASE_URL_CONTAINER."log/login");
+        curl_setopt($ch, CURLOPT_URL, API_BASE_URL."log/login");
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS,json_encode($data));
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
@@ -37,7 +37,7 @@ class ManageBackend extends CI_Model{
         $response = curl_exec($ch);
         // echo "<script>console.log('Debug Objects: " . $response . "' );</script>";
         curl_close($ch);
-        return json_decode($response, true);;
+        return json_decode($response, true);
     }
     public function log_logout($id){
         $data = array(
@@ -45,7 +45,7 @@ class ManageBackend extends CI_Model{
             "la_logout_date"=>date("Y-m-d H:i:s")
         );
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, API_BASE_URL_CONTAINER."log/logout");
+        curl_setopt($ch, CURLOPT_URL, API_BASE_URL."log/logout");
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS,json_encode($data));
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
@@ -57,8 +57,9 @@ class ManageBackend extends CI_Model{
     }
 // ------------- Web Utilities --------------
     public function menu_array($id,$link){
+        $menu_list = []; 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, API_BASE_URL_CONTAINER."".$link.$id);
+        curl_setopt($ch, CURLOPT_URL, API_BASE_URL."".$link.$id);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($ch);
         if(curl_errno($ch)){
@@ -110,7 +111,7 @@ class ManageBackend extends CI_Model{
 // ------------- Selection ---------------
     public function list_option($link){
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, API_BASE_URL_CONTAINER."".$link);
+        curl_setopt($ch, CURLOPT_URL, API_BASE_URL."".$link);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

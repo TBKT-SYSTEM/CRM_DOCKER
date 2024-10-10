@@ -693,13 +693,6 @@
                     <input type="hidden" id="if_id" name="if_id">
             </div>
             <div class="modal-footer gap-1" id="btnFooter">
-
-                <!-- <button type="reset" onclick="return false;" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal" style="cursor:not-allowed">
-                    Close
-                </button> -->
-                <!-- <button type="button" class="btn btn-primary" type="submit" onclick="return false;" style="cursor:not-allowed">
-                    Submit
-                </button> -->
                 </form>
             </div>
         </div>

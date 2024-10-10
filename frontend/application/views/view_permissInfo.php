@@ -858,6 +858,6 @@
 
 		setInterval(function (){
 			dataTable.ajax.reload( null, false );
-		}, 1000 );
+		}, 600000 );
 	});
 </script>

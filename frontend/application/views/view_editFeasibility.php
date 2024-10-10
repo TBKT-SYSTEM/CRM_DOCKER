@@ -69,22 +69,12 @@
                                                     <div class="col">
                                                         <label for="inpImportFrom" class="form-label fw-semibold">Import From</label>
                                                         <select name="if_import_tran" id="selImport" class="form-control">
-                                                            <option value="" disabled selected>Import From</option>
-                                                            <option value="1">Oversea</option>
-                                                            <option value="2">Domestic</option>
                                                         </select>
                                                         <span class="form_error"></span>
                                                     </div>
                                                     <div class="col">
                                                         <label for="selRequirement" class="form-label fw-semibold">Requirement</label>
                                                         <select name="mrt_id" id="selRequirement" class="form-control">
-                                                            <option value="" disabled selected>Choose Requirement</option>
-                                                            <?php
-                                                            $option_mrt = $this->ManageBackend->list_option("option/list_mrt");
-                                                            foreach ($option_mrt as $op_mrt) {
-                                                                echo '<option value="' . $op_mrt['mrt_id'] . '">' . $op_mrt['mrt_name'] . '</option>';
-                                                            }
-                                                            ?>
                                                         </select>
                                                         <span class="form_error"></span>
                                                     </div>
@@ -160,6 +150,7 @@
                                             <input type="hidden" id="doc_no" name="if_doc_no">
                                             <div class="col-12">
                                                 <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+                                                    <a id="btnPDF" class="btn btn-primary" target="_blank">PDF</a>
                                                     <a href="<?php echo base_url() ?>FeasibilityForm" class="btn bg-danger-subtle text-danger">Back</a>
                                                     <button type="button" class="btn btn-primary" id="btnSubmitRegister" onclick="addFeasibility()">Save</button>
                                                 </div>
@@ -236,20 +227,83 @@
         $('#form_part_no').html(html);
     }
 
+    function fetchRequirementList(mrt_id) {
+        $.ajax({
+            type: 'get',
+            url: API_URL + 'option/list_mrt',
+            success: function(result) {
+                var option_text = '<option value="" disabled selected>Choose Requirement</option>';
+                $.each(result, function(key, value) {
+                    let sel = "";
+                    if (value.mrt_id == mrt_id) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + value.mrt_id + '" ' + sel + '>' + value.mrt_name + '</option>';
+                })
+                $('#selRequirement').html(option_text);
+            }
+        })
+    }
+
+    function fetchImportFromList(if_import_tran) {
+        $.ajax({
+            type: 'get',
+            url: API_URL + 'option/list_import',
+            success: function(result) {
+                var option_text = '<option value="" disabled selected>Choose Import From</option>';
+                $.each(result, function(key, value) {
+                    let sel = "";
+                    if (value.mif_id == if_import_tran) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + value.mif_id + '" ' + sel + '>' + value.mif_name + '</option>';
+                })
+                $('#selImport').html(option_text);
+            }
+        })
+    }
+
+    function fetchCustomerList(if_customer) {
+        $.ajax({
+            type: 'get',
+            url: API_URL + 'option/list_cus',
+            success: function(result) {
+                var option_text = '<option value="" disabled selected>Choose Customer</option>';
+                $.each(result, function(key, value) {
+                    let sel = "";
+                    if (value.mct_name == if_customer) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + value.mct_id + '" ' + sel + '>' + value.mct_name + '</option>';
+                })
+                $('#inpCustomer').html(option_text);
+            }
+        })
+    }
+
     $(document).ready(function() {
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         const if_id = urlParams.get('if_id');
-        
+        var data = {};
         $.ajax({
             type: 'get',
             url: API_URL + 'feasibility/' + if_id,
-            success: function(result) {
-                let datePart = result.create_date.split(" ")[0]
+            success: async function(result) {
+                console.log(result);
+                data = result;
+                let datePart = result.create_date.split(" ")[0];
                 let formattedDate = datePart.replace(/-/g, '/');
                 $('#inpDate').val(formattedDate);
+                fetchRequirementList(result.mrt_id);
+                fetchImportFromList(result.if_import_tran);
+                fetchCustomerList(result.if_customer);
+                let queryParams = $.param(result);
+                $('#btnPDF').attr('href', '<?php echo base_url(); ?>FeasibilityForm/createPDF?' + queryParams);
             }
-        })
+        });
+
+
 
     });
 </script>

@@ -48,13 +48,13 @@ class Dashboard extends CI_Controller {
     }
 	public function login(){
 		$arrData = array(
-            'sessUsr' => $this->input->post('su_emp_code'),
+            'sessUsr' => $this->input->post('su_username'),
             'sessUsrId' => $this->input->post('su_id'),
-            'sessFname' => $this->input->post('su_fname'),
-            'sessLname' => $this->input->post('su_lname'),
+            'sessFname' => $this->input->post('su_firstname'),
+            'sessLname' => $this->input->post('su_lastname'),
             'sessEmail' => $this->input->post('su_email'),
             'sessDeptId' => $this->input->post('sd_id'),
-            'sessDeptName' => $this->input->post('sd_name'),
+            'sessDeptName' => $this->input->post('sd_dept_name'),
             'sessPgId' => $this->input->post('spg_id'),
             'sessPgName' => $this->input->post('spg_name'),
             'loggedIn' => "OK"

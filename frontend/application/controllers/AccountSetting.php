@@ -53,8 +53,8 @@ class AccountSetting extends CI_Controller
 
 		$su_id = $data['su_id'];
 		$image = $data['image'];
-		$update_date = $data['update_date'];
-		$update_by = $data['update_by'];
+		$update_date = $data['su_updated_date'];
+		$update_by = $data['su_updated_by'];
 
 		$imageData = str_replace('data:image/png;base64,', '', $image);
 		$imageData = base64_decode($imageData);
@@ -64,13 +64,10 @@ class AccountSetting extends CI_Controller
 
 		$newData = array(
 			'su_id' => (int)$su_id,
-			'snt_file_name' => $fileName,
-			'snt_file_path' => $filePath,
-			'snt_status' => 1,
-			'create_date' => $update_date,
-			'update_date' => $update_date,
-			'create_by' => $update_by,
-			'update_by' => $update_by,
+			'su_sign_file' => $fileName,
+			'su_sign_path' => $filePath,
+			'su_updated_date' => $update_date,
+			'su_updated_by' => $update_by,
 		);
 
 		if (file_put_contents($filePath, $imageData)) {

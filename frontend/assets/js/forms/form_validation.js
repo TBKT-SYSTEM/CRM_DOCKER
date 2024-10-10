@@ -111,17 +111,19 @@ function form_okCus(element1, element2) {
 
 // validate forms ----------------------
 async function login_validate() {
-    var name = document.form_login.su_emp_code
+    var name = document.form_login.su_username
     var password = document.form_login.su_password
 
     // name -----
     if (is_empty(name.value)) {
         form_err(name, "*Please Enter username");
+        $('#btnSignIn').text('Sign In');
         return false;
     } else {
         form_ok(name);
         if (is_empty(password.value)) {
             form_err(password, "*Please Enter password");
+            $('#btnSignIn').text('Sign In');
             return false;
         } else {
             form_ok(password);
@@ -140,14 +142,12 @@ async function user_validate(formType) {
         let getid = form.su_id
         id = parseInt(getid.value)
     }
-    emp_code = form.su_emp_code
-    fname = form.su_fname
-    lname = form.su_lname
+    emp_code = form.su_username
+    fname = form.su_firstname
+    lname = form.su_lastname
     email = form.su_email
-    spc_id = form.spc_id
     spg_id = form.spg_id
     sd_id = form.sd_id
-    tel = form.su_tel
 
     // name -----
     if (is_empty(emp_code.value)) {
@@ -193,34 +193,13 @@ async function user_validate(formType) {
                             form_err(sd_id, "*Please Enter Department");
                             return false;
                         } else {
-                            if (is_empty(tel.value)) {
-                                form_err(tel, "*Please Enter Telephone");
+                            form_ok(sd_id);
+                            if (is_empty(spg_id.value)) {
+                                form_err(spg_id, "*Please Enter Permission");
                                 return false;
                             } else {
-                                if (numeric(tel.value)) {
-                                    form_err(tel, "*Please Enter valid telephone");
-                                    return false;
-                                } else {
-                                    if (!is_equal(tel.value.length, 10)) {
-                                        form_err(tel, "*Phone number must be 10 number");
-                                        return false;
-                                    } else {
-                                        form_ok(tel);
-                                        if (is_empty(spc_id.value)) {
-                                            form_err(spc_id, "*Please Enter Plant");
-                                            return false;
-                                        } else {
-                                            form_ok(spc_id);
-                                            if (is_empty(spg_id.value)) {
-                                                form_err(spg_id, "*Please Enter Permission");
-                                                return false;
-                                            } else {
-                                                form_ok(spg_id);
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                }
+                                form_ok(spg_id);
+                                return true;
                             }
                         }
                     }
@@ -415,12 +394,12 @@ async function settingUser_validate() {
     var fname, lname, email, spc_id, spg_id, dept, tel;
     let getid = document.frmEditProfile.su_id
     id = parseInt(getid.value)
-    fname = document.frmEditProfile.su_fname
-    lname = document.frmEditProfile.su_lname
+    fname = document.frmEditProfile.su_firstname
+    lname = document.frmEditProfile.su_lastname
     email = document.frmEditProfile.su_email
-    spc_id = document.frmEditProfile.spc_id
     dept = document.frmEditProfile.sd_id
-    tel = document.frmEditProfile.su_tel
+    // spc_id = document.frmEditProfile.spc_id
+    // tel = document.frmEditProfile.su_tel
     // spg_id = document.frmEditProfile.spg_id
 
     if (is_empty(fname.value)) {
@@ -442,34 +421,12 @@ async function settingUser_validate() {
                     return false;
                 } else {
                     form_ok(email);
-                    if (is_empty(spc_id.value)) {
-                        form_err(spc_id, "*Please Enter Plant");
+                    if (is_empty(dept.value)) {
+                        form_err(dept, "*Please Enter Department");
                         return false;
                     } else {
-                        form_ok(spc_id);
-                        if (is_empty(dept.value)) {
-                            form_err(dept, "*Please Enter Department");
-                            return false;
-                        } else {
-                            form_ok(dept);
-                            if (is_empty(tel.value)) {
-                                form_err(tel, "*Please Enter Phone number");
-                                return false;
-                            } else {
-                                if (numeric(tel.value)) {
-                                    form_err(tel, "*Please Enter valid telephone");
-                                    return false;
-                                } else {
-                                    if (!is_equal(tel.value.length, 10)) {
-                                        form_err(tel, "*Phone number must be 10 number");
-                                        return false;
-                                    } else {
-                                        form_ok(tel);
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
+                        form_ok(dept);
+                        return true;
                     }
                 }
             }
@@ -503,33 +460,43 @@ async function settingPsw_validate() {
     }
 }
 async function department_validate(formType) {
-    var sd_name, id, url, unique_data;
+    var sd_dept_name, sd_dept_cd, sd_plant_cd, id, url, unique_data;
     url = API_URL + "department/is_unique"
     if (formType == "add") {
-        sd_name = document.getElementById("inpDepartment")
+        sd_dept_name = document.getElementById("inpDepartment")
+        sd_dept_cd = document.getElementById("inpDepartmentCd")
+        sd_plant_cd = document.getElementById("inpPlant")
         id = 0
     } else {
-        sd_name = document.edit_form.sd_name
+        sd_dept_name = document.edit_form.sd_dept_name
+        sd_dept_cd = document.edit_form.sd_dept_cd
         let getid = document.edit_form.sd_id
         id = parseInt(getid.value)
     }
 
     // name -----
-    if (is_empty(sd_name.value)) {
-        form_err(sd_name, "*Please Enter department");
+    if (is_empty(sd_dept_name.value)) {
+        form_err(sd_dept_name, "*Please Enter department name");
         return false;
+    } else if (is_empty(sd_dept_cd.value)) {
+        form_err(sd_dept_cd, "*Please Enter department code");
+        return false;
+    } else if (is_empty(sd_plant_cd.value)) {
+        sd_plant_cd = 0;
     } else {
         unique_data = {
             "sd_id": id,
-            "sd_name": sd_name.value,
+            "sd_plant_cd": parseInt(sd_plant_cd.value),
+            "sd_dept_name": sd_dept_name.value,
+            "sd_dept_cd": sd_dept_cd.value,
         }
         try {
             var chk_unique = await is_unique(unique_data, url);
             if (chk_unique) {
-                form_err(sd_name, "*Department is Duplicate");
+                form_err(sd_dept_name, "*Department is Duplicate");
                 return false;
             } else {
-                form_ok(sd_name);
+                form_ok(sd_dept_name);
                 return true;
             }
         } catch (err) {
@@ -563,40 +530,42 @@ async function forgot_validate() {
     }
 }
 async function swg_validate(formType) {
-    var name, max, id, url, unique_data;
+    var dept, lv, id, url, unique_data;
     url = API_URL + "workflow_group/is_unique"
     if (formType == "add") {
-        name = document.getElementById("inpWorkflowGroup")
-        max = document.getElementById("inpWorkflowGroup")
+        dept = document.getElementById("selDept")
+        lv = document.getElementById("inpMaxLv")
         id = 0
     } else {
-        name = document.edit_formWorkflowGroup.swg_name
-        max = document.edit_formWorkflowGroup.swg_max_lv
+        dept = document.edit_formWorkflowGroup.sd_id
+        lv = document.edit_formWorkflowGroup.swg_max_level
         let getid = document.edit_formWorkflowGroup.swg_id
         id = parseInt(getid.value)
     }
 
     // name -----
-    if (is_empty(name.value)) {
-        form_err(name, "*Please Enter workflow group");
+    if (is_empty(dept.value)) {
+        form_err(dept, "*Please Select department");
         return false;
     } else {
         unique_data = {
             "swg_id": id,
-            "swg_name": name.value
+            "sd_id": parseInt(dept.value),
+            "swg_max_level": parseInt(lv.value),
         }
         try {
             var chk_unique = await is_unique(unique_data, url);
             if (chk_unique) {
-                form_err(name, "*Workflow group is Duplicate");
+                form_err(dept, "*Workflow group is Duplicate");
+                form_ok(lv);
                 return false;
             } else {
-                form_ok(name);
-                if (is_empty(max.value)) {
-                    form_err(max, "*Please Enter Max level");
+                form_ok(dept);
+                if (is_empty(lv.value)) {
+                    form_err(lv, "*Please Enter Max level");
                     return false;
                 } else {
-                    form_ok(max);
+                    form_ok(lv);
                     return true;
                 }
             }
@@ -643,23 +612,23 @@ async function swd_validate(formType) {
                     return false;
                 } else {
                     form_ok(appType);
-                    // unique_data = {
-                    //     "swd_app_lv": parseInt(appLv.value),
-                    //     "swg_id": parseInt(swg_id.value),
-                    //     "swd_id": id
-                    // }
-                    // try {
-                    //     var chk_unique = await is_unique(unique_data, url);
-                    //     if (chk_unique) {
-                    //         form_err(appLv, "*approve level is Duplicate");
-                    //         return false;
-                    //     } else {
-                    //         form_ok(appLv);
-                    //         return true;
-                    //     }
-                    // } catch (err) {
-                    //     console.log(err); // Handle error
-                    // }
+                    unique_data = {
+                        "swd_level_no": parseInt(appLv.value),
+                        "swg_id": parseInt(swg_id.value),
+                        "swd_id": id
+                    }
+                    try {
+                        var chk_unique = await is_unique(unique_data, url);
+                        if (chk_unique) {
+                            form_err(appLv, "*approve is Duplicate");
+                            return false;
+                        } else {
+                            form_ok(appLv);
+                            return true;
+                        }
+                    } catch (err) {
+                        console.log(err); // Handle error
+                    }
                     form_ok(appLv);
                     return true;
                 }
@@ -762,7 +731,7 @@ async function edit_partno(data) {
 
 async function Feasibility_validate(formType) {
 
-    var if_customer, if_customer_new, if_import_tran, mrt_id, if_ref, refcon ,doc_no , id, url;
+    var if_customer, if_customer_new, if_import_tran, mrt_id, if_ref, refcon, doc_no, id, url;
     url = API_URL + "feasibility/last_id";
     if_ref = "FM-S&M-" + getTwoDigitYear() + "-";
     if (formType == "add") {
@@ -822,7 +791,7 @@ async function Feasibility_validate(formType) {
                 return false;
             } else {
                 form_ok(if_import_tran);
-                if (is_empty(mrt_id.value)) {  
+                if (is_empty(mrt_id.value)) {
                     form_err(mrt_id, "*Please Enter Requirement");
                     $('#navpill-111').addClass('active show');
                     $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');

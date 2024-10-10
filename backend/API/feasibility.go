@@ -252,8 +252,9 @@ func ListFeasibility(c *gin.Context) {
 	var strUpdateDate sql.NullString
 	var strCreateBy sql.NullString
 	var strUpdateBy sql.NullString
+	var strIrRef sql.NullString
 	var strDocNo sql.NullString
-	err := db.QueryRow("SELECT * FROM `info_feasibility` WHERE if_id= ?", iId).Scan(&objFeasibility.If_id, &strDocNo, &objFeasibility.If_ref, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
+	err := db.QueryRow("SELECT * FROM `info_feasibility` WHERE if_id= ?", iId).Scan(&objFeasibility.If_id, &strDocNo, &strIrRef, &objFeasibility.If_customer, &objFeasibility.If_import_tran, &objFeasibility.Mrt_id, &strDuedate, &objFeasibility.If_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -274,6 +275,9 @@ func ListFeasibility(c *gin.Context) {
 	}
 	if strUpdateBy.Valid {
 		objFeasibility.Update_by = strUpdateBy.String
+	}
+	if strIrRef.Valid {
+		objFeasibility.If_ref = strIrRef.String
 	}
 	if strDocNo.Valid {
 		objFeasibility.If_doc_no = strDocNo.String

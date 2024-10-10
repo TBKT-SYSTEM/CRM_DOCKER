@@ -15,8 +15,7 @@ func Routy() {
 	router.POST("/log/logout", LogLogout)
 
 	router.GET("/user/:id", ListUserById)
-	router.GET("/user/table", ListUserTable)
-	router.GET("/user/table2", ListUserTable2)
+	router.GET("/user/table/:id", ListUserTable)
 	router.POST("/user/emp_code_unique", UserIsUnique)
 	router.POST("/user/insert", InsertUser)
 	router.PUT("/user/update", UpdateUser)
@@ -113,6 +112,7 @@ func Routy() {
 	router.GET("/option/list_smd/:id", ListMenuDetailById)
 	router.GET("/option/list_swg", ListWorkflowGroup)
 	router.GET("/option/list_mrt", ListRequirementType)
+	router.GET("/option/list_import", ListImportFrom)
 	router.GET("/option/list_cus", ListRequirementCus)
 	router.GET("/option/list_user", ListUsers)
 	router.GET("/option/list_approve_type", ListApproveType)

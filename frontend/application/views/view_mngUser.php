@@ -87,41 +87,29 @@
                         <div class="mb-3 row align-items-center">
                             <label for="inpEmployeeCode" class="form-label fw-semibold col-sm-3 col-form-label">Code</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpEmployeeCode" name="su_emp_code" placeholder="Employee code">
+                                <input type="text" class="form-control" id="inpEmployeeCode" name="su_username" placeholder="Employee code">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
                             <label for="inpFirstName" class="form-label fw-semibold col-sm-3 col-form-label">First Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpFirstName" name="su_fname" placeholder="First name">
+                                <input type="text" class="form-control" id="inpFirstName" name="su_firstname" placeholder="First name">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
                             <label for="inpLastName" class="form-label fw-semibold col-sm-3 col-form-label">Last Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inpLastName" name="su_lname" placeholder="Last name">
+                                <input type="text" class="form-control" id="inpLastName" name="su_lastname" placeholder="Last name">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
                             <label for="inpEmail" class="form-label fw-semibold col-sm-3 col-form-label">Email</label>
                             <div class="col-sm-9">
-                                <div class="input-group border rounded-1">
-                                    <input type="email" class="form-control border-0" id="inpEmail" name="su_email" placeholder="John Deo">
-                                    <span class="form_error"></span>
-                                    <span class="input-group-text bg-transparent px-6 border-0" id="basic-addon1">@tbkk.com</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="inpTel" class="form-label fw-semibold col-sm-3 col-form-label">Phone number</label>
-                            <div class="col-sm-9">
-                                <div class="input-group border rounded-1">
-                                    <input type="text" class="form-control border-0" id="inpTel" name="su_tel" placeholder="092xxxxxxx">
-                                    <span class="form_error"></span>
-                                </div>
+                                <input type="email" class="form-control" id="inpEmail" name="su_email" placeholder="exaple_email@tbkt.co.th">
+                                <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
@@ -130,25 +118,10 @@
                                 <select name="sd_id" id="selDepartment" class="form-control">
                                     <option value="" disabled selected>Choose department</option>
                                     <?php
-                                        $option_department = $this->ManageBackend->list_option("option/list_department");
-                                        foreach($option_department as $department){
-                                            echo '<option value="'.$department['sd_id'].'">'.$department['sd_name'].'</option>';
-                                        }
-                                    ?>
-                                </select>
-                                <span class="form_error"></span>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="selPlants" class="form-label fw-semibold col-sm-3 col-form-label">Plant</label>
-                            <div class="col-sm-9">
-                                <select name="spc_id" id="selPlants" class="form-control">
-                                    <option value="" disabled selected>Choose plant</option>
-                                    <?php
-                                        $option_plant = $this->ManageBackend->list_option("option/list_plant");
-                                        foreach($option_plant as $plant){
-                                            echo '<option value="'.$plant['spc_id'].'">'.$plant['spc_name'].'</option>';
-                                        }
+                                    $option_department = $this->ManageBackend->list_option("option/list_department");
+                                    foreach ($option_department as $department) {
+                                        echo '<option value="' . $department['sd_id'] . '">' . $department['sd_dept_name'] . '</option>';
+                                    }
                                     ?>
                                 </select>
                                 <span class="form_error"></span>
@@ -160,10 +133,10 @@
                                 <select name="spg_id" id="selPermissionGroup" class="form-control">
                                     <option value="" disabled selected>Choose permission group</option>
                                     <?php
-                                        $option_spg = $this->ManageBackend->list_option("option/list_spg");
-                                        foreach($option_spg as $op_spg){
-                                            echo '<option value="'.$op_spg['spg_id'].'">'.$op_spg['spg_name'].'</option>';
-                                        }
+                                    $option_spg = $this->ManageBackend->list_option("option/list_spg");
+                                    foreach ($option_spg as $op_spg) {
+                                        echo '<option value="' . $op_spg['spg_id'] . '">' . $op_spg['spg_name'] . '</option>';
+                                    }
                                     ?>
                                 </select>
                                 <span class="form_error"></span>
@@ -200,41 +173,29 @@
                         <div class="mb-3 row align-items-center">
                             <label for="edtEmployeeCode" class="form-label fw-semibold col-sm-3 col-form-label">Code</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="edtEmployeeCode" name="su_emp_code" placeholder="Employee code">
+                                <input type="text" class="form-control" id="edtEmployeeCode" name="su_username" placeholder="Employee code">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
                             <label for="edtFirstName" class="form-label fw-semibold col-sm-3 col-form-label">First Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="edtFirstName" name="su_fname" placeholder="First name">
+                                <input type="text" class="form-control" id="edtFirstName" name="su_firstname" placeholder="First name">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
                             <label for="edtLastName" class="form-label fw-semibold col-sm-3 col-form-label">Last Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="edtLastName" name="su_lname" placeholder="Last name">
+                                <input type="text" class="form-control" id="edtLastName" name="su_lastname" placeholder="Last name">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
                             <label for="edtEmail" class="form-label fw-semibold col-sm-3 col-form-label">Email</label>
                             <div class="col-sm-9">
-                                <div class="input-group border rounded-1">
-                                    <input type="text" class="form-control border-0" id="edtEmail" name="su_email" placeholder="John Deo">
-                                    <span class="form_error"></span>
-                                    <span class="input-group-text bg-transparent px-6 border-0" id="basic-addon1">@tbkk.com</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3 row align-items-center">
-                            <label for="editTel" class="form-label fw-semibold col-sm-3 col-form-label">Phone number</label>
-                            <div class="col-sm-9">
-                                <div class="input-group border rounded-1">
-                                    <input type="text" class="form-control border-0" id="editTel" name="su_tel" placeholder="092xxxxxxx">
-                                    <span class="form_error"></span>
-                                </div>
+                                <input type="text" class="form-control" id="edtEmail" name="su_email" placeholder="John Deo">
+                                <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
@@ -247,7 +208,7 @@
                         <div class="mb-3 row align-items-center">
                             <label for="edtPlants" class="form-label fw-semibold col-sm-3 col-form-label">Plant</label>
                             <div class="col-sm-9">
-                                <select name="spc_id" id="edtPlants" class="form-control"></select>
+                                <select name="" id="edtPlants" class="form-control" disabled></select>
                                 <span class="form_error"></span>
                             </div>
                         </div>
@@ -259,9 +220,9 @@
                             </div>
                         </div>
                         <input type="hidden" id="su_id" name="su_id">
-                        <div class="my-2 row align-items-center">
+                        <!-- <div class="my-2 row align-items-center">
                             <a href="javascript:void(0)" class="text-primary fw-bold" style="text-align: right;" onclick="re_password()">Reset Password</a>
-                        </div>
+                        </div> -->
                     </div>
             </div>
             <div class="modal-footer">
@@ -278,11 +239,11 @@
 </div>
 
 <script>
-    async function addUser(){
-		event.preventDefault();
+    async function addUser() {
+        event.preventDefault();
         let chk = await user_validate("add");
         // console.log(chk);
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -295,25 +256,24 @@
                 if (result.isConfirmed) {
                     var add_form = {};
                     $('#add_form').serializeArray().forEach(function(item) {
-                        if(item.name == 'spg_id' || item.name == 'spc_id' || item.name == 'sd_id'){
+                        if (item.name == 'spg_id' || item.name == 'spc_id' || item.name == 'sd_id') {
                             item.value = parseInt(item.value)
                         }
                         add_form[item.name] = item.value;
                     })
-                    add_form["su_img_path"] = "http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/"+add_form["su_emp_code"]+".jpg";
-                    add_form["su_img_name"] = add_form["su_emp_code"]+".jpg";
-                    add_form["create_date"] = getTimeNow();
-                    add_form["create_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-                    
+                    add_form["su_created_date"] = getTimeNow();
+                    add_form["su_created_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                    // console.log(add_form);
+                    // return;
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'user/insert',
+                        url: API_URL + 'user/insert',
                         data: JSON.stringify(add_form),
-                        success: function(data){
+                        success: function(data) {
                             // console.log(data);
-                            if(data!=false){
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add user success!</p>",
                                     icon: 'success',
@@ -323,8 +283,12 @@
                                     hideClass: {
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
+                                }).then((result) => {
+                                    $('#mdlRegister').modal('hide');
+                                    var dataTable = $('#tblUsers').DataTable();
+                                    dataTable.ajax.reload(null, false);
                                 })
-                            }else{
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add user!</p>",
                                     icon: 'error',
@@ -334,19 +298,25 @@
                                     hideClass: {
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
+                                }).then((result) => {
+                                    $('#mdlRegister').modal('hide');
+                                    var dataTable = $('#tblUsers').DataTable();
+                                    dataTable.ajax.reload(null, false);
                                 })
                             }
                         },
-                        error: function(err){console.log(err);}
+                        error: function(err) {
+                            console.log(err);
+                        }
                     })
                 }
             })
         }
-	}
-    async function editUser(){
-		event.preventDefault();
+    }
+    async function editUser() {
+        event.preventDefault();
         let chk = await user_validate("edit");
-        if(chk){
+        if (chk) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -359,48 +329,58 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#edit_form').serializeArray().forEach(function(item) {
-                        if(item.name == 'spg_id' || item.name == 'spc_id' || item.name == 'su_id' || item.name == 'sd_id'){
+                        if (item.name == 'spg_id' || item.name == 'spc_id' || item.name == 'su_id' || item.name == 'sd_id') {
                             item.value = parseInt(item.value)
                         }
                         edit_form[item.name] = item.value;
                     })
-                    edit_form["su_img_path"] = "http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/"+edit_form["su_emp_code"]+".jpg";
-                    edit_form["su_img_name"] = edit_form["su_emp_code"]+".jpg";
-                    edit_form["update_date"] = getTimeNow();
-                    edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-
+                    edit_form["su_updated_date"] = getTimeNow();
+                    edit_form["su_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                    // console.log(edit_form);
+                    // return;
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
                         contentType: 'application/json',
-                        url: API_URL+'user/update',
+                        url: API_URL + 'user/update',
                         data: JSON.stringify(edit_form),
-                        success: function(data){
-                            if(data!=false){
+                        success: function(data) {
+                            if (data != false) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit user success!</p>",
                                     icon: 'success',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
+                                }).then((result) => {
+                                    $('#mdlEdits').modal('hide');
+                                    var dataTable = $('#tblUsers').DataTable();
+                                    dataTable.ajax.reload(null, false);
                                 })
-                            }else{
+                            } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit user!</p>",
                                     icon: 'error',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
+                                }).then((result) => {
+                                    $('#mdlEdits').modal('hide');
+                                    var dataTable = $('#tblUsers').DataTable();
+                                    dataTable.ajax.reload(null, false);
                                 })
                             }
                         },
-                        error: function(err){console.log(err)}
+                        error: function(err) {
+                            console.log(err)
+                        }
                     })
                 }
             })
         }
-	}
-    function change_status(id,status){
+    }
+
+    function change_status(id, status) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -416,13 +396,13 @@
                 status_form["su_status"] = status;
                 $.ajax({
                     type: 'PUT',
-					dataType: 'json',
+                    dataType: 'json',
                     contentType: 'application/json',
-                    url: API_URL+'user/change_status',
+                    url: API_URL + 'user/change_status',
                     data: JSON.stringify(status_form),
-                    success: function(data){
+                    success: function(data) {
                         // console.log(data);
-                        if(data!=false){
+                        if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status user success!</p>",
                                 icon: 'success',
@@ -433,7 +413,7 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
-                        }else{
+                        } else {
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status user!</p>",
                                 icon: 'error',
@@ -446,12 +426,14 @@
                             })
                         }
                     },
-                    error: function(err){console.log(err);}
+                    error: function(err) {
+                        console.log(err);
+                    }
                 })
             }
         })
     }
-    async function re_password(){
+    async function re_password() {
         event.preventDefault();
         var su_id = $('#su_id').val();
         var getUser = await getUserCode(su_id);
@@ -472,13 +454,13 @@
                 repswData["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                 $.ajax({
                     type: 'PUT',
-					dataType: 'json',
+                    dataType: 'json',
                     contentType: 'application/json',
-                    url: API_URL+'setting/password',
+                    url: API_URL + 'setting/password',
                     data: JSON.stringify(repswData),
-                    success: function(data){
+                    success: function(data) {
                         // console.log(data);
-                        if(data!=false){
+                        if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update user password success!</p>",
                                 icon: 'success',
@@ -489,7 +471,7 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
-                        }else{
+                        } else {
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update user password!</p>",
                                 icon: 'error',
@@ -502,16 +484,18 @@
                             })
                         }
                     },
-                    error: function(err){console.log(err);}
+                    error: function(err) {
+                        console.log(err);
+                    }
                 })
             }
         })
     }
-    async function getUserCode(suid){
+    async function getUserCode(suid) {
         try {
             var result = await $.ajax({
                 type: 'GET',
-                url: API_URL+'user/'+suid
+                url: API_URL + 'user/' + suid
             });
             return result;
         } catch (err) {
@@ -519,125 +503,129 @@
             throw err;
         }
     }
-// modal --------------------------------------
-	function editModal(id){
-		event.preventDefault();
-		$('#su_id').val(id);
+    // modal --------------------------------------
+    function editModal(id) {
+        event.preventDefault();
+        $('#su_id').val(id);
         $.ajax({
             type: 'get',
-            url: API_URL+'user/'+id,
-            success: function (result){
-                $('#edtEmployeeCode').val(result.su_emp_code);
-                $('#edtFirstName').val(result.su_fname);
-                $('#edtLastName').val(result.su_lname);
+            url: API_URL + 'user/' + id,
+            success: function(result) {
+                $('#edtEmployeeCode').val(result.su_username);
+                $('#edtFirstName').val(result.su_firstname);
+                $('#edtLastName').val(result.su_lastname);
                 $('#edtEmail').val(result.su_email);
-                $('#editTel').val(result.su_tel);
                 editDept(result.sd_id);
-                editPlant(result.spc_id);
+                editPlant(result.su_username.substring(0, 2));
                 editPerg(result.spg_id);
             }
         })
-	}
-    function editDept(id){
+    }
+
+    function editDept(id) {
         $.ajax({
             type: 'get',
-            url: API_URL+'option/list_department',
-            success: function (result){
-                var option_text = '<option value="" disabled selected>Choose Department</option>';
-                $.each(result, function (key, value){
+            url: API_URL + 'option/list_department',
+            success: function(result) {
+                if (id == 0 || id == null) {
+                    var option_text = '<option value="" selected disabled>No Department</option>';
+                }
+                $.each(result, function(key, value) {
                     let sel = "";
-                    if(value.sd_id == id){sel = "selected";}
-                    option_text += '<option value="'+value.sd_id+'" '+sel+'>'+value.sd_name+'</option>';
+                    if (value.sd_id == id) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + value.sd_id + '" ' + sel + '>' + value.sd_dept_name + '</option>';
                 })
                 $('#editDepartment').html(option_text);
             }
         })
     }
-    function editPlant(id){
-        $.ajax({
-            type: 'get',
-            url: API_URL+'option/list_plant',
-            success: function (result){
-                var option_text = '<option value="" disabled selected>Choose plant</option>';
-                $.each(result, function (key, value){
-                    let sel = "";
-                    if(value.spc_id == id){sel = "selected";}
-                    option_text += '<option value="'+value.spc_id+'" '+sel+'>'+value.spc_name+'</option>';
-                })
-                $('#edtPlants').html(option_text);
-            }
-        })
+
+    function editPlant(plant) {
+        var option_text = '<option value="" disabled selected>Choose plant</option>';
+        if (plant == 51) {
+            option_text += '<option value="51" selected disabled>Phase 10</option>';
+        } else if (plant == 52) {
+            option_text += '<option value="52" disabled>Phase 10</option>';
+        } else {
+            option_text += '<option value="0" disabled>Please check username...</option>';
+        }
+        $('#edtPlants').html(option_text);
     }
-    function editPerg(id){
+
+    function editPerg(id) {
         $.ajax({
             type: 'get',
-            url: API_URL+'option/list_spg',
-            success: function (result){
+            url: API_URL + 'option/list_spg',
+            success: function(result) {
                 var option_text = '<option value="" disabled selected>Choose permission group</option>';
-                $.each(result, function (key, value){
+                $.each(result, function(key, value) {
                     let sel = "";
-                    if(value.spg_id == id){sel = "selected";}
-                    option_text += '<option value="'+value.spg_id+'" '+sel+'>'+value.spg_name+'</option>';
+                    if (value.spg_id == id) {
+                        sel = "selected";
+                    }
+                    option_text += '<option value="' + value.spg_id + '" ' + sel + '>' + value.spg_name + '</option>';
                 })
                 $('#edtPermissionGroup').html(option_text);
             }
         })
     }
-    $(document).ready(function (){
-        if ( $.fn.DataTable.isDataTable('#tblUsers') ) {
+    $(document).ready(function() {
+        var sessUsrId = "<?php echo $this->session->userdata('sessUsrId'); ?>";
+        if ($.fn.DataTable.isDataTable('#tblUsers')) {
             $('#tblUsers').DataTable().destroy();
         }
-		var dataTable = $('#tblUsers').DataTable({
-			ajax: {
-				url: API_URL+'user/table'
-			},
+        var dataTable = $('#tblUsers').DataTable({
+            ajax: {
+                url: API_URL + 'user/table/' + sessUsrId
+            },
             columnDefs: [{
-					searchable: true,
-					orderable: false,
-					targets: 0,
-				},
-			],
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
             bSort: false,
-			order: [[1, 'asc']],
-			columns: [{
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
                     className: 'text-center',
-                    data:'su_id'
+                    data: 'su_id'
                 },
                 {
                     className: 'text-center',
-                    data:'su_id',
-                    "render": function (data, type, row){
-                        let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/'+row.su_emp_code+'.jpg';
-                        if(!is_cached(img_ok)){img_ok = 'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png';}
-                        if (type === 'display'){
-                            disp = '<div class="d-flex align-items-center">'+
-                                '<img src="'+img_ok+'" alt="avatar" class="rounded-circle avatar" width="35">'+
-                                '<div class="ms-3">'+
-                                    '<div class="user-meta-info">'+
-                                        '<h6 class="user-name mb-0" data-name="'+row.su_fname+' '+row.su_lname+'">'+row.su_fname+' '+row.su_lname+'</h6>'+
-                                        '<span class="user-work fs-3" data-occupation="'+row.su_emp_code+'">'+row.su_emp_code+'</span>'+
+                    data: 'su_id',
+                    "render": function(data, type, row) {
+                        let emp_code = row.su_username.substring(2, 7);
+                        let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
+                        disp = '<div class="d-flex align-items-center justify-content-center">' +
+                            '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35" onerror="this.onerror=null;this.src=\'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png\';">' +
+                            '<div class="ms-3">' +
+                            '<div class="user-meta-info">' +
+                            '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + ' ' + row.su_lastname + '</h6>' +
+                            '<span class="user-work fs-3" data-occupation="' + row.su_username + '">' + row.su_username + '</span>' +
                             '</div></div></div>';
-                        }
                         return disp;
                     },
                 },
                 {
                     className: 'text-center',
-                    data:'spg_name',
+                    data: 'spg_name',
                 },
                 {
                     className: 'text-center',
-                    data:'su_email'
+                    data: 'su_email'
                 },
                 {
                     className: 'text-center',
-                    data:'su_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            if(row.su_status){
-                                disp = '<a onclick="change_status('+row.su_id+',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
-                            }else{
-                                disp = '<a onclick="change_status('+row.su_id+',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                    data: 'su_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.su_status) {
+                                disp = '<a onclick="change_status(' + row.su_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+                            } else {
+                                disp = '<a onclick="change_status(' + row.su_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
                             }
                         }
                         return disp;
@@ -645,24 +633,28 @@
                 },
                 {
                     className: 'text-center',
-                    data:'su_id',
-                    "render": function (data, type, row){
-                        if (type === 'display'){
-                            disp = '<button type="button" onclick="editModal(\''+row.su_id+'\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">'+
+                    data: 'su_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<button type="button" onclick="editModal(\'' + row.su_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
                                 '<i class="ti ti-pencil me-1"></i> Edit </button>';
                         }
                         return disp;
                     }
-            }]
-		});
-        dataTable.on('order.dt search.dt', function () {
+                }
+            ]
+        });
+        dataTable.on('order.dt search.dt', function() {
             let i = 1;
-            dataTable.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
                 this.data(i++);
             });
         }).draw();
-		setInterval(function (){
-			dataTable.ajax.reload( null, false );
-		}, 1000 );
-	});
+        setInterval(function() {
+            dataTable.ajax.reload(null, false);
+        }, 300000);
+    });
 </script>

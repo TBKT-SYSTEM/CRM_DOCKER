@@ -1,4 +1,4 @@
-<title>8D | Account Setting</title>
+<title>CRM | Account Setting</title>
 <div class="container-fluid">
     <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
         <div class="card-body px-4 py-3">
@@ -42,6 +42,7 @@
         <?php
         $userId = $this->session->userdata('sessUsrId');
         $userData = $this->ManageBackend->menu_array($userId, "user/");
+        $plantSess = substr($userData['su_username'], 0, 2);
         ?>
         <div class="card-body">
             <div class="tab-content" id="pills-tabContent">
@@ -68,12 +69,12 @@
                                             <div class="col-lg-6">
                                                 <div class="mb-3">
                                                     <label for="inpEmpCode" class="form-label">Code</label>
-                                                    <input type="text" name="su_emp_code" value="<?php echo $userData['su_emp_code']; ?>" class="form-control" id="inpEmpCode" placeholder="xxxxx" disabled>
+                                                    <input type="text" name="su_emp_code" value="<?php echo $userData['su_username']; ?>" class="form-control" id="inpEmpCode" placeholder="xxxxx" disabled>
                                                     <span class="form_error"></span>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="inpFirstName" class="form-label">First Name</label>
-                                                    <input type="text" name="su_fname" value="<?php echo $userData['su_fname']; ?>" class="form-control" id="inpFirstName" placeholder="Mathew">
+                                                    <input type="text" name="su_firstname" value="<?php echo $userData['su_firstname']; ?>" class="form-control" id="inpFirstName" placeholder="Mathew">
                                                     <span class="form_error"></span>
                                                 </div>
                                                 <div class="mb-3">
@@ -83,17 +84,15 @@
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="selPlant" class="form-label">Plant</label>
-                                                    <select class="form-select" name="spc_id" aria-label="Default select example" id="selPlant">
+                                                    <select class="form-select" name="spc_id" aria-label="Default select example" id="selPlant" disabled >
                                                         <option value="" disabled selected>Choose plant</option>
                                                         <?php
-                                                        $option_plant = $this->ManageBackend->list_option("option/list_plant");
-                                                        foreach ($option_plant as $plant) {
-                                                            $sel = "";
-                                                            if ($plant['spc_id'] == $userData['spc_id']) {
-                                                                $sel = "selected";
-                                                            }
-                                                            echo '<option value="' . $plant['spc_id'] . '" ' . $sel . '>' . $plant['spc_name'] . '</option>';
+                                                        if ($plantSess == 51) {
+                                                            $optionResult = '<option value="51" disabled selected >Phase 10</option>';
+                                                        } else {
+                                                            $optionResult = '<option value="52" disabled selected >Phase 8</option>';
                                                         }
+                                                        echo $optionResult;
                                                         ?>
                                                     </select>
                                                     <span class="form_error"></span>
@@ -119,17 +118,13 @@
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="inpLastName" class="form-label">Last Name</label>
-                                                    <input type="text" name="su_lname" value="<?php echo $userData['su_lname']; ?>" class="form-control" id="inpLastName" placeholder="Anderson">
+                                                    <input type="text" name="su_lastname" value="<?php echo $userData['su_lastname']; ?>" class="form-control" id="inpLastName" placeholder="Anderson">
                                                     <span class="form_error"></span>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label for="inpTel" class="form-label">Phone number</label>
-                                                    <input type="text" name="su_tel" value="<?php echo $userData['su_tel']; ?>" class="form-control" id="inpTel" placeholder="092xxxxxxx">
-                                                    <span class="form_error"></span>
-                                                </div>
+
                                                 <div class="mb-3">
                                                     <label for="selDept" class="form-label">Department</label>
-                                                    <select class="form-select" name="sd_id" aria-label="Default select example" id="selDept">
+                                                    <select class="form-select" name="sd_id" aria-label="Default select example" id="selDept" disabled>
                                                         <option value="" disabled selected>Choose Department</option>
                                                         <?php
                                                         $option_dept = $this->ManageBackend->list_option("option/list_department");
@@ -138,7 +133,10 @@
                                                             if ($dept['sd_id'] == $userData['sd_id']) {
                                                                 $sel = "selected";
                                                             }
-                                                            echo '<option value="' . $dept['sd_id'] . '" ' . $sel . '>' . $dept['sd_name'] . '</option>';
+                                                            echo '<option value="' . $dept['sd_id'] . '" ' . $sel . '>' . $dept['sd_dept_name'] . '</option>';
+                                                        }
+                                                        if ($userData['sd_id'] == 0) {
+                                                            echo '<option value="0" selected >No Department</option>';
                                                         }
                                                         ?>
                                                     </select>
@@ -273,8 +271,8 @@
         var data = {};
         data['su_id'] = $('#su_id').val();
         data['image'] = canvas.toDataURL('image/png');
-        data['update_date'] = getTimeNow();
-        data['update_by'] = "<?php echo $this->session->userdata('sessUsr') ?>";
+        data['su_updated_date'] = getTimeNow();
+        data['su_updated_by'] = "<?php echo $this->session->userdata('sessUsr') ?>";
         const link = document.createElement('a');
         // console.log(data);
         Swal.fire({
@@ -310,6 +308,7 @@
                                             popup: 'animate__animated animate__fadeInDown'
                                         }
                                     })
+                                    window.location.reload();
                                 } else {
                                     Swal.fire({
                                         html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit personal detail!</p>",
@@ -318,6 +317,7 @@
                                             popup: 'animate__animated animate__fadeInDown'
                                         }
                                     })
+                                    window.location.reload();
                                 }
                             },
                             error: function(err) {
@@ -352,9 +352,8 @@
                         }
                         edit_form[item.name] = item.value;
                     })
-                    edit_form["update_date"] = getTimeNow();
-                    edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-
+                    edit_form["su_updated_date"] = getTimeNow();
+                    edit_form["su_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
@@ -405,8 +404,8 @@
                     var edit_form = {
                         "su_id": parseInt($('#su_id').val()),
                         "su_password": $('#inpPassword').val(),
-                        "update_date": getTimeNow(),
-                        "update_by": "<?php echo $this->session->userdata('sessUsr') ?>"
+                        "su_updated_date": getTimeNow(),
+                        "su_updated_by": "<?php echo $this->session->userdata('sessUsr') ?>"
                     };
                     $.ajax({
                         type: 'PUT',
@@ -423,6 +422,7 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 })
+                                window.location.reload();
                             } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit password!</p>",
@@ -431,6 +431,7 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 })
+                                window.location.reload();
                             }
                         },
                         error: function(err) {
