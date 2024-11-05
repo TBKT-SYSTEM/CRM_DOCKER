@@ -708,6 +708,7 @@
                 </h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
                 <form id="rfq_file" name="rfq_file">
                     <table class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;" id="tblRfqFile">
@@ -724,6 +725,7 @@
                     </table>
                 </form>
             </div>
+
             <div class="modal-footer">
                 <button type="reset" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal">
                     Close

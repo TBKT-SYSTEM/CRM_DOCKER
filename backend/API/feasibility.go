@@ -100,6 +100,65 @@ func ListManageFeasibilityTable(c *gin.Context) {
 	objData.Data = objFeasibilityList
 	c.IndentedJSON(http.StatusOK, objData)
 }
+
+func ListConsiderationScoreByid(c *gin.Context) {
+	var objConsiderationList []ManageConsernTable
+	If_id := c.Param("if_id")
+	Sd_id := c.Param("sd_id")
+	objListCons, err := db.Query("SELECT ifcp.ifcp_id, ifcp.if_id, ifcp.mc_id, mc.mc_title, mc.mc_weight, ifcp.ifcp_score, ifcp.ifcp_comment, ifcp.ifcp_file_name, ifcp.ifcp_file_path, ifcp.ifcp_submit, ifcp.ifcp_status, ifcp.update_date, ifcp.update_by FROM info_feasibility_consern_point ifcp LEFT JOIN info_feasibility inf ON ifcp.if_id = inf.if_id LEFT JOIN mst_consideration_incharge mci ON mci.mc_id = ifcp.mc_id LEFT JOIN sys_department sd ON sd.sd_id = mci.sd_id LEFT JOIN mst_consideration mc ON mc.mc_id = ifcp.mc_id WHERE ifcp.if_id = ? AND mci.sd_id = ? AND ifcp.ifcp_submit = 0 AND ifcp.ifcp_status = 1", If_id, Sd_id)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	defer objListCons.Close()
+	for objListCons.Next() {
+		var objConsideration ManageConsernTable
+		var strUpdateDate sql.NullString
+		var strUpdateBy sql.NullString
+		var strComment sql.NullString
+		var strFile_name sql.NullString
+		var strFile_path sql.NullString
+		err := objListCons.Scan(&objConsideration.Ifcp_id, &objConsideration.If_id, &objConsideration.Mc_id, &objConsideration.Mc_title,
+			&objConsideration.Mc_weight, &objConsideration.Ifcp_score, &strComment, &strFile_name, &strFile_path, &objConsideration.Ifcp_submit, &objConsideration.Ifcp_status, &strUpdateDate, &strUpdateBy)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+
+		if strUpdateDate.Valid {
+			objConsideration.Update_date = strUpdateDate.String
+		}
+		if strUpdateBy.Valid {
+			objConsideration.Update_by = strUpdateBy.String
+		}
+		if strComment.Valid {
+			objConsideration.Ifcp_comment = strComment.String
+		}
+		if strFile_name.Valid {
+			objConsideration.Ifcp_file_name = strFile_name.String
+		}
+		if strFile_path.Valid {
+			objConsideration.Ifcp_file_path = strFile_path.String
+		}
+		objConsiderationList = append(objConsiderationList, objConsideration)
+	}
+	err = objListCons.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	var objData ManageConsernData
+	objData.Data = objConsiderationList
+	c.IndentedJSON(http.StatusOK, objData)
+}
+
 func UpdateFeasibilityScore(c *gin.Context) {
 	var objFeasibility ManageFeasibility
 	if err := c.BindJSON(&objFeasibility); err != nil {

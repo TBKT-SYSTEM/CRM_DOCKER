@@ -158,10 +158,10 @@ type PermissionGroup struct {
 	Spg_id      int    `json:"spg_id"`
 	Spg_name    string `json:"spg_name"`
 	Spg_status  int    `json:"spg_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	Create_date string `json:"spg_created_date"`
+	Update_date string `json:"spg_updated_date"`
+	Create_by   string `json:"spg_created_by"`
+	Update_by   string `json:"spg_updated_by"`
 }
 type PermissionDetailData struct {
 	Data []PermissionDetailTable `json:"data"`
@@ -187,10 +187,10 @@ type PermissionDetail struct {
 	Spd_id      int    `json:"spd_id"`
 	Spg_id      int    `json:"spg_id"`
 	Spd_status  int    `json:"spd_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	Create_date string `json:"spd_created_date"`
+	Update_date string `json:"spd_updated_date"`
+	Create_by   string `json:"spd_created_by"`
+	Update_by   string `json:"spd_updated_by"`
 	Smd_name    string `json:"smd_name"`
 	Smd_id      int    `json:"smd_id"`
 	Order_no    int    `json:"order_no"`
@@ -205,6 +205,35 @@ type Plant struct {
 	Update_date string `json:"update_date"`
 	Create_by   string `json:"create_by"`
 	Update_by   string `json:"update_by"`
+}
+type DocumentTypeData struct {
+	Data []DocumentTypeTable `json:"data"`
+}
+type DocumentTypeTable struct {
+	Mdt_id        int    `json:"mdt_id"`
+	Mdt_name      string `json:"mdt_name"`
+	Mdt_position1 string `json:"mdt_position1"`
+	Mdt_position2 string `json:"mdt_position2"`
+	Mdt_position3 string `json:"mdt_position3"`
+	Mdt_status    int    `json:"mdt_status"`
+	Create_date   string `json:"mdt_created_date"`
+	Update_date   string `json:"mdt_updated_date"`
+	Create_by     string `json:"mdt_created_by"`
+	Update_by     string `json:"mdt_updated_by"`
+	Su_firstname  string `json:"su_firstname"`
+	Su_lastname   string `json:"su_lastname"`
+}
+type DocumentType struct {
+	Mdt_id        int    `json:"mdt_id"`
+	Mdt_name      string `json:"mdt_name"`
+	Mdt_position1 string `json:"mdt_position1"`
+	Mdt_position2 string `json:"mdt_position2"`
+	Mdt_position3 string `json:"mdt_position3"`
+	Mdt_status    int    `json:"mdt_status"`
+	Create_date   string `json:"mdt_created_date"`
+	Update_date   string `json:"mdt_updated_date"`
+	Create_by     string `json:"mdt_created_by"`
+	Update_by     string `json:"mdt_updated_by"`
 }
 
 type MenuGroupData struct {
@@ -229,41 +258,73 @@ type MenuGroup struct {
 	Smg_id      int    `json:"smg_id"`
 	Smg_name    string `json:"smg_name"`
 	Smg_icon    string `json:"smg_icon"`
-	Smg_order   int    `json:"smg_order"`
+	Smg_order   int    `json:"smg_order_no"`
 	Smg_status  int    `json:"smg_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	Create_date string `json:"smg_created_date"`
+	Update_date string `json:"smg_updated_date"`
+	Create_by   string `json:"smg_created_by"`
+	Update_by   string `json:"smg_updated_by"`
 }
 type MenuDetail struct {
-	Smd_id      int    `json:"smd_id"`
-	Smd_name    string `json:"smd_name"`
-	Smd_link    string `json:"smd_link"`
-	Smg_id      int    `json:"smg_id"`
-	Smd_status  int    `json:"smd_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	Smd_id       int    `json:"smd_id"`
+	Smd_name     string `json:"smd_name"`
+	Smd_link     string `json:"smd_link"`
+	Smg_id       int    `json:"smg_id"`
+	Smd_order_no int    `json:"smd_order_no"`
+	Smd_status   int    `json:"smd_status"`
+	Create_date  string `json:"smd_created_date"`
+	Update_date  string `json:"smd_updated_date"`
+	Create_by    string `json:"smd_created_by"`
+	Update_by    string `json:"smd_updated_by"`
 }
 type MenuDetailData struct {
 	Data []MenuDetailTable `json:"data"`
 }
 type MenuDetailTable struct {
-	Smd_id      int    `json:"smd_id"`
-	Smd_name    string `json:"smd_name"`
-	Smd_link    string `json:"smd_link"`
-	Smg_id      int    `json:"smg_id"`
-	Smd_status  int    `json:"smd_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
-	Su_fname    string `json:"su_fname"`
-	Su_lname    string `json:"su_lname"`
-	Su_img_path string `json:"su_img_path"`
-	Su_img_name string `json:"su_img_name"`
+	Smd_id       int    `json:"smd_id"`
+	Smd_name     string `json:"smd_name"`
+	Smd_link     string `json:"smd_link"`
+	Smg_id       int    `json:"smg_id"`
+	Smd_order_no int    `json:"smd_order_no"`
+	Smd_status   int    `json:"smd_status"`
+	Create_date  string `json:"create_date"`
+	Update_date  string `json:"update_date"`
+	Create_by    string `json:"create_by"`
+	Update_by    string `json:"update_by"`
+	Su_fname     string `json:"su_firstname"`
+	Su_lname     string `json:"su_lastname"`
+	Su_sign_path string `json:"su_sign_path"`
+	Su_sign_file string `json:"su_sign_file"`
+}
+type DocControlDetailData struct {
+	Data []DocControlDetailTable `json:"data"`
+}
+type DocControlDetailTable struct {
+	Mdcn_id        int    `json:"mdcn_id"`
+	Mdt_id         int    `json:"mdt_id"`
+	Mdcn_position1 string `json:"mdcn_position1"`
+	Mdcn_position2 string `json:"mdcn_position2"`
+	Mdcn_position3 string `json:"mdcn_position3"`
+	Create_date    string `json:"mdcn_created_date"`
+	Create_by      string `json:"mdcn_created_by"`
+	Update_date    string `json:"mdcn_updated_date"`
+	Update_by      string `json:"mdcn_updated_by"`
+	Mdt_name       string `json:"mdt_name"`
+	Su_fname       string `json:"su_firstname"`
+	Su_lname       string `json:"su_lastname"`
+	Su_sign_path   string `json:"su_sign_path"`
+	Su_sign_file   string `json:"su_sign_file"`
+}
+type DocControlNo struct {
+	Mdcn_id        int    `json:"mdcn_id"`
+	Mdt_id         int    `json:"mdt_id"`
+	Mdcn_position1 string `json:"mdcn_position1"`
+	Mdcn_position2 string `json:"mdcn_position2"`
+	Mdcn_position3 string `json:"mdcn_position3"`
+	Create_date    string `json:"mdcn_created_date"`
+	Create_by      string `json:"mdcn_created_by"`
+	Update_date    string `json:"mdcn_updated_date"`
+	Update_by      string `json:"mdcn_updated_by"`
 }
 type DepartmentData struct {
 	Data []DepartmentTable `json:"data"`
@@ -438,9 +499,31 @@ type GroupPartNo struct {
 type GetLastID struct {
 	Last_id int `json:"last_id"`
 }
+
+type ManageConsernData struct {
+	Data []ManageConsernTable `json:"data"`
+}
+
+type ManageConsernTable struct {
+	Ifcp_id        int     `json:"ifcp_id"`
+	If_id          int     `json:"if_id"`
+	Mc_id          int     `json:"mc_id"`
+	Mc_title       string  `json:"mc_title"`
+	Mc_weight      float64 `json:"mc_weight"`
+	Ifcp_score     float64 `json:"ifcp_score"`
+	Ifcp_comment   string  `json:"ifcp_comment"`
+	Ifcp_file_name string  `json:"ifcp_file_name"`
+	Ifcp_file_path string  `json:"ifcp_file_path"`
+	Ifcp_submit    int     `json:"ifcp_submit"`
+	Ifcp_status    int     `json:"ifcp_status"`
+	Update_date    string  `json:"update_date"`
+	Update_by      string  `json:"update_by"`
+}
+
 type ManageFeasibilityData struct {
 	Data []ManageFeasibilityTable `json:"data"`
 }
+
 type ManageFeasibilityTable struct {
 	Ifcp_id        int     `json:"ifcp_id"`
 	If_id          int     `json:"if_id"`

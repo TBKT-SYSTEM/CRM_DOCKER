@@ -100,7 +100,7 @@
                             <div class="col-sm-8">
                                 <select type="text" class="form-control" id="inpPlant" name="sd_plant_cd">
                                     <option value="51" selected>Phase 10</option>
-                                    <option value="58">Phase 8</option>
+                                    <option value="52">Phase 8</option>
                                 </select>
                                 <span class="form_error"></span>
                             </div>
@@ -141,7 +141,8 @@
                             </div>
                             <label for="edtDepartmentCd" class="form-label fw-semibold col-sm-3 col-form-label">Department Code</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="edtDepartmentCd" name="sd_dept_cd" placeholder="Department Code">
+                                <select type="text" class="form-control" id="edtPlantCd" name="sd_plant_cd">
+                                </select>
                                 <span class="form_error"></span>
                             </div>
                         </div>
@@ -256,13 +257,15 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#edit_form').serializeArray().forEach(function(item) {
-                        if (item.name == 'sd_id') {
+                        if (item.name == 'sd_id' || item.name == 'sd_plant_cd') {
                             item.value = parseInt(item.value)
                         }
                         edit_form[item.name] = item.value;
                     })
                     edit_form["sd_updated_date"] = getTimeNow();
                     edit_form["sd_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                    console.log(edit_form);
+                    return;
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
@@ -317,6 +320,8 @@
                 var status_form = {};
                 status_form["sd_id"] = id;
                 status_form["sd_status"] = status;
+                status_form["sd_updated_date"] = getTimeNow();
+                status_form["sd_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                 $.ajax({
                     type: 'PUT',
                     dataType: 'json',
@@ -360,15 +365,30 @@
             }
         })
     }
-    // modal --------------------------------------
-    function editModal(name, cd, id) {
+
+    function editModal(name, cd, id, plant) {
         event.preventDefault();
         $('#edtDepartment').val(name);
         $('#edtDepartmentCd').val(cd);
         $('#sd_id').val(id);
-        console.log(name + ' == ', cd + ' == ', id);
+        const phases = [{
+                value: 51,
+                label: 'Phase 10'
+            },
+            {
+                value: 52,
+                label: 'Phase 8'
+            }
+        ];
+        const plantNum = parseInt(plant, 10);
+        const options = phases.map((phase) => {
+            const selected = plantNum === phase.value ? 'selected' : '';
+            return `<option value="${phase.value}" ${selected}>${phase.label}</option>`;
+        });
 
+        $('#edtPlantCd').html(options.join(''));
     }
+
     $(document).ready(function() {
         if ($.fn.DataTable.isDataTable('#tblDepartment')) {
             $('#tblDepartment').DataTable().destroy();
@@ -443,7 +463,7 @@
                     data: 'sd_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<button type="button" onclick="editModal(\'' + row.sd_dept_name + '\',\'' + row.sd_dept_cd + '\',\'' + row.sd_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
+                            disp = '<button type="button" onclick="editModal(\'' + row.sd_dept_name + '\',\'' + row.sd_dept_cd + '\',\'' + row.sd_id + '\',\'' + row.sd_plant_cd + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
                                 '<i class="ti ti-pencil me-1"></i> Edit </button>';
                         }
                         return disp;

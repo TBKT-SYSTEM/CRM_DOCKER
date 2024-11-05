@@ -83,6 +83,9 @@ function numeric(val) {
 function is_equal(val1, val2) {
     return val1 === val2;
 }
+function is_english(val) {
+    return /^[A-Za-z]+$/.test(val);
+}
 function form_err(element, message) {
     element.style.border = "1px solid #ff0000";
     element.nextElementSibling.style.display = "block";
@@ -295,6 +298,131 @@ async function spd_validate(formType) {
         }
     }
 }
+
+async function mdt_validate(formType) {
+    var mdt_name, mdt_position1, mdt_position2, mdt_position3, id, url, unique_data;
+    url = API_URL + "document_type/is_unique"
+    if (formType == "add") {
+        mdt_name = document.getElementById("inpDocName");
+        mdt_position1 = document.getElementById("inpDocPo1");
+        mdt_position2 = document.getElementById("inpDocPo2");
+        mdt_position3 = document.getElementById("inpDocPo3");
+        id = 0;
+    } else {
+        mdt_name = document.frmEditDocType.mdt_name;
+        mdt_position1 = document.frmEditDocType.mdt_position1
+        mdt_position2 = document.frmEditDocType.mdt_position2
+        mdt_position3 = document.frmEditDocType.mdt_position3
+        let getid = document.frmEditDocType.mdt_id
+        id = parseInt(getid.value)
+    }
+
+    // name -----
+    if (is_empty(mdt_name.value)) {
+        form_err(mdt_name, "*Please Enter Document Type Name");
+        return false;
+    } else {
+        unique_data = {
+            "mdt_id": id,
+            "mdt_name": mdt_name.value,
+        }
+        try {
+            var chk_unique = await is_unique(unique_data, url);
+            if (chk_unique) {
+                form_err(mdt_name, "*Document name is Duplicate");
+                return false;
+            } else {
+                if (!is_english(mdt_name.value)) {
+                    form_err(mdt_name, "*Document name format is invalid");
+                } else {
+                    form_ok(mdt_name);
+                    if (is_empty(mdt_position1.value)) {
+                        form_err(mdt_position1, "*Please Enter Document Type Position 1");
+                        return false;
+                    } else {
+                        if (!is_english(mdt_position1.value)) {
+                            form_err(mdt_position1, "*Document type position 1 format is invalid");
+                            return false;
+                        } else {
+                            form_ok(mdt_position1);
+                            if (is_empty(mdt_position2.value)) {
+                                form_err(mdt_position2, "*Please Enter Document Type Position 2");
+                                return false;
+                            } else {
+                                form_ok(mdt_position2);
+                                if (!is_english(mdt_position2.value)) {
+                                    form_err(mdt_position2, "*Document type position 2 format is invalid");
+                                    return false;
+                                } else {
+                                    form_ok(mdt_position2);
+                                    if (is_empty(mdt_position3.value)) {
+                                        form_ok(mdt_position3);
+                                        return true;
+                                    } else {
+                                        if (!is_english(mdt_position3.value)) {
+                                            form_err(mdt_position3, "*Document type position 3 format is invalid");
+                                            return false;
+                                        } else {
+                                            form_ok(mdt_position3);
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.log(err); // Handle error
+        }
+    }
+}
+
+async function mdcn_validate(formType) {
+    var mdcn_position1, mdcn_position2, mdcn_position3, id, url, unique_data, mdt_id;
+    url = API_URL + "document_control_no/is_unique"
+    if (formType == "add") {
+        mdcn_position1 = document.getElementById("inpDocNoPo1");
+        mdt_id = document.getElementById("selDoctype");
+        id = 0;
+    } else {
+        mdcn_position1 = document.frmEditDocControl.mdcn_position1;
+        mdt_id = document.frmEditDocControl.mdt_id;
+        id = parseInt(mdt_id.value);
+    }
+
+    // name -----
+    if (is_empty(mdt_id.value)) {
+        form_err(mdt_id, "*Please Select Document Type");
+        return false;
+    } else {
+        form_ok(mdt_id);
+        if (is_empty(mdcn_position1.value)) {
+            form_err(mdcn_position1, "*Please Select Position 1");
+            return false;
+        } else {
+            unique_data = {
+                "mdcn_id": id,
+                "mdt_id": parseInt(mdt_id.value),
+                "mdcn_position1": mdcn_position1.value,
+            }
+            try {
+                var chk_unique = await is_unique(unique_data, url);
+                if (chk_unique) {
+                    form_err(mdcn_position1, "*Position is Duplicate");
+                    return false;
+                } else {
+                    form_ok(mdcn_position1);
+                    return true;
+                }
+            } catch (err) {
+                console.log(err); // Handle error
+            }
+        }
+    }
+}
+
 async function smg_validate(formType) {
     var smg_name, smg_icon, id, url, unique_data;
     url = API_URL + "menu_group/is_unique"
@@ -470,6 +598,7 @@ async function department_validate(formType) {
     } else {
         sd_dept_name = document.edit_form.sd_dept_name
         sd_dept_cd = document.edit_form.sd_dept_cd
+        sd_plant_cd = document.edit_form.sd_plant_cd
         let getid = document.edit_form.sd_id
         id = parseInt(getid.value)
     }
@@ -1013,11 +1142,24 @@ async function Rfq_validate(formType) {
 }
 
 async function scoring_validate(element) {
-    if (element.value > 5 || element.value < 1) {
-        form_err(element, "*Please enter 1-5");
+    let value = element.val();
+    if (value > 5 || value < 1 || value != Math.floor(value)) {
+        form_err_scoring(element, "*Please enter 1-5");
         return false;
-    } else {
-        form_ok(element);
-        return true;
     }
+
+    form_ok_scoring(element);
+    return parseInt(element.val());
+}
+
+function form_err_scoring(element, message) {
+    element.css("border", "1px solid #ff0000");
+    element.next().css("display", "block");
+    element.next().html(message);
+    element.focus();
+}
+
+function form_ok_scoring(element) {
+    element.css("border", "1px solid #d1d3e2");
+    element.next().css("display", "none");
 }

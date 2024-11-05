@@ -38,6 +38,7 @@ class Dashboard extends CI_Controller {
         $this->data['page_content'] = $this->parser->parse($path, $this->data, TRUE);
         $this->parser->parse('page/pagecontent', $this->data);
     }
+
 	public function index() {
         $this->another_chart_js = "<script src='" . base_url() . "assets/js/dashboard.js'></script>";
 		$this->another_js = "<script src='" . base_url() . "assets/libs/datatables.net/js/jquery.dataTables.min.js'></script>";
@@ -46,6 +47,7 @@ class Dashboard extends CI_Controller {
         $this->render_view('view_dashboard');
 
     }
+
 	public function login(){
 		$arrData = array(
             'sessUsr' => $this->input->post('su_username'),
@@ -63,17 +65,19 @@ class Dashboard extends CI_Controller {
 		$this->ManageBackend->log_login($arrData['sessUsrId']);
 		echo json_encode(true);
 	}
+
 	public function logout(){
 		$userId = $this->session->userdata('sessUsrId');
 		$this->ManageBackend->log_logout($userId);
 		$this->session->sess_destroy();
 		redirect('Welcome');
 	}
+
 	public function send_toEmail(){
-		$username = $this->input->post('su_emp_code');
+		$username = $this->input->post('su_username');
 		$email = $this->input->post('su_email');
-		$fname = $this->input->post('su_fname');
-		$lname = $this->input->post('su_lname');
+		$fname = $this->input->post('su_firstname');
+		$lname = $this->input->post('su_lastname');
 		$psw = base64_decode($this->input->post('su_password'));
 		$data = array(
 			"username" => $username,

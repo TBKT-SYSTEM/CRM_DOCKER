@@ -571,6 +571,7 @@
             }
         })
     }
+    
     $(document).ready(function() {
         var sessUsrId = "<?php echo $this->session->userdata('sessUsrId'); ?>";
         if ($.fn.DataTable.isDataTable('#tblUsers')) {

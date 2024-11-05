@@ -7973,6 +7973,10 @@ fieldset:disabled .btn {
     .modal-xl {
         --bs-modal-width: 1140px
     }
+
+    .modal-xxl {
+        --bs-modal-width: 1500px
+    }
 }
 
 .modal-fullscreen {

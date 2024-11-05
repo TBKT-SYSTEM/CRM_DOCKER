@@ -546,3 +546,15 @@ $config['email_config'] = array(
 	'mailtype' => "html",
 	'newline' => "\r\n"
 );
+
+// $config['email_config'] = array(
+// 	'protocol' => "smtp",
+// 	'smtp_host' => "ssl://smtp.gmail.com",
+// 	'smtp_timeout' => 30,
+// 	'smtp_port' => 465,
+// 	'smtp_user' => "tanasidphakdeechot@gmail.com",
+// 	'smtp_pass' => "dize wuux ilxx qria",
+// 	'charset' => "utf-8",
+// 	'mailtype' => "html",
+// 	'newline' => "\r\n"
+// );

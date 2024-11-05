@@ -10,7 +10,7 @@ import (
 // permission group ---------------------------
 func ListSpgTable(c *gin.Context) {
 	var objPermissionGroupArray []PermissionGroupTable
-	objListPermissiong, err := db.Query("SELECT spg.*,su.su_fname,su.su_lname,su.su_img_path,su.su_img_name FROM `sys_permission_group` AS spg LEFT JOIN sys_user AS su ON spg.update_by = su.su_emp_code ORDER BY spg.spg_id")
+	objListPermissiong, err := db.Query("SELECT spg.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file FROM `sys_permission_group` AS spg LEFT JOIN sys_users AS su ON spg.spg_updated_by = su.su_username ORDER BY spg.spg_id")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -28,7 +28,7 @@ func ListSpgTable(c *gin.Context) {
 		var strUpdateDate sql.NullString
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
-		err := objListPermissiong.Scan(&objPermissionGroup.Spg_id, &objPermissionGroup.Spg_name, &objPermissionGroup.Spg_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
+		err := objListPermissiong.Scan(&objPermissionGroup.Spg_id, &objPermissionGroup.Spg_name, &objPermissionGroup.Spg_status, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -80,7 +80,7 @@ func InsertSpg(c *gin.Context) {
 		return
 	}
 	TextTrim(&objPermissionGroupData.Spg_name, " ")
-	objResult, err := db.Exec("INSERT INTO sys_permission_group(spg_name,create_date,create_by) VALUES(?,?,?)", objPermissionGroupData.Spg_name, objPermissionGroupData.Create_date, objPermissionGroupData.Create_by)
+	objResult, err := db.Exec("INSERT INTO sys_permission_group(spg_name,spg_created_date,spg_created_by,spg_updated_date,spg_updated_by) VALUES(?,?,?,?,?)", objPermissionGroupData.Spg_name, objPermissionGroupData.Create_date, objPermissionGroupData.Create_by, objPermissionGroupData.Create_date, objPermissionGroupData.Create_by)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
@@ -99,7 +99,7 @@ func UpdateSpg(c *gin.Context) {
 		return
 	}
 	TextTrim(&objPermissionGroupData.Spg_name, " ")
-	objResult, err := db.Exec("Update sys_permission_group SET spg_name = ?, update_date = ?, update_by = ? WHERE spg_id = ?", objPermissionGroupData.Spg_name, objPermissionGroupData.Update_date, objPermissionGroupData.Update_by, objPermissionGroupData.Spg_id)
+	objResult, err := db.Exec("Update sys_permission_group SET spg_name = ?, spg_updated_date = ?, spg_updated_by = ? WHERE spg_id = ?", objPermissionGroupData.Spg_name, objPermissionGroupData.Update_date, objPermissionGroupData.Update_by, objPermissionGroupData.Spg_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -127,7 +127,7 @@ func ChangeSpgStatus(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update sys_permission_group SET spg_status = ? WHERE spg_id = ?", objPermissionGroupData.Spg_status, objPermissionGroupData.Spg_id)
+	objResult, err := db.Exec("Update sys_permission_group SET spg_status = ?, spg_updated_date = ?, spg_updated_by = ? WHERE spg_id = ?", objPermissionGroupData.Spg_status, objPermissionGroupData.Update_date, objPermissionGroupData.Update_by, objPermissionGroupData.Spg_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -141,13 +141,13 @@ func ChangeSpgStatus(c *gin.Context) {
 func ListSpdTable(c *gin.Context) {
 	var objPermissionDetailArray []PermissionDetailTable
 	iId := c.Param("id")
-	objListPermissionDetail, err := db.Query("SELECT spd.spd_id, spd.spg_id, spd.spd_status, spd.update_date, spd.update_by, smd.smd_name,smd.smd_id, smg.smg_name,smg.smg_id,su.su_fname, su.su_lname, su.su_img_path, su.su_img_name"+
+	objListPermissionDetail, err := db.Query("SELECT spd.spd_id, spd.spg_id, spd.spd_status, spd.spd_updated_date, spd.spd_updated_by, smd.smd_name,smd.smd_id, smg.smg_name,smg.smg_id,su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file"+
 		" FROM `sys_permission_detail` AS spd"+
 		" LEFT JOIN sys_permission_group AS spg ON spd.spg_id = spg.spg_id"+
 		" LEFT JOIN sys_menu_detail AS smd ON spd.smd_id = smd.smd_id"+
 		" LEFT JOIN sys_menu_group AS smg ON smd.smg_id = smg.smg_id"+
-		" LEFT JOIN sys_user AS su ON spd.update_by = su.su_emp_code"+
-		" WHERE spd.spg_id = ?", iId)
+		" LEFT JOIN sys_users AS su ON spd.spd_updated_by = su.su_username"+
+		" WHERE spd.spg_id = ? ORDER BY smg.smg_order_no, spd.spd_order_no", iId)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -223,7 +223,7 @@ func InsertSpd(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("INSERT INTO sys_permission_detail(spg_id,smd_id,create_date,create_by) VALUES(?,?,?,?)", strPerDetail.Spg_id, strPerDetail.Smd_id, strPerDetail.Create_date, strPerDetail.Create_by)
+	objResult, err := db.Exec("INSERT INTO sys_permission_detail(spg_id, smd_id, spd_created_date, spd_created_by, spd_updated_date, spd_updated_by) VALUES(?,?,?,?,?,?)", strPerDetail.Spg_id, strPerDetail.Smd_id, strPerDetail.Create_date, strPerDetail.Create_by, strPerDetail.Create_date, strPerDetail.Create_by)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
@@ -241,7 +241,7 @@ func UpdateSpd(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update sys_permission_detail SET smd_id = ?, update_date = ?, update_by = ? WHERE spd_id = ?", strPerDetail.Smd_id, strPerDetail.Update_date, strPerDetail.Update_by, strPerDetail.Spd_id)
+	objResult, err := db.Exec("Update sys_permission_detail SET smd_id = ?, spd_updated_date = ?, spd_updated_by = ? WHERE spd_id = ?", strPerDetail.Smd_id, strPerDetail.Update_date, strPerDetail.Update_by, strPerDetail.Spd_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -256,7 +256,7 @@ func ChangeSpdStatus(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update sys_permission_detail SET spd_status = ? WHERE spd_id = ?", strPerDetail.Spd_status, strPerDetail.Spd_id)
+	objResult, err := db.Exec("Update sys_permission_detail SET spd_status = ?, spd_updated_date = ?, spd_updated_by = ? WHERE spd_id = ?", strPerDetail.Spd_status, strPerDetail.Update_date, strPerDetail.Update_by, strPerDetail.Spd_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),

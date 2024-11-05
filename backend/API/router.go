@@ -42,11 +42,22 @@ func Routy() {
 	router.PUT("/menu_group/update", UpdateSmg)
 	router.PUT("/menu_group/change_status", ChangeSmgStatus)
 
+	router.GET("/document_type/table", ListDocumentTypeTable)
+	router.POST("/document_type/is_unique", MdtIsUnique)
+	router.POST("/document_type/insert", InsertMdt)
+	router.PUT("/document_type/change_status", ChangeDmtStatus)
+	router.PUT("/document_type/update", UpdateMdt)
+
 	router.GET("/menu_detail/table/:id", ListMenuDetailTable)
 	router.POST("/menu_detail/is_unique", SmdIsUnique)
 	router.POST("/menu_detail/insert", InsertSmd)
 	router.PUT("/menu_detail/update", UpdateSmd)
 	router.PUT("/menu_detail/change_status", ChangeSmdStatus)
+
+	router.GET("/doc_control_detail/table/:id", ListDocControlDetailTable)
+	router.POST("/document_control_no/is_unique", MdcnIsUnique)
+	router.POST("/document_control_no/insert", InsertMdcn)
+	router.PUT("/document_control_no/update", UpdateMdcn)
 
 	router.GET("/department/table", ListDepartmentTable)
 	router.POST("/department/is_unique", SdIsUnique)
@@ -86,6 +97,7 @@ func Routy() {
 	router.POST("/rfq/insert", InsertRfq)
 
 	router.GET("/manage_feasibility/table/:id", ListManageFeasibilityTable)
+	router.GET("/manage_feasibility/table_consern/:if_id/:sd_id", ListConsiderationScoreByid)
 	router.PUT("/manage_feasibility/scoring", UpdateFeasibilityScore)
 	router.PUT("/manage_feasibility/commenting", UpdateFeasibilityComment)
 	router.PUT("/manage_feasibility/file", UpdateFeasibilityFile)
@@ -118,6 +130,7 @@ func Routy() {
 	router.GET("/option/list_approve_type", ListApproveType)
 	router.GET("/option/list_department", ListDepartment)
 	router.GET("/option/list_mc", ListConsideration)
+	router.GET("/option/list_mdt", ListDocType)
 
 	router.GET("/view/feas_score/:id", ListConsiderationScore)
 	router.GET("/view/in_dept", ListIncharge)
