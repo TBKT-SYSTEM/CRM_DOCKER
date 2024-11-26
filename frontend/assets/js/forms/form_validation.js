@@ -51,6 +51,19 @@ async function getLastId(url) {
         throw err;
     }
 }
+
+async function getDocNo(url, id) {
+    try {
+        var result = await $.ajax({
+            type: 'GET',
+            url: url,
+        });
+        return result;
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
 // validate functions ----------------
 async function is_unique(data, url) {
     try {
@@ -92,6 +105,25 @@ function form_err(element, message) {
     element.nextElementSibling.innerHTML = message;
     element.focus();
 }
+
+function form_errValid(element, message) {
+    element.classList.add('is-invalid');
+    element.nextElementSibling.style.display = "block";
+    element.nextElementSibling.innerHTML = message;
+    element.focus();
+}
+
+function form_okValid(element) {
+    element.classList.remove('is-invalid');
+    element.classList.add('is-valid');
+    element.nextElementSibling.style.display = "none";
+}
+
+function form_defaultValid(element) {
+    element.classList.remove('is-valid');
+}
+
+
 function form_errCus(element1, element2, message) {
     element2.style.border = "1px solid #ff0000";
     element2.nextElementSibling.style.display = "block";
@@ -110,6 +142,28 @@ function form_okCus(element1, element2) {
     element2.nextElementSibling.style.display = "none";
     element1.style.border = "1px solid #d1d3e2";
     element1.nextElementSibling.style.display = "none";
+}
+
+async function checkPartGroup(partNo, partName, model) {
+    if (is_empty(partNo.value)) {
+        form_errValid(partNo, '*Plase Enter Part No.');
+        return false;
+    } else {
+        form_okValid(partNo)
+        if (is_empty(partName.value)) {
+            form_errValid(partName, '*Plase Enter Part Name');
+            return false;
+        } else {
+            form_okValid(partName)
+            if (is_empty(model.value)) {
+                form_errValid(model, '*Plase Enter Model');
+                return false;
+            } else {
+                form_okValid(model)
+                return true;
+            }
+        }
+    }
 }
 
 // validate forms ----------------------
@@ -885,12 +939,14 @@ async function Feasibility_validate(formType) {
     var partInsert = [];
     var partNoInputs = $('#form_part_no input[name="if_part_no[]"]');
     var partNameInputs = $('#form_part_no input[name="if_part_name[]"]');
+    var modelInputs = $('#form_part_no input[name="ir_model[]"]');
 
     partNoInputs.each(function (index) {
         var partNo = $(this).val();
         var partName = partNameInputs.eq(index).val();
-        if (partNo && partName) {
-            partInsert.push({ ['partNo' + (index + 1)]: partNo, ['partName' + (index + 1)]: partName });
+        var model = modelInputs.eq(index).val();
+        if (partNo && partName && model) {
+            partInsert.push({ ['partNo' + (index + 1)]: partNo, ['partName' + (index + 1)]: partName, ['model' + (index + 1)]: model });
         }
     });
 
@@ -944,6 +1000,7 @@ async function Feasibility_validate(formType) {
                                 for (let i = 0; i < indexCount; i++) {
                                     let partNo = document.getElementById('inpPartNo' + i);
                                     let partName = document.getElementById('inpPartName' + i);
+                                    let model = document.getElementById('inpModel' + i);
 
                                     if (is_empty(partNo.value)) {
                                         form_err(partNo, "*Please Enter Part No.");
@@ -955,6 +1012,11 @@ async function Feasibility_validate(formType) {
                                     } else {
                                         form_ok(partName);
                                     }
+                                    if (is_empty(model.value)) {
+                                        form_err(model, "*Please Enter Part Name");
+                                    } else {
+                                        form_ok(model);
+                                    }
                                 }
                             } else {
                                 let indexCount = $('#inpQtyPartNo').val();
@@ -964,6 +1026,7 @@ async function Feasibility_validate(formType) {
                                 for (let i = 1; i < indexCount; i++) {
                                     let partNo = document.getElementById('inpPartNo' + i);
                                     let partName = document.getElementById('inpPartName' + i);
+                                    let model = document.getElementById('inpModel' + i);
 
                                     if (is_empty(partNo.value)) {
                                         form_err(partNo, "*Please Enter Part No.");
@@ -975,6 +1038,12 @@ async function Feasibility_validate(formType) {
                                             return false;
                                         } else {
                                             form_ok(partName);
+                                            if (is_empty(model.value)) {
+                                                form_err(model, "*Please Enter Model");
+                                                return false;
+                                            } else {
+                                                form_ok(model);
+                                            }
                                         }
                                     }
                                 }
@@ -1028,116 +1097,317 @@ async function Feasibility_validate(formType) {
 }
 
 async function Rfq_validate(formType) {
-    var ir_customer, ir_ref_nbc, ir_pro_life, ir_sop, refcon, ir_ref, id, url;
+    var ir_customer, ir_customer_new, if_ref_fm, ir_ref_nbc, ir_pro_life, ir_sop, refcon, id, url, urlDocNo, ir_ref, ir_doc_no;
     var fileInput = document.getElementById('inpFile');
     var files = fileInput.files;
 
+    urlDocNo = API_URL + "rfq/doc_no/2";
     url = API_URL + "rfq/last_id";
-    ir_ref = "RFQ-SM-" + getTwoDigitYear() + "-";
+    ir_doc_no = await getDocNo(urlDocNo);
+    ir_ref = ir_doc_no['doc_no'] + '-';
     if (formType == "add") {
-        ir_customer = document.add_form.ir_customer
-        ir_ref_nbc = document.add_form.ir_ref_nbc
-        ir_pro_life = document.add_form.ir_pro_life
-        ir_sop = document.add_form.ir_sop
-        ir_file1 = document.add_form.ir_file
-        refcon = document.getElementById('add_ir_ref')
-        id = 0
+        ir_customer = document.add_form.ir_customer;
+        ir_customer_new = document.add_form.ir_customer_new;
+        if_ref_fm = document.add_form.if_ref_fm;
+        ir_ref_nbc = document.add_form.ir_ref_nbc;
+        ir_pro_life = document.add_form.ir_pro_life;
+        ir_sop = document.add_form.ir_sop;
+        ir_file1 = document.add_form.ir_file;
+        refcon = document.getElementById('inpDocNo');
+        ir_qty_part_no = document.add_form.ir_qty_part_no
+        id = 0;
     } else {
-        if_customer = document.edit_form.if_customer
-        if_import_tran = document.edit_form.if_import_tran
-        if_part_no = document.edit_form.if_part_no
-        if_part_name = document.edit_form.if_part_name
-        mrt_id = document.edit_form.mrt_id
-        let getid = document.edit_form.if_id
-        id = parseInt(getid.value)
+        ir_customer = document.edit_form.ir_customer;
+        ir_customer_new = document.edit_form.ir_customer_new;
+        if_ref_fm = document.edit_form.if_ref_fm;
+        ir_ref_nbc = document.edit_form.ir_ref_nbc;
+        ir_pro_life = document.edit_form.ir_pro_life;
+        ir_sop = document.edit_form.ir_sop;
+        ir_file1 = document.edit_form.ir_file;
+        ir_qty_part_no = document.edit_form.ir_qty_part_no
+        let getid = document.edit_form.ir_id;
+        id = parseInt(getid.value);
     }
 
-    if (is_empty(ir_customer.value)) {
-        form_err(ir_customer, "*Please Enter Customer");
+    if (!is_empty(ir_customer.value) && !is_empty(ir_customer_new.value)) {
+        form_errCus(ir_customer, ir_customer_new, "*Please select 1 type of customer.");
         $('#navpill-111').addClass('active show');
         $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
         $('#navpill-222').removeClass('active show');
         $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
         return false;
     } else {
-        form_ok(ir_customer);
-        if (is_empty(ir_ref_nbc.value)) {
-            form_err(ir_ref_nbc, "*Please Enter Ref. NBC.");
+        if (is_empty(ir_customer.value) && is_empty(ir_customer_new.value)) {
+            form_errCus(ir_customer, ir_customer_new, "*Please select 1 type of customer.");
             $('#navpill-111').addClass('active show');
             $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
             $('#navpill-222').removeClass('active show');
             $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
             return false;
         } else {
-            form_ok(ir_ref_nbc);
+            form_okCus(ir_customer, ir_customer_new);
+            cusActive(ir_customer.value);
             if (is_empty(ir_pro_life.value)) {
                 form_err(ir_pro_life, "*Please Enter Project Life");
-                $('#navpill-111').addClass('active show');
-                $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
-                $('#navpill-222').removeClass('active show');
-                $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
+                cusActive(ir_customer.value);
                 return false;
             } else {
+                if (ir_pro_life.value == 0 || ir_pro_life.value > 10) {
+                    form_err(ir_pro_life, "*Please Enter Project Life between 1 to 10");
+                    return false;
+                }
                 form_ok(ir_pro_life);
                 if (is_empty(ir_sop.value)) {
                     form_err(ir_sop, "*Please Enter Program Timing Info. (SOP)");
-                    $('#navpill-111').removeClass('active show');
-                    $('a[href="#navpill-111"]').removeClass('active').attr('aria-selected', 'false');
-                    $('#navpill-222').addClass('active show');
-                    $('a[href="#navpill-222"]').addClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
+                    cusActive(ir_customer.value);
                     return false;
                 } else {
                     form_ok(ir_sop);
-                    if (files.length == 0) {
-                        form_err(fileInput, "*Please Upload File");
+                    var partInsert = [];
+                    var partNoInputs = $('#form_part_no input[name="ir_part_no[]"]');
+                    var partNameInputs = $('#form_part_no input[name="ir_part_name[]"]');
+                    var modelInputs = $('#form_part_no input[name="ir_model[]"]');
+                    var remarkInputs = $('#form_part_no input[name="ir_remark[]"]');
+
+                    partNoInputs.each(function (index) {
+                        var partNo = $(this).val();
+                        var partName = partNameInputs.eq(index).val();
+                        var model = modelInputs.eq(index).val();
+                        var remark = remarkInputs.eq(index).val();
+                        if (partNo && partName && model) {
+                            partInsert.push({
+                                ['partNo' + (index + 1)]: partNo,
+                                ['partName' + (index + 1)]: partName,
+                                ['model' + (index + 1)]: model,
+                                ['remark' + (index + 1)]: remark
+                            });
+                        }
+                    });
+
+                    if (is_empty(ir_qty_part_no.value)) {
+                        form_err(ir_qty_part_no, "*Please Enter Quentity Part No.");
                         return false;
                     } else {
-                        form_ok(fileInput);
-                        var fileArr = [];
-                        for (var i = 0; i < files.length; i++) {
-                            fileArr.push(files[i].name);
-                        }
-                        if (formType == "add") {
-                            try {
-                                var last_id = await getLastId(url);
-                                if (typeof last_id['last_id'] != "number") {
-                                    form_err(refcon, "*Error generate reference no.");
+                        if (partInsert.length == 0) {
+                            let indexCount = $('#inpQtyPartNo').val();
+                            for (let i = 0; i < indexCount; i++) {
+                                let partNo = document.getElementById('inpPartNo' + i);
+                                let partName = document.getElementById('inpPartName' + i);
+                                let models = document.getElementById('inpModel' + i);
+
+                                if (is_empty(partNo.value)) {
+                                    form_ok(models);
+                                    form_err(partNo, "*Please Enter Part No.");
                                     return false;
                                 } else {
-                                    form_ok(refcon);
-                                    if (++last_id['last_id'] < 10) {
-                                        if (last_id['last_id'] == 0) {
-                                            ir_ref += "001";
-                                        } else {
-                                            ir_ref += "00" + last_id['last_id'];
-                                        }
-                                    } else if (last_id['last_id'] < 100) {
-                                        ir_ref += "0" + last_id['last_id'];
-                                    } else {
-                                        ir_ref += last_id['last_id'];
-                                    }
-                                    refcon.value = ir_ref;
-                                    // console.log("ir_ref: " + ir_ref);
-                                    return true, fileArr;
+                                    form_ok(partNo);
                                 }
-                            } catch (err) {
-                                console.log(err); // Handle error
+                                if (is_empty(partName.value)) {
+                                    form_err(partName, "*Please Enter Part Name");
+                                    return false;
+                                } else {
+                                    form_ok(partName);
+                                }
+                                if (is_empty(models.value)) {
+                                    form_err(models, "*Please Enter Model");
+                                    return false;
+                                } else {
+                                    form_ok(models);
+                                }
                             }
                         } else {
-                            var duedate = document.edit_form.if_duedate;
-                            if (is_empty(duedate.value)) {
-                                form_err(duedate, "*Please Enter Due date");
-                                return false;
+                            let indexCount = $('#inpQtyPartNo').val();
+                            let partNo0 = document.getElementById('inpPartNo0');
+                            let partName0 = document.getElementById('inpPartName0');
+                            let model0 = document.getElementById('inpModel0');
+                            form_ok(partNo0);
+                            form_ok(partName0);
+                            form_ok(model0);
+                            for (let i = 1; i < indexCount; i++) {
+                                let partNo = document.getElementById('inpPartNo' + i);
+                                let partName = document.getElementById('inpPartName' + i);
+                                let models = document.getElementById('inpModel' + i);
+
+                                if (is_empty(partNo.value)) {
+                                    form_err(partNo, "*Please Enter Part No.");
+                                    return false;
+                                } else {
+                                    form_ok(partNo);
+                                    if (is_empty(partName.value)) {
+                                        form_err(partName, "*Please Enter Part Name");
+                                        return false;
+                                    } else {
+                                        form_ok(partName);
+                                        if (is_empty(models.value)) {
+                                            form_err(models, "*Please Enter Model");
+                                            return false;
+                                        } else {
+                                            form_ok(models);
+                                        }
+                                    }
+                                }
+                            }
+                            var fileArr = [];
+                            if (formType == "add") {
+                                if (files.length == 0) {
+                                    fileArr = [];
+                                } else {
+                                    for (var iFile = 0; iFile < files.length; iFile++) {
+                                        fileArr.push(files[iFile].name);
+                                    }
+                                }
+                                try {
+                                    var last_id = await getLastId(url);
+                                    if (typeof last_id['last_id'] != "number") {
+                                        form_err(refcon, "*Error generate reference no.");
+                                        return false;
+                                    } else {
+                                        form_ok(refcon);
+                                        if (++last_id['last_id'] < 10) {
+                                            if (last_id['last_id'] == 0) {
+                                                ir_ref += "001";
+                                            } else {
+                                                ir_ref += "00" + last_id['last_id'];
+                                            }
+                                        } else if (last_id['last_id'] < 100) {
+                                            ir_ref += "0" + last_id['last_id'];
+                                        } else {
+                                            ir_ref += last_id['last_id'];
+                                        }
+                                        refcon.value = ir_ref;
+                                        let data = {
+                                            fileArr: fileArr,
+                                            partInsert: partInsert
+                                        }
+                                        return true, data;
+                                    }
+                                } catch (err) {
+                                    console.log(err); // Handle error
+                                }
                             } else {
-                                form_ok(duedate);
-                                return true;
+                                if (files.length == 0) {
+                                    fileArr = [];
+                                } else {
+                                    for (var iFile = 0; iFile < files.length; iFile++) {
+                                        fileArr.push(files[iFile].name);
+                                    }
+                                }
+                                let data = {
+                                    fileArr: fileArr,
+                                }
+                                return true, data;
                             }
                         }
                     }
                 }
-
             }
         }
+    }
+}
+
+async function Rfq_valid(formType) {
+    var url, urlDocNo, ir_doc, ir_import_tran, ir_customer, ir_mrt, ir_other_mrt, ir_enclosures, ir_other_enclosures;
+
+    urlDocNo = API_URL + "rfq/doc_no/2"; // 2 = RFQ Format Doc
+    url = API_URL + "rfq/last_id";
+    ir_doc_no = await getDocNo(urlDocNo);
+    ir_doc = ir_doc_no['doc_no'] + '-';
+
+    if (formType == "add") {
+        ir_import_tran = document.add_form.ir_import_tran;
+        ir_customer = document.add_form.ir_customer;
+        ir_mrt = document.add_form.ir_mrt;
+        ir_other_mrt = document.add_form.ir_other_mrt;
+        ir_enclosures = document.add_form.ir_enclosures;
+        ir_other_enclosures = document.add_form.ir_other_enclosures;
+        refcon = document.getElementById('inpDocNo');
+        id = 0;
+    } else {
+        let getid = document.edit_form.ir_id;
+        id = parseInt(getid.value);
+    }
+
+    if (is_empty(ir_import_tran.value)) {
+        form_errValid(ir_import_tran, "*Please Select Customer Type");
+        return false;
+    } else {
+        form_okValid(ir_import_tran);
+        if (is_empty(ir_customer.value)) {
+            form_errValid(ir_customer, "*Please Select Customer Name");
+            return false;
+        } else {
+            form_okValid(ir_customer);
+            if (is_empty(ir_mrt.value)) {
+                form_errValid(ir_mrt, "*Please Subject");
+                return false;
+            } else {
+                form_okValid(ir_mrt);
+                if (ir_other_mrt.disabled) {
+                    form_okValid(ir_other_mrt);
+                } else {
+                    if (is_empty(ir_other_mrt.value)) {
+                        form_errValid(ir_other_mrt, "*Please Enter Other Subject");
+                        return false;
+                    } else {
+                        form_okValid(ir_other_mrt);
+                    }
+                }
+                ////// Enclosures
+                if (is_empty(ir_enclosures.value)) {
+                    form_errValid(ir_enclosures, "*Please Select Enclosures");
+                    return false;
+                } else {
+                    form_okValid(ir_enclosures);
+                    if (ir_other_enclosures.disabled) {
+                        form_okValid(ir_other_enclosures);
+                    } else {
+                        if (is_empty(ir_other_enclosures.value)) {
+                            form_errValid(ir_other_enclosures, "*Please Enter Other Enclosures");
+                            return false;
+                        } else {
+                            form_okValid(ir_other_enclosures);
+                        }
+                    }
+                }
+                if (formType == "add") {
+                    try {
+                        var last_id = await getLastId(url);
+                        if (typeof last_id['last_id'] != "number") {
+                            return false;
+                        } else {
+                            if (++last_id['last_id'] < 10) {
+                                if (last_id['last_id'] == 0) {
+                                    ir_doc += "001";
+                                } else {
+                                    ir_doc += "00" + last_id['last_id'];
+                                }
+                            } else if (last_id['last_id'] < 100) {
+                                ir_doc += "0" + last_id['last_id'];
+                            } else {
+                                ir_doc += last_id['last_id'];
+                            }
+                            return true, ir_doc;
+                        }
+                    } catch (err) {
+                        console.log(err); // Handle error
+                    }
+                }
+            }
+        }
+    }
+}
+
+async function cusActive(cus) {
+    if (!is_empty(cus)) {
+        $('#navpill-111').addClass('active show');
+        $('a[href="#navpill-111"]').addClass('active').attr('aria-selected', 'false');
+        $('#navpill-222').removeClass('active show');
+        $('a[href="#navpill-222"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
+    } else {
+        $('#navpill-222').addClass('active show');
+        $('a[href="#navpill-222"]').addClass('active').attr('aria-selected', 'false');
+        $('#navpill-111').removeClass('active show');
+        $('a[href="#navpill-111"]').removeClass('active').attr('aria-selected', 'true').removeAttr('tabindex');
     }
 }
 

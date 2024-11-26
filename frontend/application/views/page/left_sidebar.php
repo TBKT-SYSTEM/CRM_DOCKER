@@ -34,33 +34,33 @@
                     <span class="hide-menu">Apps</span>
                 </li>
                 <?php
-                    $spg_id = $this->session->userdata('sessPgId');
-                    // $spg_id = 2;
-                    $menu_group = $this->ManageBackend->menu_array($spg_id,"side_menu/side_menuGroup/");
-                    $menu_detail = $this->ManageBackend->menu_array($spg_id,"side_menu/side_menuDetail/");
-                    foreach($menu_group as $mg){
-                        echo '<li class="sidebar-item">
+                $spg_id = $this->session->userdata('sessPgId');
+                // $spg_id = 2;
+                $menu_group = $this->ManageBackend->menu_array($spg_id, "side_menu/side_menuGroup/");
+                $menu_detail = $this->ManageBackend->menu_array($spg_id, "side_menu/side_menuDetail/");
+                foreach ($menu_group as $mg) {
+                    echo '<li class="sidebar-item">
                             <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
                                 <span class="d-flex">
-                                    <i class="'.$mg['smg_icon'].'"></i>
+                                    <i class="' . $mg['smg_icon'] . '"></i>
                                 </span>
-                                <span class="hide-menu">'.$mg['smg_name'].'</span>
+                                <span class="hide-menu">' . $mg['smg_name'] . '</span>
                             </a>
                             <ul aria-expanded="false" class="collapse first-level">';
-                        foreach($menu_detail as $md){
-                            if($md['smg_id'] == $mg['smg_id']){
-                                echo '<li class="sidebar-item">
-                                    <a href="'.base_url().$md['smd_link'].'" class="sidebar-link">
+                    foreach ($menu_detail as $md) {
+                        if ($md['smg_id'] == $mg['smg_id']) {
+                            echo '<li class="sidebar-item">
+                                    <a href="' . base_url() . $md['smd_link'] . '" class="sidebar-link">
                                         <div class="round-16 d-flex align-items-center justify-content-center">
                                             <i class="ti ti-circle"></i>
                                         </div>
-                                        <span class="hide-menu">'.$md['smd_name'].'</span>
+                                        <span class="hide-menu">' . $md['smd_name'] . '</span>
                                     </a>
                                 </li>';
-                            }
                         }
-                        echo '</ul></li>';
                     }
+                    echo '</ul></li>';
+                }
                 ?>
                 <!-- <li class="sidebar-item">
                     <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">

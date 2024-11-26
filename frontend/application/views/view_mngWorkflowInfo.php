@@ -48,7 +48,7 @@
                                                 <?php
                                                 $option_swg = $this->ManageBackend->list_option("option/list_swg");
                                                 foreach ($option_swg as $op_swg) {
-                                                    echo '<option value="' . $op_swg['swg_id'] . '">' . $op_swg['sd_dept_name'] . '</option>';
+                                                    echo '<option value="' . $op_swg['sd_id'] . '">' . $op_swg['sd_dept_name'] . '</option>';
                                                 }
                                                 ?>
                                             </select>
@@ -82,18 +82,7 @@
                                                 <div class="mb-3 row align-items-center">
                                                     <label for="selUser" class="form-label fw-semibold col-sm-2 col-form-label">Users</label>
                                                     <div class="col-sm-8">
-                                                        <select class="form-control" id="selUser" disabled>
-                                                            <option value="" selected disabled>Choose users ...</option>
-                                                            <?php
-                                                            $option_user = $this->ManageBackend->list_option("option/list_user");
-                                                            foreach ($option_user as $op_user) {
-                                                                if ($op_user['sd_dept_name'] == '') {
-                                                                    $op_user['sd_dept_name'] = 'No Department';
-                                                                }
-                                                                echo '<option value="' . $op_user['su_id'] . '">' . $op_user['su_firstname'] . ' ' . $op_user['su_lastname'] . ' &nbsp;(' . $op_user['sd_dept_name'] . ')</option>';
-                                                            }
-                                                            ?>
-                                                        </select>
+                                                        <select class="form-control" id="selUser" disabled></select>
                                                         <span class="form_error"></span>
                                                     </div>
                                                 </div>
@@ -846,9 +835,25 @@
             }
         })
     }
+
+    async function listUserByDept(id) {
+        $.ajax({
+            type: 'get',
+            url: API_URL + 'option/list_user_by_dept/' + id,
+            success: function(result) {
+                var option_text = '<option value="">Choose Users</option>';
+                $.each(result, function(key, value) {
+                    option_text += '<option value="' + value.su_id + '">' + value.su_firstname + ' ' + value.su_lastname + '&nbsp( ' + value.su_username + ' )' + '</option>';
+                })
+                $('#selUser').html(option_text);
+            }
+        })
+    }
+
     $('#selWorkflowGroup').on('change', function() {
-        // alert( this.value );
+        // alert(this.value);
         getMaxLevel(this.value);
+        listUserByDept(this.value);
         if ($.fn.DataTable.isDataTable('#tblWorkflowDetail')) {
             $('#tblWorkflowDetail').DataTable().destroy();
             $('#tblWorkflowDetail').empty();

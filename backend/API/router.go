@@ -91,10 +91,12 @@ func Routy() {
 
 	router.GET("/rfq/:id", ListRFQ)
 	router.GET("/rfq/last_id", RfqLastid)
+	router.GET("/rfq/doc_no/:id", RfqDocNo)
 	router.GET("/rfq/table", ListRfqTable)
 	router.GET("/rfq/file/:id", ListRfqFileId)
-	router.GET("/rfq/getBtnRfq/:id", ListBtnRfq)
+	// router.GET("/rfq/getBtnRfq/:id", ListBtnRfq)
 	router.POST("/rfq/insert", InsertRfq)
+	router.PUT("/rfq/cancel/:id", CancelRfq)
 
 	router.GET("/manage_feasibility/table/:id", ListManageFeasibilityTable)
 	router.GET("/manage_feasibility/table_consern/:if_id/:sd_id", ListConsiderationScoreByid)
@@ -127,6 +129,7 @@ func Routy() {
 	router.GET("/option/list_import", ListImportFrom)
 	router.GET("/option/list_cus", ListRequirementCus)
 	router.GET("/option/list_user", ListUsers)
+	router.GET("/option/list_user_by_dept/:id", ListUsersByDept)
 	router.GET("/option/list_approve_type", ListApproveType)
 	router.GET("/option/list_department", ListDepartment)
 	router.GET("/option/list_mc", ListConsideration)

@@ -430,18 +430,55 @@ type Feasibility1 struct {
 	Doc_type        int                 `json:"doc_type"`
 }
 
+type RfqGroupPart struct {
+	Irpn_id    int    `json:"irpn_id"`
+	IrPartNo   string `json:"irpn_part_no"`
+	IrPartName string `json:"irpn_part_name"`
+	IrModel    string `json:"irpn_model"`
+	IrRemark   string `json:"irpn_remark"`
+}
+
+type RfqGroupVolume struct {
+	Year   string `json:"year"`
+	Volume string `json:"volume"`
+}
+
+type RfqGroupCheckbox struct {
+	IrPuDept       int `json:"ir_pu_dept"`
+	IrPeDept       int `json:"ir_pe_dept"`
+	IrScmDept      int `json:"ir_scm_dept"`
+	IrCeDept       int `json:"ir_ce_dept"`
+	IrGdcDept      int `json:"ir_gdc_dept"`
+	IrRawPuc       int `json:"ir_raw_puc"`
+	IrMoldPuc      int `json:"ir_mold_puc"`
+	IrMenufacPuc   int `json:"ir_menufac_puc"`
+	IrTransportPuc int `json:"ir_transport_puc"`
+	IrCastPoc      int `json:"ir_cast_poc"`
+	IrMachinPoc    int `json:"ir_machin_poc"`
+	IrAssemblyPoc  int `json:"ir_assembly_poc"`
+	IrPackPoc      int `json:"ir_pack_poc"`
+}
+
 type Rfq struct {
-	Ir_id       string `json:"ir_ref"`
-	Ir_customer string `json:"ir_customer"`
-	Ir_ref_nbc  int    `json:"ir_ref_nbc"`
-	Ir_pro_life string `json:"ir_pro_life"`
-	Ir_pro_tim  string `json:"ir_sop"`
-	Ir_duedate  string `json:"ir_duedate"`
-	Ir_status   int    `json:"ir_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	IrId            int                `json:"ir_id"`
+	IrDocNo         string             `json:"ir_doc_no"`
+	IrCustomer      string             `json:"ir_customer"`
+	IrImportTran    int                `json:"ir_import_tran"`
+	IrMrt           string             `json:"ir_mrt"`
+	IrEnclosures    string             `json:"ir_enclosures"`
+	IrRefFm         int                `json:"ir_ref_fm"`
+	IrRefNbc        int                `json:"ir_ref_nbc"`
+	IrProLife       int                `json:"ir_pro_life"`
+	IrProTim        string             `json:"ir_pro_tim"`
+	IrDueDate       string             `json:"ir_duedate"`
+	IrNote          string             `json:"ir_note"`
+	IrComment       string             `json:"ir_comment"`
+	IrCreatedDate   string             `json:"ir_created_date"`
+	IrCreatedBy     string             `json:"ir_created_by"`
+	IrStatus        int                `json:"ir_status"`
+	IrGroupPart     []RfqGroupPart     `json:"ir_group_part"`
+	IrGroupVolume   []RfqGroupVolume   `json:"ir_group_volume"`
+	IrGroupCheckbox []RfqGroupCheckbox `json:"ir_group_checkbox"`
 }
 
 type RfqData struct {
@@ -449,21 +486,31 @@ type RfqData struct {
 }
 
 type RfqTable struct {
-	Ir_id       string `json:"ir_ref"`
-	Ir_customer string `json:"ir_customer"`
-	Ir_ref_nbc  int    `json:"ir_ref_nbc"`
-	Ir_pro_life string `json:"ir_pro_life"`
-	Ir_pro_tim  string `json:"ir_sop"`
-	Ir_duedate  string `json:"ir_duedate"`
-	Ir_status   int    `json:"ir_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
-	Su_fname    string `json:"su_fname"`
-	Su_lname    string `json:"su_lname"`
-	Su_img_path string `json:"su_img_path"`
-	Su_img_name string `json:"su_img_name"`
+	Ir_id           string             `json:"ir_id"`
+	Ir_doc_no       string             `json:"ir_doc_no"`
+	Ir_customer     string             `json:"ir_customer"`
+	Ir_import_tran  int                `json:"ir_import_tran"`
+	Ir_mrt          string             `json:"mrt_id"`
+	Ir_enclosures   string             `json:"ir_enclosures"`
+	Ir_ref_fm       int                `json:"ir_ref_fm"`
+	Ir_ref_nbc      int                `json:"ir_ref_nbc"`
+	Ir_pro_life     string             `json:"ir_pro_life"`
+	Ir_pro_tim      string             `json:"ir_sop_tim"`
+	Ir_duedate      string             `json:"ir_duedate"`
+	Ir_note         string             `json:"ir_note"`
+	Ir_comment      string             `json:"ir_comment"`
+	Ir_status       int                `json:"ir_status"`
+	Create_date     string             `json:"ir_created_date"`
+	Create_by       string             `json:"ir_created_by"`
+	Update_date     string             `json:"ir_updated_date"`
+	Update_by       string             `json:"ir_updated_by"`
+	Su_firstname    string             `json:"su_firstname"`
+	Su_lastname     string             `json:"su_lastname"`
+	Su_sign_path    string             `json:"su_sign_path"`
+	Su_sign_file    string             `json:"su_sign_file"`
+	IrGroupPart     []RfqGroupPart     `json:"ir_group_part"`
+	IrGroupVolume   []RfqGroupVolume   `json:"ir_group_volume"`
+	IrGroupCheckbox []RfqGroupCheckbox `json:"ir_group_checkbox"`
 }
 
 type GetRfqFileByIdData struct {
@@ -498,6 +545,12 @@ type GroupPartNo struct {
 
 type GetLastID struct {
 	Last_id int `json:"last_id"`
+}
+
+type GetDocNo struct {
+	Doc_type   string `json:"doc_type"`
+	Doc_con_no string `json:"doc_con_no"`
+	Doc_no     string `json:"doc_no"`
 }
 
 type ManageConsernData struct {
@@ -730,9 +783,11 @@ type GetPartNoByIdData struct {
 	Data []GetPartNoById `json:"data"`
 }
 type GetPartNoById struct {
-	Ifpn_id  int    `json:"ifpn_id"`
-	PartNo   string `json:"partNo"`
-	PartName string `json:"partName"`
+	Irpn_id        int    `json:"irpn_id"`
+	Irpn_part_no   string `json:"irpn_part_no"`
+	Irpn_part_name string `json:"irpn_part_name"`
+	Irpn_model     string `json:"irpn_model"`
+	Irpn_remark    string `json:"irpn_remark"`
 }
 
 type ViewFeasibilityScore struct {

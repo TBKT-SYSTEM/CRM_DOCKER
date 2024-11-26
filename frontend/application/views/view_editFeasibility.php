@@ -290,7 +290,7 @@
             type: 'get',
             url: API_URL + 'feasibility/' + if_id,
             success: async function(result) {
-                console.log(result);
+                // console.log(result);
                 data = result;
                 let datePart = result.create_date.split(" ")[0];
                 let formattedDate = datePart.replace(/-/g, '/');
@@ -302,8 +302,6 @@
                 $('#btnPDF').attr('href', '<?php echo base_url(); ?>FeasibilityForm/createPDF?' + queryParams);
             }
         });
-
-
-
     });
+    
 </script>

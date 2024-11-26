@@ -945,7 +945,7 @@ func ListInchargeTable(c *gin.Context) {
 func ListPartNoById(c *gin.Context) {
 	// log.Println("List Part No By Id : ", c.Param("id"))
 	var objPartNoList []GetPartNoById
-	objListPartNo, err := db.Query("SELECT ifpn_id, ifpn_part_no, ifpn_part_name FROM `info_feasibility_part_no` WHERE if_id = ? AND ifpn_status = 1", c.Param("id"))
+	objListPartNo, err := db.Query("SELECT irpn_id, irpn_part_no, irpn_part_name, irpn_model, irpn_remark FROM `info_rfq_part_no` WHERE ir_id = ? ORDER BY irpn_id", c.Param("id"))
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -955,20 +955,16 @@ func ListPartNoById(c *gin.Context) {
 	defer objListPartNo.Close()
 	for objListPartNo.Next() {
 		var objPartNo GetPartNoById
-		var strPartNo sql.NullString
-		var strPartName sql.NullString
-		err := objListPartNo.Scan(&objPartNo.Ifpn_id, &objPartNo.PartNo, &objPartNo.PartName)
+		var strRemark sql.NullString
+		err := objListPartNo.Scan(&objPartNo.Irpn_id, &objPartNo.Irpn_part_no, &objPartNo.Irpn_part_name, &objPartNo.Irpn_model, &strRemark)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
 			})
 			return
 		}
-		if strPartNo.Valid {
-			objPartNo.PartNo = strPartNo.String
-		}
-		if strPartName.Valid {
-			objPartNo.PartName = strPartName.String
+		if strRemark.Valid {
+			objPartNo.Irpn_remark = strRemark.String
 		}
 
 		objPartNoList = append(objPartNoList, objPartNo)
@@ -1386,7 +1382,7 @@ func ListRequirementType(c *gin.Context) {
 
 func ListImportFrom(c *gin.Context) {
 	var objImportFromList []ImportFrom
-	objListImportFrom, err := db.Query("SELECT * FROM `mst_import_from` WHERE mif_status=1")
+	objListImportFrom, err := db.Query("SELECT * FROM `mst_import_from` WHERE mif_status = 1")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -1589,6 +1585,75 @@ func ListUsers(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, objUserSessionList)
 }
+
+func ListUsersByDept(c *gin.Context) {
+	var objUserSessionList []UserSession
+	objListUser, err := db.Query("SELECT su.*, sd.sd_dept_name, spg.spg_name FROM `sys_users` AS su LEFT JOIN sys_department AS sd ON su.sd_id = sd.sd_id LEFT JOIN sys_permission_group AS spg ON su.spg_id = spg.spg_id WHERE su.su_status = 1 AND su.sd_id = ? AND su.sd_id <> '' ", c.Param("id"))
+
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	defer objListUser.Close()
+	for objListUser.Next() {
+		var objUsers UserSession
+
+		var strDept sql.NullInt64
+		var strDeptName sql.NullString
+		var strUserSingPath sql.NullString
+		var strUserSingFile sql.NullString
+		var strCreateDate sql.NullString
+		var strUpdateDate sql.NullString
+		var strCreateBy sql.NullString
+		var strUpdateBy sql.NullString
+
+		err := objListUser.Scan(&objUsers.Su_id, &objUsers.Spg_id, &objUsers.Su_username, &objUsers.Su_password, &objUsers.Su_firstname, &objUsers.Su_lastname, &objUsers.Su_email, &strDept, &strUserSingPath, &strUserSingFile, &objUsers.Su_status, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &objUsers.Su_last_accress, &strDeptName, &objUsers.Spg_name)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+		StringReplace(&objUsers.Sd_dept_name, "\u0026", "&", 1)
+		if strDeptName.Valid {
+			objUsers.Sd_dept_name = strDeptName.String
+		}
+		if strUserSingPath.Valid {
+			objUsers.Su_sign_path = strUserSingPath.String
+		}
+		if strUserSingFile.Valid {
+			objUsers.Su_sign_file = strUserSingFile.String
+		}
+		if strCreateDate.Valid {
+			objUsers.Create_date = strCreateDate.String
+		}
+		if strUpdateDate.Valid {
+			objUsers.Update_date = strUpdateDate.String
+		}
+		if strCreateBy.Valid {
+			objUsers.Create_by = strCreateBy.String
+		}
+		if strUpdateBy.Valid {
+			objUsers.Update_by = strUpdateBy.String
+		}
+		if strDept.Valid {
+			objUsers.Sd_id = int(strDept.Int64)
+		}
+		objUserSessionList = append(objUserSessionList, objUsers)
+	}
+	err = objListUser.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, objUserSessionList)
+}
+
 func ListApproveType(c *gin.Context) {
 	var objApproveTypeList []ApproveType
 	objListApproveType, err := db.Query("SELECT * FROM `sys_approve_type` WHERE sat_status=1")
