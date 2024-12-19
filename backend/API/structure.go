@@ -214,7 +214,7 @@ type DocumentTypeTable struct {
 	Mdt_name      string `json:"mdt_name"`
 	Mdt_position1 string `json:"mdt_position1"`
 	Mdt_position2 string `json:"mdt_position2"`
-	Mdt_position3 string `json:"mdt_position3"`
+	Map_id        int    `json:"map_id"`
 	Mdt_status    int    `json:"mdt_status"`
 	Create_date   string `json:"mdt_created_date"`
 	Update_date   string `json:"mdt_updated_date"`
@@ -228,12 +228,22 @@ type DocumentType struct {
 	Mdt_name      string `json:"mdt_name"`
 	Mdt_position1 string `json:"mdt_position1"`
 	Mdt_position2 string `json:"mdt_position2"`
-	Mdt_position3 string `json:"mdt_position3"`
+	Map_id        int    `json:"map_id"`
 	Mdt_status    int    `json:"mdt_status"`
 	Create_date   string `json:"mdt_created_date"`
 	Update_date   string `json:"mdt_updated_date"`
 	Create_by     string `json:"mdt_created_by"`
 	Update_by     string `json:"mdt_updated_by"`
+}
+type ApprovePattern struct {
+	Map_id      int    `json:"map_id"`
+	Map_name    string `json:"map_name"`
+	Map_detail  string `json:"map_detail"`
+	Map_status  int    `json:"map_status"`
+	Create_date string `json:"map_created_date"`
+	Update_date string `json:"map_updated_date"`
+	Create_by   string `json:"map_created_by"`
+	Update_by   string `json:"map_updated_by"`
 }
 
 type MenuGroupData struct {
@@ -304,7 +314,6 @@ type DocControlDetailTable struct {
 	Mdt_id         int    `json:"mdt_id"`
 	Mdcn_position1 string `json:"mdcn_position1"`
 	Mdcn_position2 string `json:"mdcn_position2"`
-	Mdcn_position3 string `json:"mdcn_position3"`
 	Create_date    string `json:"mdcn_created_date"`
 	Create_by      string `json:"mdcn_created_by"`
 	Update_date    string `json:"mdcn_updated_date"`
@@ -320,7 +329,6 @@ type DocControlNo struct {
 	Mdt_id         int    `json:"mdt_id"`
 	Mdcn_position1 string `json:"mdcn_position1"`
 	Mdcn_position2 string `json:"mdcn_position2"`
-	Mdcn_position3 string `json:"mdcn_position3"`
 	Create_date    string `json:"mdcn_created_date"`
 	Create_by      string `json:"mdcn_created_by"`
 	Update_date    string `json:"mdcn_updated_date"`
@@ -330,25 +338,27 @@ type DepartmentData struct {
 	Data []DepartmentTable `json:"data"`
 }
 type DepartmentTable struct {
-	Sd_id        int    `json:"sd_id"`
-	Sd_dept_name string `json:"sd_dept_name"`
-	Sd_plant_cd  int    `json:"sd_plant_cd"`
-	Sd_dept_cd   string `json:"sd_dept_cd"`
-	Sd_status    int    `json:"sd_status"`
-	Create_date  string `json:"sd_created_date"`
-	Create_by    string `json:"sd_created_by"`
-	Update_date  string `json:"sd_updated_date"`
-	Update_by    string `json:"sd_updated_by"`
-	Su_fname     string `json:"su_fname"`
-	Su_lname     string `json:"su_lname"`
-	Su_img_path  string `json:"su_img_path"`
-	Su_img_name  string `json:"su_img_name"`
+	Sd_id         int    `json:"sd_id"`
+	Sd_plant_cd   int    `json:"sd_plant_cd"`
+	Sd_dept_cd    string `json:"sd_dept_cd"`
+	Sd_dept_name  string `json:"sd_dept_name"`
+	Sd_dept_aname string `json:"sd_dept_aname"`
+	Sd_status     int    `json:"sd_status"`
+	Create_date   string `json:"sd_created_date"`
+	Create_by     string `json:"sd_created_by"`
+	Update_date   string `json:"sd_updated_date"`
+	Update_by     string `json:"sd_updated_by"`
+	Su_fname      string `json:"su_fname"`
+	Su_lname      string `json:"su_lname"`
+	Su_sign_path  string `json:"su_sign_path"`
+	Su_sign_file  string `json:"su_sign_file"`
 }
 type Department struct {
 	Sd_id       int    `json:"sd_id"`
 	Sd_plant_cd int    `json:"sd_plant_cd"`
 	Sd_name_cd  string `json:"sd_dept_cd"`
 	Sd_name     string `json:"sd_dept_name"`
+	Sd_Aname    string `json:"sd_dept_aname"`
 	Sd_status   int    `json:"sd_status"`
 	Create_date string `json:"sd_created_date"`
 	Update_date string `json:"sd_updated_date"`
@@ -722,28 +732,28 @@ type ConsiderationData struct {
 	Data []ConsiderationTable `json:"data"`
 }
 type ConsiderationTable struct {
-	Mc_id        int     `json:"mc_id"`
-	Mc_title     string  `json:"mc_title"`
-	Mc_weight    float64 `json:"mc_weight"`
-	Mc_status    int     `json:"mc_status"`
-	Create_date  string  `json:"create_date"`
-	Update_date  string  `json:"update_date"`
-	Create_by    string  `json:"create_by"`
-	Update_by    string  `json:"update_by"`
-	Su_fname     string  `json:"su_firstname"`
-	Su_lname     string  `json:"su_lastname"`
-	Su_sign_path string  `json:"su_sign_path"`
-	Su_sign_file string  `json:"su_sign_file"`
+	Mci_id             int    `json:"mci_id"`
+	Mci_name           string `json:"mci_name"`
+	Mci_calculate_type int    `json:"mci_calculate_type"`
+	Mci_status         int    `json:"mci_status"`
+	Create_date        string `json:"mci_created_date"`
+	Create_by          string `json:"mci_created_by"`
+	Update_date        string `json:"mci_updated_date"`
+	Update_by          string `json:"mci_updated_by"`
+	Su_fname           string `json:"su_firstname"`
+	Su_lname           string `json:"su_lastname"`
+	Su_sign_path       string `json:"su_sign_path"`
+	Su_sign_file       string `json:"su_sign_file"`
 }
 type Consideration struct {
-	Mc_id       int     `json:"mc_id"`
-	Mc_title    string  `json:"mc_title"`
-	Mc_weight   float64 `json:"mc_weight"`
-	Mc_status   int     `json:"mc_status"`
-	Create_date string  `json:"create_date"`
-	Update_date string  `json:"update_date"`
-	Create_by   string  `json:"create_by"`
-	Update_by   string  `json:"update_by"`
+	Mci_id             int    `json:"mci_id"`
+	Mci_name           string `json:"mci_name"`
+	Mci_calculate_type int    `json:"mci_calculate_type"`
+	Mci_status         int    `json:"mci_status"`
+	Create_date        string `json:"mci_created_date"`
+	Create_by          string `json:"mci_created_by"`
+	Update_date        string `json:"mci_updated_date"`
+	Update_by          string `json:"mci_updated_by"`
 }
 type ConsiderationCount struct {
 	Mc_id int `json:"mc_id"`

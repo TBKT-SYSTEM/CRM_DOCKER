@@ -102,6 +102,7 @@
                                                                 <th>No.</th>
                                                                 <th>DOC. Type Name</th>
                                                                 <th>DOC. Control Position 1</th>
+                                                                <th>DOC. Control Position 2</th>
                                                                 <th>Updated Date</th>
                                                                 <th>Updated By</th>
                                                                 <th>Action</th>
@@ -161,9 +162,17 @@
                                                     </div>
                                                     <div class="col-lg-5">
                                                         <div class=" row align-items-center">
-                                                            <label for="inpDocPo3" class="form-label fw-semibold col-sm-3 col-form-label">Position 3</label>
+                                                            <label for="inpDocPo3" class="form-label fw-semibold col-sm-3 col-form-label">Approve Pattern</label>
                                                             <div class="col-sm-8">
-                                                                <input type="text" class="form-control" name="inpDocPo3" id="inpDocPo3" placeholder="Enter Text Position 3">
+                                                                <select type="text" class="form-select" name="inpDocPo3" id="inpDocPo3">
+                                                                    <option value="" selected disabled>Choose approve pattern</option>
+                                                                    <?php
+                                                                    $option_mm = $this->ManageBackend->list_option("option/list_map");
+                                                                    foreach ($option_mm as $op_mm) {
+                                                                        echo '<option value="' . $op_mm['map_id'] . '">' . $op_mm['map_name'] . '</option>';
+                                                                    }
+                                                                    ?>
+                                                                </select>
                                                                 <span class="form_error"></span>
                                                             </div>
                                                         </div>
@@ -196,7 +205,7 @@
                                                                 <th>Document Type Name</th>
                                                                 <th>Position 1</th>
                                                                 <th>Position 2</th>
-                                                                <th>Position 3</th>
+                                                                <th>Approve Type</th>
                                                                 <th>Updated Date</th>
                                                                 <th>Updated By</th>
                                                                 <th>Status</th>
@@ -301,9 +310,9 @@
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
-                            <label for="edtPo3" class="form-label fw-semibold col-sm-3 col-form-label">Position 3</label>
+                            <label for="edtPo3" class="form-label fw-semibold col-sm-3 col-form-label">Approver pattern</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="edtPo3" name="mdt_position3" placeholder="Text Position 3 ...">
+                                <select type="text" class="form-control" id="edtPo3" name="map_id"></select>
                                 <span class="form_error"></span>
                             </div>
                         </div>
@@ -402,7 +411,7 @@
                         "mdt_name": $('#inpDocName').val(),
                         "mdt_position1": $('#inpDocPo1').val(),
                         "mdt_position2": $('#inpDocPo2').val(),
-                        "mdt_position3": $('#inpDocPo3').val(),
+                        "map_id": +$('#inpDocPo3').val(),
                         "mdt_status": 1,
                         "mdt_created_date": getTimeNow(),
                         "mdt_created_by": "<?php echo $this->session->userdata('sessUsr') ?>"
@@ -477,7 +486,7 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#frmEditDocType').serializeArray().forEach(function(item) {
-                        if (item.name == 'mdt_id') {
+                        if (item.name == 'mdt_id' || item.name == 'map_id') {
                             edit_form[item.name] = parseInt(item.value);
                             return;
                         }
@@ -601,8 +610,7 @@
                     var add_form = {
                         "mdt_id": parseInt($('#selDoctype').val()),
                         "mdcn_position1": $('#inpDocNoPo1').val(),
-                        "mdcn_position2": '',
-                        "mdcn_position3": '',
+                        "mdcn_position2": "0",
                         "mdcn_created_date": getTimeNow(),
                         "mdcn_created_by": "<?php echo $this->session->userdata('sessUsr') ?>"
                     };
@@ -718,7 +726,7 @@
     }
 
     // modal --------------------------------------
-    function editModal(name, po1, po2, po3, id) {
+    function editModal(name, po1, po2, map_id, id) {
         event.preventDefault();
         // alert('name:' + name +
         //     '\npo1:' + po1 +
@@ -728,8 +736,23 @@
         $('#edtDocName').val(name);
         $('#edtPo1').val(po1);
         $('#edtPo2').val(po2);
-        $('#edtPo3').val(po3);
         $('#edtDocId').val(id);
+        $.ajax({
+            url: API_URL + 'option/list_map',
+            type: 'GET',
+            success: function(response) {
+                $('#edtPo3').html('<option value="" disabled>Choose approve pattern</option>');
+                for (let i = 0; i < response.length; i++) {
+                    let optionHtml = '';
+                    if (response[i].map_id == map_id) {
+                        optionHtml = '<option value="' + response[i].map_id + '" selected>' + response[i].map_name + '</option>';
+                    } else {
+                        optionHtml = '<option value="' + response[i].map_id + '">' + response[i].map_name + '</option>';
+                    }
+                    $('#edtPo3').append(optionHtml);
+                }
+            }
+        })
     }
 
     function editDetailModal(position1, mdt_id, mdcn_id) {
@@ -740,20 +763,13 @@
 
     $('#selDoctype').on('change', function() {
         form_ok(document.getElementById("selDoctype"));
-        $.ajax({
-            url: API_URL + 'doc_control_detail/table/' + this.value,
-            type: 'GET',
-            success: function(response) {
-                let data = response.data;
-                if (!data) {
-                    $('#tab-1 select').prop('disabled', false);
-                    $('#tab-1 #btnRegisterDocControlNo').prop('disabled', false);
-                } else {
-                    $('#tab-1 select').prop('disabled', true);
-                    $('#tab-1 #btnRegisterDocControlNo').prop('disabled', true);
-                }
-            }
-        });
+        if (this.value) {
+            $('#tab-1 select').prop('disabled', false);
+            $('#tab-1 #btnRegisterDocControlNo').prop('disabled', false);
+        } else {
+            $('#tab-1 select').prop('disabled', true);
+            $('#tab-1 #btnRegisterDocControlNo').prop('disabled', true);
+        }
         generateYearOptions('inpDocNoPo1');
         // alert( this.value );
         if ($.fn.DataTable.isDataTable('#tblDocControl')) {
@@ -787,6 +803,11 @@
                     title: 'DOC. Control Position 1',
                     className: 'text-center',
                     data: 'mdcn_position1'
+                },
+                {
+                    title: 'DOC. Control Position 2',
+                    className: 'text-center',
+                    data: 'mdcn_position2'
                 },
                 {
                     title: 'Updated Date',
@@ -879,7 +900,7 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'mdt_position3'
+                    data: 'map_id'
                 },
                 {
                     className: 'text-center',
@@ -926,7 +947,7 @@
                     data: 'mdt_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<button type="button" onclick="editModal(\'' + row.mdt_name + '\',\'' + row.mdt_position1 + '\',\'' + row.mdt_position2 + '\',\'' + row.mdt_position3 + '\',\'' + row.mdt_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditDocType">' +
+                            disp = '<button type="button" onclick="editModal(\'' + row.mdt_name + '\',\'' + row.mdt_position1 + '\',\'' + row.mdt_position2 + '\',\'' + row.map_id + '\',\'' + row.mdt_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditDocType">' +
                                 '<i class="ti ti-pencil me-1"></i>Edit</button>';
                         }
                         return disp;

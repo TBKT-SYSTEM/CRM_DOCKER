@@ -354,19 +354,19 @@ async function spd_validate(formType) {
 }
 
 async function mdt_validate(formType) {
-    var mdt_name, mdt_position1, mdt_position2, mdt_position3, id, url, unique_data;
+    var mdt_name, mdt_position1, mdt_position2, map_id, id, url, unique_data;
     url = API_URL + "document_type/is_unique"
     if (formType == "add") {
         mdt_name = document.getElementById("inpDocName");
         mdt_position1 = document.getElementById("inpDocPo1");
         mdt_position2 = document.getElementById("inpDocPo2");
-        mdt_position3 = document.getElementById("inpDocPo3");
+        map_id = document.getElementById("inpDocPo3");
         id = 0;
     } else {
         mdt_name = document.frmEditDocType.mdt_name;
         mdt_position1 = document.frmEditDocType.mdt_position1
         mdt_position2 = document.frmEditDocType.mdt_position2
-        mdt_position3 = document.frmEditDocType.mdt_position3
+        map_id = document.frmEditDocType.map_id
         let getid = document.frmEditDocType.mdt_id
         id = parseInt(getid.value)
     }
@@ -409,17 +409,12 @@ async function mdt_validate(formType) {
                                     return false;
                                 } else {
                                     form_ok(mdt_position2);
-                                    if (is_empty(mdt_position3.value)) {
-                                        form_ok(mdt_position3);
+                                    if (is_empty(map_id.value)) {
+                                        form_ok(map_id);
                                         return true;
                                     } else {
-                                        if (!is_english(mdt_position3.value)) {
-                                            form_err(mdt_position3, "*Document type position 3 format is invalid");
-                                            return false;
-                                        } else {
-                                            form_ok(mdt_position3);
-                                            return true;
-                                        }
+                                        form_ok(map_id);
+                                        return true;
                                     }
                                 }
                             }
@@ -823,7 +818,7 @@ async function mc_validate(formType) {
     var title, weight, id;
     if (formType == "add") {
         title = document.getElementById("inpTitle")
-        weight = document.getElementById("inpWeight")
+        weight = document.getElementById("inpCal")
         id = 0
     } else {
         title = document.edit_formConsider.mc_title
@@ -838,7 +833,7 @@ async function mc_validate(formType) {
     } else {
         form_ok(title);
         if (is_empty(weight.value)) {
-            form_err(weight, "*Please Enter weight");
+            form_err(weight, "*Please Select Calculate Type"); 
             return false;
         } else {
             form_ok(weight);
@@ -1306,7 +1301,7 @@ async function Rfq_validate(formType) {
 }
 
 async function Rfq_valid(formType) {
-    var url, urlDocNo, ir_doc, ir_import_tran, ir_customer, ir_mrt, ir_other_mrt, ir_enclosures, ir_other_enclosures;
+    var url, urlDocNo, ir_doc, ir_import_tran, ir_customer, ir_mrt, ir_other_mrt, ir_enclosures, ir_other_enclosures, ir_duedate;
 
     urlDocNo = API_URL + "rfq/doc_no/2"; // 2 = RFQ Format Doc
     url = API_URL + "rfq/last_id";
@@ -1320,9 +1315,17 @@ async function Rfq_valid(formType) {
         ir_other_mrt = document.add_form.ir_other_mrt;
         ir_enclosures = document.add_form.ir_enclosures;
         ir_other_enclosures = document.add_form.ir_other_enclosures;
+        ir_duedate = document.add_form.ir_duedate;
         refcon = document.getElementById('inpDocNo');
         id = 0;
     } else {
+        ir_import_tran = document.edit_form.ir_import_tran;
+        ir_customer = document.edit_form.ir_customer;
+        ir_mrt = document.edit_form.ir_mrt;
+        ir_other_mrt = document.edit_form.ir_other_mrt;
+        ir_enclosures = document.edit_form.ir_enclosures;
+        ir_other_enclosures = document.edit_form.ir_other_enclosures;
+        ir_duedate = document.edit_form.ir_duedate;
         let getid = document.edit_form.ir_id;
         id = parseInt(getid.value);
     }
@@ -1366,6 +1369,13 @@ async function Rfq_valid(formType) {
                             return false;
                         } else {
                             form_okValid(ir_other_enclosures);
+                            if (is_empty(ir_duedate.value)) {
+                                form_errValid(ir_duedate, "*Please Select Due Date");
+                                return false;
+                            }
+                            else {
+                                form_okValid(ir_duedate);
+                            }
                         }
                     }
                 }
@@ -1390,6 +1400,19 @@ async function Rfq_valid(formType) {
                         }
                     } catch (err) {
                         console.log(err); // Handle error
+                    }
+                } else {
+                    if (ir_customer.value == "Other") {
+                        form_errValid(ir_customer, "*Please Enter Other Customer Name");
+                        return false;
+                    } else {
+                        if (is_empty(ir_duedate.value)) {
+                            form_errValid(ir_duedate, "*Please Select Due Date");
+                            return false;
+                        } else {
+                            form_okValid(ir_duedate);
+                            return true, id;
+                        }
                     }
                 }
             }

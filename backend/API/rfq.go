@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -332,7 +333,7 @@ func ListRFQ(c *gin.Context) {
 		return
 	}
 
-	groupPart, err := db.Query("SELECT irpn_id, irpn_part_no, irpn_part_name, irpn_model, irpn_remark FROM info_rfq_part_no WHERE ir_id = ? ORDER BY irpn_id", iId)
+	groupPart, err := db.Query("SELECT irpn_id, irpn_part_no, irpn_part_name, irpn_model, irpn_remark FROM info_rfq_part_no WHERE ir_id = ? AND irpn_status = 1 ORDER BY irpn_id", iId)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -409,6 +410,12 @@ func ListRFQ(c *gin.Context) {
 	if strUserLname.Valid {
 		objRfq.Su_lastname = strUserLname.String
 	}
+	if strNote.Valid {
+		objRfq.Ir_note = strNote.String
+	}
+	if strComment.Valid {
+		objRfq.Ir_comment = strComment.String
+	}
 	if strUserSignPath.Valid {
 		objRfq.Su_sign_path = strUserSignPath.String
 	}
@@ -432,8 +439,38 @@ func ListRFQ(c *gin.Context) {
 
 func CancelRfq(c *gin.Context) {
 	iId := c.Param("id")
+	iReason := c.Param("reason")
+	log.Println("iReason : ", iReason)
 
 	objResult, err := db.Exec("UPDATE info_rfq SET ir_status = 0 WHERE ir_id = ?", iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+}
+
+func ReverseRfq(c *gin.Context) {
+	iId := c.Param("id")
+
+	objResult, err := db.Exec("UPDATE info_rfq SET ir_status = 1 WHERE ir_id = ?", iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+}
+
+func SubmitRfq(c *gin.Context) {
+	iId := c.Param("id")
+
+	objResult, err := db.Exec("UPDATE info_rfq SET ir_status = 9 WHERE ir_id = ?", iId)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"Error": err.Error(),
@@ -477,6 +514,251 @@ func ListRfqFileId(c *gin.Context) {
 	var objData GetRfqFileByIdData
 	objData.Data = objFileList
 	c.IndentedJSON(http.StatusOK, objData)
+}
+
+func EditRfq(c *gin.Context) {
+	var objRfq Rfq
+	var groupPartCountOld []int
+	var groupVolumeCountOld []int
+
+	if err := c.BindJSON(&objRfq); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var strRefFm sql.NullInt64
+	var strRefNbc sql.NullInt64
+	var strNote sql.NullString
+	var strComment sql.NullString
+
+	if strRefFm.Valid {
+		objRfq.IrRefFm = int(strRefFm.Int64)
+	}
+	if strRefNbc.Valid {
+		objRfq.IrRefNbc = int(strRefNbc.Int64)
+	}
+
+	strNote = sql.NullString{
+		String: objRfq.IrNote,
+		Valid:  objRfq.IrNote != "",
+	}
+	strComment = sql.NullString{
+		String: objRfq.IrComment,
+		Valid:  objRfq.IrComment != "",
+	}
+
+	_, err := db.Exec("UPDATE info_rfq SET ir_customer = ?, ir_import_tran = ?, ir_mrt = ?, ir_enclosures = ?, ir_ref_fm = ?, ir_ref_nbc = ?, ir_pro_life = ?, ir_pro_tim = ?, ir_duedate = ?, ir_note = ?, ir_comment = ?, ir_updated_date = ?, ir_updated_by = ? WHERE ir_id = ?", objRfq.IrCustomer, objRfq.IrImportTran, objRfq.IrMrt, objRfq.IrEnclosures, strRefFm, strRefNbc, objRfq.IrProLife, objRfq.IrProTim, objRfq.IrDueDate, strNote, strComment, objRfq.IrCreatedDate, objRfq.IrCreatedBy, objRfq.IrId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		return
+	} else {
+		//////////////////////////////////// Group Part //////////////////////////////////
+
+		rows, err := db.Query("SELECT irpn_id FROM info_rfq_part_no WHERE ir_id = ? AND irpn_status = 1 ORDER BY irpn_id", objRfq.IrId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+			return
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var irpnId int
+			if err := rows.Scan(&irpnId); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+				return
+			}
+			groupPartCountOld = append(groupPartCountOld, irpnId)
+		}
+
+		if err := rows.Err(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+			return
+		}
+
+		newPartGroupCount := len(objRfq.IrGroupPart)
+
+		if len(groupPartCountOld) == newPartGroupCount {
+			//////////////////////////////////// Old Group Part //////////////////////////////////
+			for i, part := range objRfq.IrGroupPart {
+				var remark sql.NullString
+				if part.IrRemark == "" {
+					remark = sql.NullString{String: "", Valid: false}
+				} else {
+					remark = sql.NullString{String: part.IrRemark, Valid: true}
+				}
+
+				_, err := db.Exec(
+					"UPDATE info_rfq_part_no SET irpn_part_no = ?, irpn_part_name = ?, irpn_model = ?, irpn_remark = ? WHERE irpn_id = ?",
+					part.IrPartNo, part.IrPartName, part.IrModel, remark, groupPartCountOld[i],
+				)
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+					return
+				}
+			}
+		} else {
+			//////////////////////////////////// New Group Part //////////////////////////////////
+
+			_, err := db.Exec("UPDATE info_rfq_part_no SET irpn_status = 0 WHERE ir_id = ?", objRfq.IrId)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update old parts status"})
+				return
+			}
+
+			var sql string = "INSERT INTO info_rfq_part_no (ir_id, irpn_part_no, irpn_part_name, irpn_model, irpn_remark, irpn_status, irpn_created_date, irpn_created_by, irpn_updated_date, irpn_updated_by) VALUES "
+			values := []string{}
+
+			for _, partCurrent := range objRfq.IrGroupPart {
+				partNo := partCurrent.IrPartNo
+				partName := partCurrent.IrPartName
+				model := partCurrent.IrModel
+				remark := partCurrent.IrRemark
+
+				if remark == "" {
+					remark = "NULL"
+				} else {
+					remark = fmt.Sprintf("'%s'", remark)
+				}
+
+				value := fmt.Sprintf("(%d, '%s', '%s', '%s', %s, %d, '%s', '%s', '%s', '%s')",
+					objRfq.IrId,
+					partNo,
+					partName,
+					model,
+					remark,
+					1,
+					objRfq.IrCreatedDate,
+					objRfq.IrCreatedBy,
+					objRfq.IrCreatedDate,
+					objRfq.IrCreatedBy)
+
+				values = append(values, value)
+			}
+
+			if len(values) == 0 {
+				c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+				return
+			}
+
+			sql += strings.Join(values, ",")
+
+			_, err = db.Exec(sql)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+				return
+			}
+		}
+
+		//////////////////////////////////// Group Volume //////////////////////////////////
+
+		rowsVolume, err := db.Query("SELECT irv_id FROM info_rfq_volume WHERE ir_id = ? AND irv_status_flg = 1 ORDER BY irv_id", objRfq.IrId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+			return
+		}
+		defer rowsVolume.Close()
+
+		for rowsVolume.Next() {
+			var irvId int
+			if err := rowsVolume.Scan(&irvId); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+				return
+			}
+			groupVolumeCountOld = append(groupVolumeCountOld, irvId)
+		}
+
+		if err := rowsVolume.Err(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+			return
+		}
+
+		newVolumeGroupCount := len(objRfq.IrGroupVolume)
+
+		if len(groupVolumeCountOld) == newVolumeGroupCount {
+			//////////////////////////////////// Old Group Volume //////////////////////////////////
+			for i, volume := range objRfq.IrGroupVolume {
+				_, err := db.Exec(
+					"UPDATE info_rfq_volume SET irv_year = ?, irv_volume = ?, irv_updated_date = ?, irv_updated_by = ? WHERE irv_id = ? AND ir_id = ?", volume.Year, volume.Volume, objRfq.IrCreatedDate, objRfq.IrCreatedBy, groupVolumeCountOld[i], objRfq.IrId,
+				)
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+					return
+				}
+			}
+		} else {
+			//////////////////////////////////// New Group Volume //////////////////////////////////
+
+			_, err := db.Exec("UPDATE info_rfq_volume SET irv_status_flg = 0 WHERE ir_id = ?", objRfq.IrId)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update old Volume status"})
+				return
+			}
+
+			var sql string = "INSERT INTO info_rfq_volume (ir_id, irv_year, irv_volume, irv_status_flg, irv_created_date, irv_created_by, irv_updated_date, irv_updated_by) VALUES "
+			values := []string{}
+
+			for _, volumeCurrent := range objRfq.IrGroupVolume {
+				year := volumeCurrent.Year
+				volume, err := strconv.Atoi(volumeCurrent.Volume)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid volume value: %s", volumeCurrent.Volume)})
+					return
+				}
+
+				value := fmt.Sprintf("(%d, '%s', %d, %d, '%s', '%s', '%s', '%s')",
+					objRfq.IrId,
+					year,
+					volume,
+					1,
+					objRfq.IrCreatedDate,
+					objRfq.IrCreatedBy,
+					objRfq.IrCreatedDate,
+					objRfq.IrCreatedBy)
+
+				values = append(values, value)
+			}
+
+			if len(values) == 0 {
+				c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+				return
+			}
+
+			sql += strings.Join(values, ",")
+
+			_, err = db.Exec(sql)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+				return
+			}
+		}
+
+		//////////////////////////////////// Checkbox //////////////////////////////////
+		log.Println("Checkbox")
+		_, err = db.Exec("UPDATE info_rfq_formcheck SET irfc_pu_dept = ?, irfc_pe_dept = ?, irfc_scm_dept = ?, irfc_ce_dept = ?, irfc_gdc_dept = ?, irfc_raw_puc = ?, irfc_mold_puc = ?, irfc_menufac_puc = ?, irfc_transport_puc = ?, irfc_cast_poc = ?, irfc_machin_poc = ?, irfc_assembly_poc = ?, irfc_pack_poc = ?, irfc_updated_date = ?, irfc_updated_by = ? WHERE ir_id = ?",
+			objRfq.IrGroupCheckbox[0].IrPuDept,
+			objRfq.IrGroupCheckbox[0].IrPeDept,
+			objRfq.IrGroupCheckbox[0].IrScmDept,
+			objRfq.IrGroupCheckbox[0].IrCeDept,
+			objRfq.IrGroupCheckbox[0].IrGdcDept,
+			objRfq.IrGroupCheckbox[0].IrRawPuc,
+			objRfq.IrGroupCheckbox[0].IrMoldPuc,
+			objRfq.IrGroupCheckbox[0].IrMenufacPuc,
+			objRfq.IrGroupCheckbox[0].IrTransportPuc,
+			objRfq.IrGroupCheckbox[0].IrCastPoc,
+			objRfq.IrGroupCheckbox[0].IrMachinPoc,
+			objRfq.IrGroupCheckbox[0].IrAssemblyPoc,
+			objRfq.IrGroupCheckbox[0].IrPackPoc,
+			objRfq.IrCreatedDate,
+			objRfq.IrCreatedBy,
+			objRfq.IrId)
+
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+			return
+		}
+		c.IndentedJSON(http.StatusOK, gin.H{"Update": "Update Success"})
+	}
+
 }
 
 // func ListBtnRfq(c *gin.Context) {

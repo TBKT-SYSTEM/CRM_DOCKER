@@ -219,11 +219,21 @@ func SpdIsUnique(c *gin.Context) {
 }
 func InsertSpd(c *gin.Context) {
 	var strPerDetail PermissionDetail
+	var nextOrder int
+
 	if err := c.BindJSON(&strPerDetail); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("INSERT INTO sys_permission_detail(spg_id, smd_id, spd_created_date, spd_created_by, spd_updated_date, spd_updated_by) VALUES(?,?,?,?,?,?)", strPerDetail.Spg_id, strPerDetail.Smd_id, strPerDetail.Create_date, strPerDetail.Create_by, strPerDetail.Create_date, strPerDetail.Create_by)
+
+	query := `SELECT COUNT(smg.smg_id) + 1 AS next_order FROM sys_permission_detail AS spd LEFT JOIN sys_menu_detail AS smd ON spd.smd_id = smd.smd_id LEFT JOIN sys_menu_group AS smg ON smd.smg_id = smg.smg_id WHERE spd.spg_id = ? AND smd_status = 1 AND spd_status = 1 AND smg.smg_id = (SELECT smg_id FROM sys_menu_detail WHERE smd_id = ?)`
+
+	err := db.QueryRow(query, strPerDetail.Spg_id, strPerDetail.Smd_id).Scan(&nextOrder)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+	objResult, err := db.Exec("INSERT INTO sys_permission_detail(spg_id, smd_id, spd_order_no,spd_created_date, spd_created_by, spd_updated_date, spd_updated_by) VALUES(?,?,?,?,?,?,?)", strPerDetail.Spg_id, strPerDetail.Smd_id, nextOrder, strPerDetail.Create_date, strPerDetail.Create_by, strPerDetail.Create_date, strPerDetail.Create_by)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return

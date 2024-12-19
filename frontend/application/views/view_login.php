@@ -32,7 +32,7 @@
                                 <form id="form_login" name="form_login">
                                     <div class="mb-3">
                                         <label for="InputUsername" class="form-label">Username</label>
-                                        <input type="text" class="form-control" id="InputUsername" name="su_username">
+                                        <input type="text" class="form-control text-uppercase" id="InputUsername" name="su_username">
                                         <span class="form_error"></span>
                                     </div>
                                     <div class="mb-4">
@@ -103,6 +103,23 @@
     <script src="<?php echo base_url() ?>assets/js/forms/form_validation.js"></script>
 </body>
 <script>
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            document.getElementById('btnSignIn').click();
+        }
+    });
+
+    document.getElementById('InputUsername').addEventListener('input', function(event) {
+        this.value = this.value.replace(/[ก-๙]/g, '');
+    });
+
+    document.getElementById('InputUsername').addEventListener('keypress', function(event) {
+        const key = event.key;
+        if (/[\u0E00-\u0E7F]/.test(key)) {
+            event.preventDefault();
+        }
+    });
+
     async function login() {
         event.preventDefault();
         var divLoad = `<div class="d-flex justify-content-center align-items-center gap-2">

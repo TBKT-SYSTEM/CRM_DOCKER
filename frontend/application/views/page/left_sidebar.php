@@ -109,18 +109,22 @@
             </ul>
         </nav>
 
-        <div class="fixed-profile p-3 mx-4 mb-2 bg-secondary-subtle rounded mt-3">
+        <div class="fixed-profile p-3 mx-4 mb-2 bg-secondary-subtle rounded mt-3 shadow-sm">
             <div class="hstack gap-3">
                 <div class="john-img">
-                    <img src="<?php echo base_url() ?>assets/images/profile/user-1.jpg" class="rounded-circle" width="40" height="40" alt="" />
+                    <?php
+                    $sessUsr = $this->session->userdata('sessUsr');
+                    $firstPart = substr($sessUsr, 2, 7);
+                    ?>
+                    <img class="rounded-circle" width="35" height="35" alt="" src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/<?php echo $firstPart ?>.jpg" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png'">
                 </div>
                 <div class="john-title">
-                    <h6 class="mb-0 fs-4 fw-semibold">Mathew</h6>
-                    <span class="fs-2">Designer</span>
+                    <h6 class="mb-0 fs-4 fw-semibold"><?php echo $this->session->userdata('sessFname') . ' ' . substr($this->session->userdata('sessLname'). ' ', 0, 1).'.' ?></h6>
+                    <span class="fs-2"><?php echo $this->session->userdata('sessPgName') ?></span>
                 </div>
-                <button class="border-0 bg-transparent text-primary ms-auto" tabindex="0" type="button" aria-label="logout" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="logout">
+                <a href="<?php echo base_url() ?>dashboard/logout" class="border-0 bg-transparent text-primary ms-auto" tabindex="0" type="button" aria-label="logout" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="logout">
                     <i class="ti ti-power fs-6"></i>
-                </button>
+                </a>
             </div>
         </div>
 

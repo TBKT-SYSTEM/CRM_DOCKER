@@ -146,9 +146,12 @@
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="mb-3 row align-items-center">
-                                                    <label for="inpWeight" class="form-label fw-semibold col-sm-1 col-form-label">Weight</label>
+                                                    <label for="inpCal" class="form-label fw-semibold col-auto col-form-label">Calculate Type</label>
                                                     <div class="col-sm-3">
-                                                        <input type="number" id="inpWeight" class="form-control" placeholder="Enter Weight">
+                                                        <select type="number" id="inpCal" class="form-select">
+                                                            <option value="1">Nomal</option>
+                                                            <option value="2">Average</option>
+                                                        </select>
                                                         <span class="form_error"></span>
                                                     </div>
                                                     <div class="col-sm-3">
@@ -175,8 +178,8 @@
                                                         <!-- start row -->
                                                         <tr>
                                                             <th>No.</th>
-                                                            <th>Title</th>
-                                                            <th>Weight</th>
+                                                            <th>Name</th>
+                                                            <th>Calculate Type</th>
                                                             <th>Updated Date</th>
                                                             <th>Updated By</th>
                                                             <th>Status</th>
@@ -259,20 +262,20 @@
                 <form id="edit_formConsider" name="edit_formConsider">
                     <div class="container-fluid">
                         <div class="mb-3 row align-items-center">
-                            <label for="edtTitle" class="form-label fw-semibold col-sm-3 col-form-label">Title</label>
+                            <label for="edtName" class="form-label fw-semibold col-sm-3 col-form-label">Consideration Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="edtTitle" name="mc_title" placeholder="Enter Title">
+                                <input type="text" class="form-control" id="edtName" name="mci_name" placeholder="Enter Title">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
-                            <label for="edtWeight" class="form-label fw-semibold col-sm-3 col-form-label">Weight</label>
+                            <label for="edtCal" class="form-label fw-semibold col-sm-3 col-form-label">Calculate Type</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="edtWeight" name="mc_weight" placeholder="Enter Weight">
+                                <select type="text" class="form-control" id="edtCal" name="mci_calculate_type"></select>
                                 <span class="form_error"></span>
                             </div>
                         </div>
-                        <input type="hidden" name="mc_id" id="edtConsiderationId">
+                        <input type="hidden" name="mci_id" id="edtConsiderationId">
                     </div>
             </div>
             <div class="modal-footer">
@@ -304,10 +307,10 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var add_form = {
-                        "mc_title": $('#inpTitle').val(),
-                        "mc_weight": parseFloat($('#inpWeight').val()),
-                        "create_date": getTimeNow(),
-                        "create_by": "<?php echo $this->session->userdata('sessUsr') ?>"
+                        "mci_name": $('#inpTitle').val(),
+                        "mci_calculate_type": parseInt($('#inpCal').val()),
+                        "mci_created_date": getTimeNow(),
+                        "mci_created_by": "<?php echo $this->session->userdata('sessUsr') ?>"
                     };
                     $.ajax({
                         type: 'POST',
@@ -329,8 +332,6 @@
                                     }
                                 })
                                 $('#inpTitle').val("")
-                                $('#inpWeight').val("")
-                                $('#inpTotal').val("")
                                 var table = $('#tblConsideration').DataTable();
                                 table.ajax.reload(null, false);
                             } else {
@@ -373,15 +374,13 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#edit_formConsider').serializeArray().forEach(function(item) {
-                        if (item.name == 'mc_id') {
+                        if (item.name == 'mci_id' || item.name == 'mci_calculate_type') {
                             item.value = parseInt(item.value)
-                        } else if (item.name == 'mc_weight') {
-                            item.value = parseFloat(item.value)
                         }
                         edit_form[item.name] = item.value;
                     })
-                    edit_form["update_date"] = getTimeNow();
-                    edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                    edit_form["mci_updated_date"] = getTimeNow();
+                    edit_form["mci_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
 
                     $.ajax({
                         type: 'PUT',
@@ -676,10 +675,23 @@
         })
     }
     // modal --------------------------------------
-    function editModal(title, weight, id) {
+    function editModal(name, cal_type, id) {
         event.preventDefault();
-        $('#edtTitle').val(title);
-        $('#edtWeight').val(weight);
+        $('#edtName').val(name);
+        const option = [{
+                value: 1,
+                label: 'Nomal'
+            },
+            {
+                value: 2,
+                label: 'Average'
+            }
+        ];
+        const options = option.map((option) => {
+            const selected = cal_type === option.value ? 'selected' : '';
+            return `<option value="${option.value}" ${selected}>${option.label}</option>`;
+        });
+        $('#edtCal').html(options.join(''));
         $('#edtConsiderationId').val(id);
     }
 
@@ -839,11 +851,11 @@
             ],
             columns: [{
                     className: 'text-center',
-                    data: 'mc_id'
+                    data: 'mci_id'
                 },
                 {
-                    className: 'text-center',
-                    data: 'mc_title',
+                    className: 'text-center col-4',
+                    data: 'mci_name',
                     render: function(data, type, row) {
                         if (type === 'display') {
                             disp = '<div class="text-warp">' + data + '</div>';
@@ -853,25 +865,35 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'mc_weight'
+                    data: 'mci_calculate_type',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.mci_calculate_type == 1) {
+                                disp = 'Nomal';
+                            } else {
+                                disp = 'Average';
+                            }
+                        }
+                        return disp;
+                    }
                 },
                 {
                     className: 'text-center',
-                    data: 'update_date'
+                    data: 'mci_updated_date'
                 },
                 {
                     className: 'text-center',
-                    data: 'update_by',
+                    data: 'mci_updated_by',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            let emp_code = row.update_by.substring(2, 7);
+                            let emp_code = row.mci_updated_by.substring(2, 7);
                             let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
                             disp = '<div class="d-flex align-items-center justify-content-center">' +
                                 '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35" onerror="this.onerror=null;this.src=\'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png\';">' +
                                 '<div class="ms-3">' +
                                 '<div class="user-meta-info">' +
                                 '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + ' ' + row.su_lastname + '</h6>' +
-                                '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
+                                '<span class="user-work fs-3" data-occupation="' + row.mci_updated_by + '">' + row.mci_updated_by + '</span>' +
                                 '</div></div></div>';
                         }
                         return disp;
@@ -879,13 +901,13 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'mc_id',
+                    data: 'mci_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            if (row.mc_status) {
-                                disp = '<a onclick="change_mc_status(' + row.mc_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+                            if (row.mci_status) {
+                                disp = '<a onclick="change_mc_status(' + row.mci_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
                             } else {
-                                disp = '<a onclick="change_mc_status(' + row.mc_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                                disp = '<a onclick="change_mc_status(' + row.mci_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
                             }
                         }
                         return disp;
@@ -893,10 +915,10 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'mc_id',
+                    data: 'mci_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<button type="button" onclick="editModal(\'' + row.mc_title + '\',\'' + row.mc_weight + '\',\'' + row.mc_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditConsideration">' +
+                            disp = '<button type="button" onclick="editModal(\'' + row.mci_name + '\',\'' + row.mci_calculate_type + '\',\'' + row.mci_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditConsideration">' +
                                 '<i class="ti ti-pencil me-1"></i>Edit</button>';
                         }
                         return disp;

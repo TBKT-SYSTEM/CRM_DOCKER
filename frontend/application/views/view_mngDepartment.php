@@ -51,6 +51,7 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>Department Name</th>
+                                            <th>Department Short Name</th>
                                             <th>Department Code</th>
                                             <th>Updated Date</th>
                                             <th>Updated By</th>
@@ -91,6 +92,11 @@
                                 <input type="text" class="form-control" id="inpDepartment" name="sd_dept_name" placeholder="Department Name">
                                 <span class="form_error"></span>
                             </div>
+                            <label for="inpDepartmentShort" class="form-label fw-semibold col-sm-4 col-form-label">Department Short Name</label>
+                            <div class="col-sm-8 mb-3">
+                                <input type="text" class="form-control" id="inpDepartmentShort" name="sd_dept_aname" placeholder="Department Short Name">
+                                <span class="form_error"></span>
+                            </div>
                             <label for="inpDepartmentCd" class="form-label fw-semibold col-sm-4 col-form-label">Department Code</label>
                             <div class="col-sm-8 mb-3">
                                 <input type="text" class="form-control" id="inpDepartmentCd" name="sd_dept_cd" placeholder="Department Code">
@@ -98,7 +104,7 @@
                             </div>
                             <label for="inpPlant" class="form-label fw-semibold col-sm-4 col-form-label">Plant</label>
                             <div class="col-sm-8">
-                                <select type="text" class="form-control" id="inpPlant" name="sd_plant_cd">
+                                <select type="text" class="form-select" id="inpPlant" name="sd_plant_cd">
                                     <option value="51" selected>Phase 10</option>
                                     <option value="52">Phase 8</option>
                                 </select>
@@ -134,14 +140,24 @@
                 <form id="edit_form" name="edit_form">
                     <div class="container-fluid">
                         <div class="mb-3 row align-items-center">
-                            <label for="edtDepartment" class="form-label fw-semibold col-sm-3 col-form-label">Department Name</label>
-                            <div class="col-sm-9">
+                            <label for="edtDepartment" class="form-label fw-semibold col-sm-4 col-form-label mb-3">Department Name</label>
+                            <div class="col-sm-8 mb-3">
                                 <input type="text" class="form-control" id="edtDepartment" name="sd_dept_name" placeholder="Department Name">
                                 <span class="form_error"></span>
                             </div>
-                            <label for="edtDepartmentCd" class="form-label fw-semibold col-sm-3 col-form-label">Department Code</label>
-                            <div class="col-sm-9">
-                                <select type="text" class="form-control" id="edtPlantCd" name="sd_plant_cd">
+                            <label for="edtDepartmentShort" class="form-label fw-semibold col-sm-4 col-form-label mb-3">Department Short Name</label>
+                            <div class="col-sm-8 mb-3">
+                                <input type="text" class="form-control" id="edtDepartmentShort" name="sd_dept_aname" placeholder="Department Short Name">
+                                <span class="form_error"></span>
+                            </div>
+                            <label for="edtDepartmentCd" class="form-label fw-semibold col-sm-4 col-form-label mb-3">Department Code</label>
+                            <div class="col-sm-8 mb-3">
+                                <input type="text" class="form-control" id="edtDepartmentCd" name="sd_dept_cd" placeholder="Department Code">
+                                <span class="form_error"></span>
+                            </div>
+                            <label for="edtPlantCd" class="form-label fw-semibold col-sm-4 col-form-label">Department Code</label>
+                            <div class="col-sm-8">
+                                <select type="text" class="form-select" id="edtPlantCd" name="sd_plant_cd">
                                 </select>
                                 <span class="form_error"></span>
                             </div>
@@ -209,6 +225,7 @@
                                     }
                                 })
                                 $("#inpDepartment").val('');
+                                $("#inpDepartmentShort").val('');
                                 $("#inpDepartmentCd").val('');
                                 $("#inpPlant").prop('selectedIndex', 0);
                                 var dataTable = $('#tblDepartment').DataTable();
@@ -226,6 +243,7 @@
                                     }
                                 })
                                 $("#inpDepartment").val('');
+                                $("#inpDepartmentShort").val('');
                                 $("#inpDepartmentCd").val('');
                                 $("#inpPlant").prop('selectedIndex', 0);
                                 var dataTable = $('#tblDepartment').DataTable();
@@ -264,8 +282,6 @@
                     })
                     edit_form["sd_updated_date"] = getTimeNow();
                     edit_form["sd_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-                    console.log(edit_form);
-                    return;
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
@@ -366,9 +382,10 @@
         })
     }
 
-    function editModal(name, cd, id, plant) {
+    function editModal(name, cd, id, plant, aname) {
         event.preventDefault();
         $('#edtDepartment').val(name);
+        $('#edtDepartmentShort').val(aname);
         $('#edtDepartmentCd').val(cd);
         $('#sd_id').val(id);
         const phases = [{
@@ -413,6 +430,20 @@
                 {
                     className: 'text-center',
                     data: 'sd_dept_name',
+                },
+                {
+                    className: 'text-center',
+                    data: 'sd_dept_aname',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.sd_dept_aname == "") {
+                                disp = "-";
+                            } else {
+                                disp = row.sd_dept_aname;
+                            }
+                        }
+                        return disp;
+                    }
                 },
                 {
                     className: 'text-center',
@@ -463,7 +494,7 @@
                     data: 'sd_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<button type="button" onclick="editModal(\'' + row.sd_dept_name + '\',\'' + row.sd_dept_cd + '\',\'' + row.sd_id + '\',\'' + row.sd_plant_cd + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
+                            disp = '<button type="button" onclick="editModal(\'' + row.sd_dept_name + '\',\'' + row.sd_dept_cd + '\',\'' + row.sd_id + '\',\'' + row.sd_plant_cd + '\',\'' + row.sd_dept_aname + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEdits">' +
                                 '<i class="ti ti-pencil me-1"></i> Edit </button>';
                         }
                         return disp;

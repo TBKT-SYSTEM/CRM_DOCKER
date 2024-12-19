@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/form_validation.css" />
     <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/switch_toggle.css" />
+    {another_css}
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.8/sweetalert2.all.js"></script>

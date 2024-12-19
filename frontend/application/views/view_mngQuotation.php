@@ -1,16 +1,16 @@
-<title>CRM | Manage RFQ Document</title>
+<title>CRM | Manage Quotation</title>
 <div class="container-fluid">
     <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
         <div class="card-body px-4 py-3">
             <div class="row align-items-center">
                 <div class="col-9">
-                    <h4 class="fw-semibold mb-8">Manage RFQ Document</h4>
+                    <h4 class="fw-semibold mb-8">Manage Quotation</h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
                                 <a class="text-muted text-decoration-none" href="<?php echo base_url() ?>">Document Control</a>
                             </li>
-                            <li class="breadcrumb-item" aria-current="page">Manage RFQ</li>
+                            <li class="breadcrumb-item" aria-current="page">Manage Quotation</li>
                         </ol>
                     </nav>
                 </div>
@@ -25,8 +25,8 @@
                 <!-- start Zero Configuration -->
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="mb-3">RFQ Document List</h4>
-                        <div class="row" style="padding: 15px;">
+                        <h4 class="mb-3">Quotation List</h4>
+                        <div class="row border" style="padding: 15px;">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <div class="d-flex align-items-center flex-nowrap">
@@ -44,13 +44,17 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <div class="d-flex align-items-center flex-nowrap">
-                                        <label class="col-auto fs-3 text-dark fw-semibold me-2" style="width: 120px;">Issue Date :</label>
-                                        <input type="date" class="form-control form-control-sm shadow-sm" id="inpIssueDate" onchange="filterData()"></input>
+                                        <label class="col-auto fs-3 text-dark fw-semibold me-2" style="width: 120px;">Quotation Date :</label>
+                                        <div class="input-group">
+                                            <input type="date" class="form-control form-control-sm text-center" id="startDate">
+                                            <span class="input-group-text bg-info text-white fs-1 px-3" style="padding-top: 0rem !important; padding-bottom: 0rem !important;">TO</span>
+                                            <input type="date" class="form-control form-control-sm text-center" id="endDate">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="d-flex align-items-center flex-nowrap">
-                                        <label class="col-auto fs-3 text-dark fw-semibold me-2" style="width: 120px;">Document No :</label>
+                                        <label class="col-auto fs-3 text-dark fw-semibold me-2" style="width: 120px;">Quotation No :</label>
                                         <input type="text" class="form-control form-control-sm shadow-sm" id="inpSearchDocNo" placeholder="Input RFQ No." onkeyup="filterData()"></input>
                                     </div>
                                 </div>
@@ -66,6 +70,12 @@
                                         <button class="btn btn-sm bg-danger text-white card-hover shadow-sm" onclick="btnTable('cancel')">Cancel</button>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center flex-nowrap">
+                                        <label class="col-auto fs-3 text-dark fw-semibold me-2" style="width: 120px;">Quotation No :</label>
+                                        <input type="text" class="form-control form-control-sm shadow-sm" id="inpSearchDocNo" placeholder="Input RFQ No." onkeyup="filterData()"></input>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -77,15 +87,14 @@
                         </div>
                         <div class="row border" style="padding: 15px;">
                             <div class="table-responsive">
-                                <table id="tblRFQ" class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;">
+                                <table id="tblNBC" class="dataTable table  table-bordered text-nowrap align-middle" style="width: 100%;">
                                     <thead>
                                         <!-- start row -->
                                         <tr>
                                             <th class="text-center">No.</th>
-                                            <th class="text-center">Customer Type</th>
                                             <th class="text-center">Document No.</th>
+                                            <th class="text-center">Refer RFQ No.</th>
                                             <th class="text-center">Customer</th>
-                                            <th class="text-center">Item Info.</th>
                                             <th class="text-center">Status</th>
                                             <th class="text-center">Created Date</th>
                                             <th class="text-center">Created By</th>
@@ -94,6 +103,87 @@
                                         <!-- end row -->
                                     </thead>
                                     <tbody>
+                                        <tr>
+                                            <td class="text-center">1</td>
+                                            <td class="text-center">
+                                                NBC-SM-2024-001
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-danger-subtle text-white fw-semibold fs-3 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #a345efe6 !important;">RFQ-SM-2024-001</span>
+                                            </td>
+                                            <td class="text-center">ISUZU Co., Ltd.</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-danger-subtle text-danger fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-x fs-4"></i>Cancel</span>
+                                            </td>
+                                            <td class="text-center">30/11/2024</td>
+                                            <td class="text-center">Kyoko</td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-evenly gap-1">
+                                                    <button type="button" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
+                                                        <i class="ti ti-zoom-exclamation" data-bs-target="#mdlViewEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
+                                                    </button>
+                                                    <button type="button" class="btn bg-info-subtle text-info rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Reverse">
+                                                        <i class="ti ti-arrow-back-up" style="font-size: 1.5rem !important;"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">2</td>
+                                            <td class="text-center">
+                                                NBC-SM-2024-002
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-danger-subtle text-white fw-semibold fs-3 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #a345efe6 !important;">RFQ-SM-2024-002</span>
+                                            </td>
+                                            <td class="text-center">MAHLE Co., Ltd..</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-info-subtle text-info fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-send fs-4"></i>Open</span>
+                                            </td>
+                                            <td class="text-center">18/12/2024</td>
+                                            <td class="text-center">Kantamanee</td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-evenly gap-1">
+                                                    <button type="button" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See/Edit">
+                                                        <i class="ti ti-pencil-minus" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
+                                                    </button>
+                                                    <button id="btnPDF" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
+                                                        <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
+                                                    </button>
+                                                    <button type="button" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Submit">
+                                                        <i class="ti ti-check" style="font-size: 1.5rem !important;"></i>
+                                                    </button>
+                                                    <button type="button" class="btn bg-danger-subtle text-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel">
+                                                        <i class="ti ti-x" style="font-size: 1.5rem !important;"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">3</td>
+                                            <td class="text-center">
+                                                NBC-SM-2024-003
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-danger-subtle text-white fw-semibold fs-3 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #a345efe6 !important;">RFQ-SM-2024-003</span>
+                                            </td>
+                                            <td class="text-center">Kubota Co., Ltd.</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-warning-subtle text-warning fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-clock-hour-4 fs-4"></i>Wait Approve</span>
+                                            </td>
+                                            <td class="text-center">20/11/2024</td>
+                                            <td class="text-center">Kantamanee</td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-evenly gap-1">
+                                                    <button type="button" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
+                                                        <i class="ti ti-zoom-exclamation" data-bs-target="#mdlViewEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
+                                                    </button>
+                                                    <button id="btnPDF" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
+                                                        <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -791,1234 +881,20 @@
     </div>
 </div>
 
-
 <script>
-    let dataTable;
-    let isProcessing = false;
-
-    async function saveChange(groupPart, groupVolume) {
-        if (isProcessing) return;
-        isProcessing = true;
-        event.preventDefault();
-        let chk = await Rfq_valid("edit");
-
-        if (!chk) {
-            isProcessing = false;
-            return;
-        }
-
-        let groupPartData = [];
-        let groupVolumeData = [];
-        let hasError = false;
-        const formElements = document.edit_form.querySelectorAll('textarea');
-        formElements.forEach(element => {
-            form_okValid(element);
-        });
-
-        $('#tblEditBodyPartNo tr:not(:last)').each(function() {
-            if (hasError) return false;
-            let rowData = {};
-            let isValid = true;
-            $(this).find('td').each(function() {
-                const input = $(this).find('input');
-
-                if (input.length > 0) {
-                    if (input.attr('name') !== 'irpn_remark') {
-                        if (is_empty(input.val())) {
-                            form_errValid(input[0], "*Please Enter Value");
-                            hasError = true;
-                            return false;
-                        } else {
-                            form_okValid(input[0]);
-                        }
-                    } else {
-                        form_okValid(input[0]);
-                    }
-
-                    const inputName = input.attr('name');
-                    rowData[inputName] = input.val().trim();
-                }
-            });
-            if (!isValid || hasError) {
-                return false;
-            }
-            if (Object.keys(rowData).length > 0) {
-                groupPartData.push(rowData);
-            }
-        });
-
-        const partNo = document.querySelector('input[id="inpPartNo"]');
-        const partName = document.querySelector('input[id="inpPartName"]');
-        const model = document.querySelector('input[id="inpModel"]');
-
-        const fields = [{
-                element: partNo,
-                message: '*Please Enter Part No.'
-            },
-            {
-                element: partName,
-                message: '*Please Enter Part Name'
-            },
-            {
-                element: model,
-                message: '*Please Enter Model'
-            }
-        ];
-
-        const allEmpty = fields.every(field => is_empty(field.element.value.trim()));
-
-        if (!allEmpty) {
-            fields.forEach(field => {
-                if (is_empty(field.element.value.trim())) {
-                    form_errValid(field.element, field.message);
-                    hasError = true;
-                } else {
-                    form_okValid(field.element);
-                }
-            });
-        } else {
-            fields.forEach(field => {
-                form_defaultValid(field.element);
-            });
-        }
-
-        if (hasError) {
-            isProcessing = false;
-            return;
-        }
-        // console.log(groupPartData);
-
-        $('#tblBodyProjectLifeEdit tr').each(function() {
-            if (hasError) return false;
-
-            let rowData = {};
-            const label = $(this).find('td:first-child label').text().trim();
-            const inputElement = $(this).find('td:last-child input');
-            const inputValue = inputElement.val().trim();
-
-            if (is_empty(inputValue)) {
-                form_errValid(inputElement[0], "*Please Enter Value");
-                hasError = true;
-                return false;
-            } else {
-                form_okValid(inputElement[0]);
-                rowData['year'] = label;
-                rowData['volume'] = inputValue;
-            }
-
-            if (Object.keys(rowData).length > 0) {
-                groupVolumeData.push(rowData);
-            }
-        });
-        if (hasError) {
-            isProcessing = false;
-            return;
-        }
-        // console.log(groupVolumeData);
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to Edit RFQ?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, edit it.!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var edit_form = {};
-                let groupCheckBox = [{}];
-
-                $('#edit_form').serializeArray().forEach(function(item) {
-                    if ($('input[name="' + item.name + '"]').attr('type') === 'checkbox') {
-                        return;
-                    }
-                    if (item.name == 'irpn_part_no' || item.name == 'irpn_part_name' || item.name == 'irpn_model' || item.name == 'irpn_remark') {
-                        return;
-                    }
-                    if (item.name == 'ir_id' || item.name == 'ir_import_tran' || item.name == 'ir_mrt' || item.name == 'ir_enclosures' || item.name == 'ir_pro_life') {
-                        item.value = parseInt(item.value)
-                    }
-                    edit_form[item.name] = item.value;
-                });
-
-                $('#edit_form input[type="checkbox"]').each(function() {
-                    groupCheckBox[0][$(this).attr('name')] = $(this).is(':checked') ? 1 : 0;
-                });
-
-                if (edit_form["ir_mrt"] == 0) {
-                    edit_form["ir_mrt"] = edit_form["ir_other_mrt"];
-                } else {
-                    edit_form["ir_mrt"] = document.edit_form.ir_mrt.options[document.edit_form.ir_mrt.selectedIndex].text;
-                }
-
-                if (edit_form["ir_enclosures"] == 0) {
-                    edit_form["ir_enclosures"] = edit_form["ir_other_enclosures"];
-                } else {
-                    edit_form["ir_enclosures"] = document.edit_form.ir_enclosures.options[document.edit_form.ir_enclosures.selectedIndex].text;
-                }
-
-                edit_form["ir_ref_fm"] = null;
-                edit_form["ir_ref_nbc"] = null;
-                edit_form["ir_created_date"] = getTimeNow();
-                edit_form["ir_created_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-                edit_form["ir_status"] = 1;
-
-                edit_form["ir_doc_no"] = '';
-                edit_form["ir_group_part"] = groupPartData;
-                edit_form["ir_group_volume"] = groupVolumeData;
-                edit_form["ir_group_checkbox"] = groupCheckBox;
-
-                // console.log(edit_form);
-                $.ajax({
-                    type: 'PUT',
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    url: API_URL + 'rfq/edit',
-                    data: JSON.stringify(edit_form),
-                    success: function(data) {
-                        if (data.Error != "null" || data.Error != "") {
-                            Swal.fire({
-                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Updated RFQ success!</p>",
-                                icon: 'success',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                            // $('#mdlEdit').modal('hide');
-                        } else {
-                            Swal.fire({
-                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Updated RFQ!</p>",
-                                icon: 'error',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                            // $('#mdlEdit').modal('hide');
-                        }
-                    }
-                });
-            } else {
-                console.log('Cancel');
-            }
-        });
-
-        isProcessing = false;
-    }
-
-
-
-    async function changeProLife() {
-        let proLife = document.getElementById('inpProjectLifeEdit');
-        let proTim = document.getElementById('inpProTimEdit');
-
-        if (proLife.value <= 0 || proLife.value > 10) {
-            form_errValid(document.getElementById('inpProjectLifeEdit'), "*Please Enter Number 1-10");
-            return;
-        } else {
-            form_okValid(document.getElementById('inpProjectLifeEdit'));
-        }
-
-        if (!is_empty(proLife.value) && !is_empty(proTim.value)) {
-            let html = '';
-            let count = 1;
-            let year = proTim.value.substring(0, 4);
-            for (let i = 0; i <= proLife.value; i++) {
-                html += '<tr>' +
-                    '<td class="text-center border-end"><label class="form-label">' + (parseInt(year) + i) + '</label></td>' +
-                    '<td><div class="col"><input type="number" class="form-control text-center col-6" min="0" max="999999" id="inpVolume' + i + '"><span class="invalid-feedback"></span></div></td>' +
-                    '</tr>';
-            }
-            document.getElementById('tblBodyProjectLifeEdit').innerHTML = html;
-        }
-    }
-
-    async function changeRequirement() {
-        let data = $('#selRequirementEdit').val();
-        if (data == 'Other') {
-            $('#inpOtherSubjectEdit').prop('disabled', false);
-            $('#inpOtherSubjectEdit').focus();
-        } else {
-            $('#inpOtherSubjectEdit').prop('disabled', true);
-        }
-    }
-
-    async function changeEnclosures() {
-        let data = $('#inpEnclosuresEdit').val();
-        if (data == '0') {
-            $('#inpOtherEnclosuresEdit').prop('disabled', false);
-            $('#inpOtherEnclosuresEdit').focus();
-        } else {
-            $('#inpOtherEnclosuresEdit').prop('disabled', true);
-        }
-    }
-
-    async function btnTable(type) {
-        dataTable
-            .columns(5)
-            .search(type)
-            .draw();
-    }
-
-    async function ViewAll() {
-        dataTable
-            .search('')
-            .columns().search('')
-            .draw();
-        $('#inpImportFrom').val('');
-        $('#inpCustomer').val('');
-        $('#inpIssueDate').val('');
-        $('#inpSearchDocNo').val('');
-    }
-
-    async function listImportfrom(id) {
-        $.ajax({
-            type: 'get',
-            url: API_URL + 'option/list_import',
-            success: function(result) {
-                var option_text = '<option value="">Choose Customer Type</option>';
-                $.each(result, function(key, value) {
-                    let sel = "";
-                    if (value.mif_id == id) {
-                        sel = "selected";
-                        chkCus = true;
-                    }
-                    option_text += '<option value="' + value.mif_id + '" ' + sel + '>' + value.mif_name + '</option>';
-                })
-                $('#inpImportFrom').html(option_text);
-            }
-        })
-    }
-
-    async function listCustomer() {
-        $.ajax({
-            type: 'get',
-            url: 'http://192.168.161.106/etax_invoice_system_debug/api/customers',
-            success: function(result) {
-                var option_text = '<option value="">Choose Costomer Name</option>';
-                $.each(result, function(key, value) {
-                    option_text += '<option value="' + value.MC_CUST_ANAME + '">' + value.MC_CUST_ANAME + '&nbsp( ' + value.MC_CUST_CD + ' )' + '</option>';
-                })
-                option_text += '<option value="Other">Other</option>';
-                $('#inpCustomer').html(option_text);
-            }
-        })
-    }
-
-    async function listImportfromView(id, type) {
-        const url = `${API_URL}option/list_import`;
-        const response = await fetch(url);
-        const result = await response.json();
-
-        let optionText = '<option value="">Choose Customer Type</option>';
-        result.forEach((value) => {
-            const selected = value.mif_id === id ? 'selected' : '';
-            optionText += `<option value="${value.mif_id}" ${selected}>${value.mif_name}</option>`;
-        });
-
-        if (type === 'edit') {
-            const formElem = document.querySelector('form[name="edit_form"]');
-            if (formElem && formElem.ir_import_tran) {
-                formElem.ir_import_tran.innerHTML = optionText;
-            }
-        } else {
-            const formElem = document.querySelector('form[name="view_edit_form"]');
-            if (formElem && formElem.ir_import_tran) {
-                formElem.ir_import_tran.innerHTML = optionText;
-            }
-        }
-    }
-
-    async function listCustomerView(name, type) {
-        const url = 'http://192.168.161.106/etax_invoice_system_debug/api/customers';
-        const response = await fetch(url);
-        const result = await response.json();
-
-        let optionText = '<option value="">Choose Customer Name</option>';
-        let found = false;
-
-        result.forEach((value) => {
-            const sel = value.MC_CUST_ANAME === name ? 'selected' : '';
-            optionText += `<option value="${value.MC_CUST_ANAME}" ${sel}>${value.MC_CUST_ANAME} &nbsp;( ${value.MC_CUST_CD} )</option>`;
-
-            if (value.MC_CUST_ANAME === name) {
-                found = true;
-            }
-        });
-
-        if (!found && name) {
-            optionText += `<option value="${name}" selected>${name}</option>;`
-        }
-
-        optionText += '<option value="Other">Other</option>';
-
-        const formElem = type === 'edit' ? document.querySelector('form[name="edit_form"]') : document.querySelector('form[name="view_edit_form"]');
-        formElem.ir_customer.innerHTML = optionText;
-    }
-
-    async function filterData() {
-        const elementId = event.target.id
-        var customerType = $('#inpImportFrom').val();
-        var customerName = $('#inpCustomer').val();
-        var issueDate = $('#inpIssueDate').val();
-        var docNo = $('#inpSearchDocNo').val();
-
-        if (elementId === "inpCustomer") {
-            if (customerName == 'Other') {
-                const {
-                    value: text
-                } = await Swal.fire({
-                    title: "Input Customer Name",
-                    input: "text",
-                    inputPlaceholder: "Enter your customer name"
-                });
-
-                if (text) {
-                    let optionExists = false;
-                    $('select#inpCustomer option').each(function() {
-                        if ($(this).val() == text) {
-                            optionExists = true;
-                        }
-                    });
-
-                    if (!optionExists) {
-                        $('select#inpCustomer').append(new Option(text, text));
-                    }
-                    $('select#inpCustomer').val(text);
-                }
-
-                customerName = text;
-            }
-        }
-
-        if (is_empty(customerType)) {
-            customerType = '';
-        } else {
-            customerType = $('#inpImportFrom option:selected').text();
-        }
-        if (is_empty(customerName)) {
-            customerName = '';
-        }
-        if (is_empty(issueDate)) {
-            issueDate = '';
-        }
-
-        dataTable
-            .columns(1)
-            .search(customerType)
-            .columns(3)
-            .search(customerName)
-            .columns(6)
-            .search(issueDate)
-            .columns(2)
-            .search(docNo)
-            .draw();
-    }
-
-    async function listTablePartNo(data, type) {
-        let html = '';
-        if (type == 'view') {
-            for (let i = 0; i < data.length; i++) {
-                html += '<tr>';
-                html += '<td>' + data[i].irpn_part_no + '</td>';
-                html += '<td>' + data[i].irpn_part_name + '</td>';
-                html += '<td>' + data[i].irpn_model + '</td>';
-                html += '<td>' + data[i].irpn_remark + '</td>';
-                html += '</tr>';
-            }
-            document.getElementById('tblViewBodyPartNo').innerHTML = html;
-        } else {
-            for (let i = 0; i < data.length; i++) {
-                html += '<tr>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="irpn_part_no" value="' + data[i].irpn_part_no + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="irpn_part_name" value="' + data[i].irpn_part_name + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="irpn_model" value="' + data[i].irpn_model + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="irpn_remark" value="' + data[i].irpn_remark + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div><button type="button" onclick="deletePartNoByItem(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnDeletePartNo" name="btnDeletePartNo" data-id="' + data[i].irpn_id + '"><i class="ti ti-trash-x fs-6"></i></button></td>';
-                html += '</tr>';
-            }
-            html += '<tr>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartNo" placeholder="Part No"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartName" placeholder="Part Name"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpModel" placeholder="Model"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpRemark" placeholder="Remark"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><button type="button" onclick="addPartNoByItem(event)" class="btn mb-1 btn-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnAddPartNo" name="btnAddPartNo" data-id=""><i class="ti ti-plus fs-6"></i></button></td>';
-            html += '</tr>';
-            document.getElementById('tblEditBodyPartNo').innerHTML = html;
-        }
-    }
-
-    function addPartNoByItem(event) {
-        const button = event.target.closest('button');
-        const currentRow = button.closest('tr');
-
-        const partNo = currentRow.querySelector('input[id="inpPartNo"]');
-        const partName = currentRow.querySelector('input[id="inpPartName"]');
-        const model = currentRow.querySelector('input[id="inpModel"]');
-        const remark = currentRow.querySelector('input[id="inpRemark"]');
-
-        if (is_empty(partNo.value.trim())) {
-            form_errValid(partNo, '*Plase Enter Part No.');
-            return;
-        } else {
-            form_okValid(partNo);
-            if (is_empty(partName.value.trim())) {
-                form_errValid(partName, '*Plase Enter Part Name');
-                return;
-            } else {
-                form_okValid(partName);
-                if (is_empty(model.value.trim())) {
-                    form_errValid(model, '*Plase Enter Model');
-                    return;
-                } else {
-                    form_okValid(model);
-                }
-            }
-        }
-
-        form_defaultValid(partNo);
-        form_defaultValid(partName);
-        form_defaultValid(model);
-
-        const tbody = document.getElementById('tblEditBodyPartNo');
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-        <td><div class="col"><input class="form-control text-center" type="text" name="irpn_part_no" value="${partNo.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="irpn_part_name" value="${partName.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="irpn_model" value="${model.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="irpn_remark" value="${remark.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td>
-            <button type="button" onclick="deletePartNoByItem(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm">
-                <i class="ti ti-trash-x fs-6"></i>
-            </button>
-        </td>
-    `;
-        tbody.insertBefore(newRow, currentRow);
-
-        currentRow.querySelector('input[placeholder="Part No"]').value = '';
-        currentRow.querySelector('input[placeholder="Part Name"]').value = '';
-        currentRow.querySelector('input[placeholder="Model"]').value = '';
-        currentRow.querySelector('input[placeholder="Remark"]').value = '';
-
-        tbody.appendChild(currentRow);
-    }
-
-    function deletePartNoByItem(event) {
-        const button = event.target.closest('button');
-        const row = button.closest('tr');
-        row.remove();
-    }
-
-    async function listTableProLife(data, type) {
-        let html = '';
-        if (type == 'view') {
-            for (let i = 0; i < data.length; i++) {
-                html += '<tr>';
-                html += '<td class="border-end">' + data[i].year + '</td>';
-                html += '<td>' + data[i].volume + '</td>';
-                html += '</tr>';
-            }
-            document.getElementById('tblViewBodyProjectLife').innerHTML = html;
-        } else {
-            for (let i = 0; i < data.length; i++) {
-                html += '<tr>';
-                html += '<td class="border-end"><label class="form-label">' + data[i].year + '</label></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" value="' + data[i].volume + '"><span class="invalid-feedback"></span></div></td>';
-                html += '</tr>';
-            }
-            document.getElementById('tblBodyProjectLifeEdit').innerHTML = html;
-        }
-    }
-
-    async function listSubjectView(name, type) {
-        const url = `${API_URL}option/list_mrt`;
-        const response = await fetch(url);
-        const result = await response.json();
-
-        let optionText = '<option value="">Select Subject</option>';
-        let found = false;
-
-        result.forEach((value) => {
-            const isSelected = value.mrt_name === name;
-            optionText += `<option value="${value.mrt_id}" ${isSelected ? 'selected' : ''}>${value.mrt_name}</option>`;
-            if (isSelected) found = true;
-        });
-
-        const formElem = document.querySelector(type == 'edit' ? 'form[name="edit_form"]' : 'form[name="view_edit_form"]');
-        if (!formElem) return;
-
-        if (type !== 'edit') {
-            if (!found && name) {
-                optionText += '<option value="Other" selected>Other</option>';
-                formElem.ir_mrt.innerHTML = optionText;
-                formElem.ir_other_mrt.value = name;
-                formElem.ir_other_mrt.disabled = false;
-            } else {
-                optionText += '<option value="Other">Other</option>';
-                formElem.ir_mrt.innerHTML = optionText;
-                formElem.ir_other_mrt.value = '';
-                formElem.ir_other_mrt.disabled = true;
-            }
-        } else {
-            if (!found && name) {
-                optionText += '<option value="Other" selected>Other</option>';
-                formElem.ir_mrt.innerHTML = optionText;
-                formElem.ir_other_mrt.value = name;
-                formElem.ir_other_mrt.disabled = false;
-            } else {
-                optionText += '<option value="Other">Other</option>';
-                formElem.ir_mrt.innerHTML = optionText;
-                formElem.ir_other_mrt.value = '';
-                formElem.ir_other_mrt.disabled = true;
-            }
-        }
-    }
-
-    async function listEnclosuresView(name, type) {
-        const formElem = document.querySelector(type == 'edit' ? 'form[name="edit_form"]' : 'form[name="view_edit_form"]');
-        const element = formElem.ir_enclosures;
-        let found = false;
-
-        for (const option of element.options) {
-            if (option.value === name) {
-                option.selected = true;
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            for (const option of element.options) {
-                if (option.value === "0") {
-                    option.selected = true;
-                    formElem.ir_other_enclosures.value = name;
-                    formElem.ir_other_enclosures.disabled = false;
-                    break;
-                }
-            }
-        } else {
-            formElem.ir_other_enclosures.value = '';
-            formElem.ir_other_enclosures.disabled = true;
-        }
-    }
-
-    function editModal(id) {
-        event.preventDefault();
-        if ($('#mdlEdit').hasClass('show')) {
-            $('#mdlEdit').modal('hide');
-        }
-        $('#mdlEdit').modal('show');
-        $.ajax({
-            method: 'GET',
-            url: API_URL + 'rfq/' + id,
-            success: function(data) {
-                if (!data.Error) {
-                    console.log(data);
-                    $('#mdlEdit .modal-header h4').text(data.ir_doc_no);
-
-                    document.edit_form.ir_id.value = data.ir_id;
-                    document.edit_form.ir_pu_dept.checked = data.ir_group_checkbox[0]['ir_pu_dept'] == 1;
-                    document.edit_form.ir_pe_dept.checked = data.ir_group_checkbox[0]['ir_pe_dept'] == 1;
-                    document.edit_form.ir_scm_dept.checked = data.ir_group_checkbox[0]['ir_scm_dept'] == 1;
-                    document.edit_form.ir_ce_dept.checked = data.ir_group_checkbox[0]['ir_ce_dept'] == 1;
-                    document.edit_form.ir_gdc_dept.checked = data.ir_group_checkbox[0]['ir_gdc_dept'] == 1;
-
-                    document.edit_form.ir_raw_puc.checked = data.ir_group_checkbox[0]['ir_raw_puc'] == 1;
-                    document.edit_form.ir_mold_puc.checked = data.ir_group_checkbox[0]['ir_mold_puc'] == 1;
-                    document.edit_form.ir_menufac_puc.checked = data.ir_group_checkbox[0]['ir_menufac_puc'] == 1;
-                    document.edit_form.ir_transport_puc.checked = data.ir_group_checkbox[0]['ir_transport_puc'] == 1;
-
-                    document.edit_form.ir_cast_poc.checked = data.ir_group_checkbox[0]['ir_cast_poc'] == 1;
-                    document.edit_form.ir_machin_poc.checked = data.ir_group_checkbox[0]['ir_machin_poc'] == 1;
-                    document.edit_form.ir_assembly_poc.checked = data.ir_group_checkbox[0]['ir_assembly_poc'] == 1;
-                    document.edit_form.ir_pack_poc.checked = data.ir_group_checkbox[0]['ir_pack_poc'] == 1;
-
-                    document.edit_form.ir_note.value = data.ir_note;
-                    document.edit_form.ir_comment.value = data.ir_comment;
-                    document.edit_form.ir_duedate.value = data.ir_duedate.substring(0, 10);
-
-                    listImportfromView(data.ir_import_tran, 'edit');
-                    listCustomerView(data.ir_customer, 'edit');
-                    listSubjectView(data.mrt_id, 'edit');
-                    listEnclosuresView(data.ir_enclosures, 'edit');
-
-                    listTablePartNo(data.ir_group_part, 'edit');
-                    listTableProLife(data.ir_group_volume, 'edit');
-
-                    document.edit_form.ir_pro_life.value = data.ir_pro_life;
-                    document.edit_form.ir_pro_tim.value = data.ir_sop_tim;
-
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.Error,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $('#mdlEdit').modal('hide');
-                        }
-                    });
-
-                }
-
-                $('#btnSaveChange').on('click', function() {
-                    saveChange(data.ir_group_part, data.ir_group_volume);
-                });
-
-            }
-        })
-
-        $('#mdlEdit').on('hidden.bs.modal', function() {
-            const formElements = document.edit_form.querySelectorAll('input, select, textarea');
-            formElements.forEach(element => {
-                form_defaultValid(element);
-            });
-
-        })
-
-    }
-
-    function viewEditModal(id) {
-        event.preventDefault();
-        $.ajax({
-            method: 'GET',
-            url: API_URL + 'rfq/' + id,
-            success: function(data) {
-                if (!data.Error) {
-                    $('#mdlViewEdit .modal-header h4').text(data.ir_doc_no);
-                    document.querySelectorAll('#view_edit_form input, #view_edit_form select,  #view_edit_form textarea').forEach(element => element.disabled = true);
-
-                    document.view_edit_form.ir_pu_dept.checked = data.ir_group_checkbox[0]['ir_pu_dept'] == 1;
-                    document.view_edit_form.ir_pe_dept.checked = data.ir_group_checkbox[0]['ir_pe_dept'] == 1;
-                    document.view_edit_form.ir_scm_dept.checked = data.ir_group_checkbox[0]['ir_scm_dept'] == 1;
-                    document.view_edit_form.ir_ce_dept.checked = data.ir_group_checkbox[0]['ir_ce_dept'] == 1;
-                    document.view_edit_form.ir_gdc_dept.checked = data.ir_group_checkbox[0]['ir_gdc_dept'] == 1;
-
-                    document.view_edit_form.ir_raw_puc.checked = data.ir_group_checkbox[0]['ir_raw_puc'] == 1;
-                    document.view_edit_form.ir_mold_puc.checked = data.ir_group_checkbox[0]['ir_mold_puc'] == 1;
-                    document.view_edit_form.ir_menufac_puc.checked = data.ir_group_checkbox[0]['ir_menufac_puc'] == 1;
-                    document.view_edit_form.ir_transport_puc.checked = data.ir_group_checkbox[0]['ir_transport_puc'] == 1;
-
-                    document.view_edit_form.ir_cast_poc.checked = data.ir_group_checkbox[0]['ir_cast_poc'] == 1;
-                    document.view_edit_form.ir_machin_poc.checked = data.ir_group_checkbox[0]['ir_machin_poc'] == 1;
-                    document.view_edit_form.ir_assembly_poc.checked = data.ir_group_checkbox[0]['ir_assembly_poc'] == 1;
-                    document.view_edit_form.ir_pack_poc.checked = data.ir_group_checkbox[0]['ir_pack_poc'] == 1;
-
-                    listSubjectView(data.mrt_id, 'view');
-                    listEnclosuresView(data.ir_enclosures, 'view');
-
-                    document.view_edit_form.ir_note.value = data.ir_note;
-                    document.view_edit_form.ir_comment.value = data.ir_comment;
-                    document.view_edit_form.ir_duedate.value = data.ir_duedate.substring(0, 10);
-
-                    listImportfromView(data.ir_import_tran, 'view');
-                    listCustomerView(data.ir_customer, 'view');
-                    listTablePartNo(data.ir_group_part, 'view');
-                    listTableProLife(data.ir_group_volume, 'view');
-
-                    document.view_edit_form.ir_pro_life.value = data.ir_pro_life;
-                    document.view_edit_form.ir_pro_tim.value = data.ir_sop_tim;
-
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.Error,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $('#mdlViewEdit').modal('hide');
-                        }
-                    });
-
-                }
-            }
-        })
-    }
-
-    async function changeEditCustomer() {
-        const customerInput = document.edit_form.ir_customer.value;
-
-        if (customerInput === 'Other') {
-            $('#customCustomerModal').modal('show');
-            $('#newCustomerName').focus();
-            $('#saveCustomerName').off('click').on('click', function() {
-                const text = $('#newCustomerName').val();
-
-                if (text) {
-                    const select = $('select#inpEditCustomer');
-                    if (!select.find(`option[value="${text}"]`).length) {
-                        select.append(new Option(text, text));
-                    }
-                    select.val(text);
-                }
-                $('#newCustomerName').val('')
-                $('#customCustomerModal').modal('hide');
-            });
-        }
-        $('#customCustomerModal').on('hidden.bs.modal', function() {
-            $('#newCustomerName').val('');
-        })
-    }
-
-    async function btnFormRfq(sat_name) {
-        var btnText = ``;
-        if (sat_name == 'Issue') {
-            btnText += `<button type="button" class="btn bg-warning-subtle text-warning waves-effect" onclick="return false;">Issue</button>`
-        } else if (sat_name == 'Checked') {
-            btnText += `<button type="button" class="btn bg-info-subtle text-info waves-effect" onclick="return false;">Check</button>`
-        } else if (sat_name == 'Approve') {
-            btnText += `<button type="button" class="btn bg-danger-subtle text-danger waves-effect" onclick="return false;">Approve</button>`
-        } else if (sat_name == 'Authorize') {
-            btnText += ` <button type="button" class="btn bg-success-subtle text-success waves-effect" onclick="return false;">Authorize</button>`
-        } else {
-            btnText += ``;
-        }
-        return btnText;
-    }
-
-    function modalPartno(id, ir_doc_no) {
-        event.preventDefault();
-        $('#inpDocNo').val(ir_doc_no);
-        $('#inpDocNoRef').val('-');
-        if ($.fn.DataTable.isDataTable('#tblPartNo')) {
-            $('#tblPartNo').DataTable().destroy();
-        }
-        let dataTablePartno = $('#tblPartNo').DataTable({
-            ajax: {
-                url: API_URL + 'view/partno/' + id,
-            },
-            columnDefs: [{
-                searchable: false,
-                orderable: false,
-                targets: 0,
-                width: "10px",
-            }, ],
-            bSort: false,
-            order: [
-                [1, 'asc']
-            ],
-            columns: [{
-                    className: 'text-center col-1',
-                    data: null,
-                    render: function(data, type, row, meta) {
-                        return meta.row + 1;
-                    },
-                },
-                {
-                    className: 'text-center',
-                    data: 'irpn_part_no',
-                },
-                {
-                    className: 'text-center',
-                    data: 'irpn_part_name',
-                },
-                {
-                    className: 'text-center',
-                    data: 'irpn_model',
-                },
-                {
-                    className: 'text-center',
-                    data: 'irpn_remark',
-                }
-            ]
-        });
-        dataTablePartno.on('order.dt search.dt', function() {
-            let i = 1;
-            dataTablePartno.cells(null, 0, {
-                search: 'applied',
-                order: 'applied'
-            }).every(function(cell) {
-                this.data(i++);
-            });
-        }).draw();
-    }
-
-    function formatDate(inputDate) {
-        let dateParts = inputDate.split('-');
-        let year = dateParts[0];
-        let month = dateParts[1];
-        let day = dateParts[2];
-
-        let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        let monthName = months[parseInt(month) - 1];
-
-        return `${day}-${monthName}-${year.substring(2)}`;
-    }
-
-    async function viewPDF(ir_id) {
-        $.ajax({
-            type: 'get',
-            url: API_URL + 'rfq/' + ir_id,
-            success: async function(result) {
-
-                let param = {
-                    ...result
-                };
-
-                let IssueDate = param.ir_created_date.split(" ")[0];
-                param.ir_created_date = formatDate(IssueDate);
-
-                let Duedate = param.ir_duedate.split(" ")[0];
-                param.ir_duedate = formatDate(Duedate);
-
-                param.ir_sop_tim = param.ir_sop_tim.substring(0, 4);
-
-                if (param.ir_ref_nbc == 0) {
-                    param.ir_ref_nbc = '';
-                }
-
-                // console.log(param);
-                let pdfUrl = '<?php echo base_url(); ?>RfqForm/createPDF?' + $.param(param);
-                window.open(pdfUrl, '_blank');
-            }
-        });
-    }
-
-    function rfqCancel(id) {
-        event.preventDefault();
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to cancel RFQ?",
-            icon: 'warning',
-            input: "text",
-            inputPlaceholder: "Please fill reason for cancellation.",
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, Cancel it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const cancelReason = result.value;
-                $.ajax({
-                    method: 'PUT',
-                    url: API_URL + 'rfq/cancel/' + id + '/' + cancelReason,
-                    success: function(data) {
-                        if (data != false) {
-                            Swal.fire({
-                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Cancel RFQ Success!</p>",
-                                icon: 'success',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                            var dataTable = $('#tblRFQ').DataTable();
-                            dataTable.ajax.reload(null, false);
-                        } else {
-                            Swal.fire({
-                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Cancel RFQ!</p>",
-                                icon: 'error',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                            var dataTable = $('#tblRFQ').DataTable();
-                            dataTable.ajax.reload(null, false);
-                        }
-                    }
-                })
-            }
-        })
-    }
-
-    function rfqReverse(id) {
-        event.preventDefault();
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to reverse RFQ?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, reverse it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    method: 'PUT',
-                    url: API_URL + 'rfq/reverse/' + id,
-                    success: function(data) {
-                        if (data != false) {
-                            Swal.fire({
-                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Reverse RFQ Success!</p>",
-                                icon: 'success',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                            var dataTable = $('#tblRFQ').DataTable();
-                            dataTable.ajax.reload(null, false);
-                        } else {
-                            Swal.fire({
-                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Reverse RFQ!</p>",
-                                icon: 'error',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                            var dataTable = $('#tblRFQ').DataTable();
-                            dataTable.ajax.reload(null, false);
-                        }
-                    }
-                })
-            }
-        })
-    }
-
-    function rfqSubmit(id) {
-        event.preventDefault();
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to submit RFQ?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, submit it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    method: 'PUT',
-                    url: API_URL + 'rfq/submit/' + id,
-                    success: function(data) {
-                        if (data != false) {
-                            Swal.fire({
-                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Submit RFQ Success!</p>",
-                                icon: 'success',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                            var dataTable = $('#tblRFQ').DataTable();
-                            dataTable.ajax.reload(null, false);
-                        } else {
-                            Swal.fire({
-                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Submit RFQ!</p>",
-                                icon: 'error',
-                                showClass: {
-                                    popup: 'animate__animated animate__fadeInDown'
-                                },
-                                hideClass: {
-                                    popup: 'animate__animated animate__fadeOutUp'
-                                }
-                            })
-                            var dataTable = $('#tblRFQ').DataTable();
-                            dataTable.ajax.reload(null, false);
-                        }
-                    }
-                })
-            }
-        })
-    }
-
-    function showStatus(status) {
-        if (status == 1) {
-            return '<span class="badge bg-info-subtle text-info fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-send fs-4"></i>Open</span>'
-        } else if (status == 5) {
-            return '<span class="badge bg-warning-subtle text-warning fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-clock-hour-4 fs-4"></i>Wait Approve</span>'
-        } else if (status == 6) {
-            return '<span class="badge text-perple fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #ffafbb !important; color: #C7253E !important"><i class="ti ti-repeat-off fs-4"></i>Rejected</span>'
-        } else if (status == 9) {
-            return '<span class="badge bg-success-subtle text-success fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-check fs-4"></i>Approved</span>'
-        } else {
-            return '<span class="badge bg-danger-subtle text-danger fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-x fs-4"></i>Cancel</span>'
-        }
-    }
-
-    function showbtnAction(status, id) {
-        if (status == 1 || status == 6) {
-            return `
-            <div class="d-flex justify-content-evenly gap-1">
-                <button type="button" onclick="editModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See/Edit">
-                    <i class="ti ti-pencil-minus" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
-                </button>
-                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
-                    <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
-                </button>
-                <button type="button" onclick="rfqSubmit(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Submit">
-                    <i class="ti ti-check" style="font-size: 1.5rem !important;"></i>
-                </button>
-                <button type="button" onclick="rfqCancel(${id})" class="btn bg-danger-subtle text-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel">
-                    <i class="ti ti-x" style="font-size: 1.5rem !important;"></i>
-                </button>
-            </div>`;
-        } else if (status == 5) {
-            return `
-            <div class="d-flex justify-content-evenly gap-1">
-                <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
-                    <i class="ti ti-zoom-exclamation" data-bs-target="#mdlViewEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
-                </button>
-                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
-                    <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
-                </button>
-            </div>`;
-        } else if (status == 9) {
-            return `
-            <div class="d-flex justify-content-evenly gap-1">
-                <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
-                    <i class="ti ti-zoom-exclamation" data-bs-target="#mdlViewEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
-                </button>
-                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
-                    <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
-                </button>
-                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate NBC">
-                    <i class="ti ti-checklist" style="font-size: 1.5rem !important;"></i>
-                </button>
-            </div>`;
-        } else {
-            return `
-            <div class="d-flex justify-content-evenly gap-1">
-                <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
-                    <i class="ti ti-zoom-exclamation" data-bs-target="#mdlViewEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
-                </button>
-                <button type="button" onclick="rfqReverse(${id})" class="btn bg-info-subtle text-info rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Reverse">
-                    <i class="ti ti-arrow-back-up" style="font-size: 1.5rem !important;"></i>
-                </button>
-            </div>`;
-        }
-    }
-
-    $(document).ready(function() {
-        listImportfrom();
-        listCustomer();
-        if ($.fn.DataTable.isDataTable('#tblRFQ')) {
-            $('#tblRFQ').DataTable().destroy();
-        }
-        dataTable = $('#tblRFQ').DataTable({
-            ajax: {
-                url: API_URL + 'rfq/table'
-            },
-            columnDefs: [{
-                searchable: true,
-                orderable: false,
-                targets: 0,
-            }, ],
-            scrollX: true,
-            bSort: false,
-            order: [
-                [1, 'asc']
-            ],
-            columns: [{
-                    className: 'text-center',
-                    data: 'ir_id'
-                },
-                {
-                    className: 'text-center col-1',
-                    data: 'ir_import_tran',
-                    render: function(data, type, row) {
-                        if (row.ir_import_tran == 1) {
-                            return 'Overseas';
-                        } else if (row.ir_import_tran == 2) {
-                            return 'Domestic';
-                        }
-                    }
-                },
-                {
-                    className: 'text-center',
-                    data: 'ir_doc_no',
-                },
-                {
-                    className: 'text-center',
-                    data: 'ir_customer',
-                },
-                {
-                    className: 'text-center',
-                    data: 'ir_id',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            disp = '<div class="d-flex justify-content-around gap-1">' +
-                                '<button type="button" onclick="modalPartno(\'' + row.ir_id + '\' , \'' + row.ir_doc_no + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
-                                '</div>';
-                        }
-                        return disp;
-                    }
-                },
-                {
-                    className: 'text-center',
-                    data: 'ir_status',
-                    "render": function(data, type, row) {
-                        return showStatus(row.ir_status);
-                    }
-                },
-                {
-                    className: 'text-center',
-                    data: 'ir_created_date',
-                    "render": function(data, type, row) {
-                        return row.ir_created_date.substring(0, 10);
-                    }
-                },
-                {
-                    className: 'text-center',
-                    data: 'ir_created_by',
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            if (row.create_by != "") {
-                                let emp_code = row.ir_created_by.substring(2, 7);
-                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
-                                disp = '<div class="d-flex align-items-center justify-content-center">' +
-                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
-                                    '<div class="ms-3">' +
-                                    '<div class="user-meta-info">' +
-                                    '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + '</h6>' +
-                                    '<span class="user-work fs-3" data-occupation="' + row.ir_created_by + '">' + row.ir_created_by + '</span>' +
-                                    '</div></div></div>';
-                            } else {
-                                disp = "";
-                            }
-                        }
-                        return disp;
-                    },
-                },
-                {
-                    className: 'text-center',
-                    data: 'ir_id',
-                    "render": function(data, type, row) {
-                        return showbtnAction(row.ir_status, row.ir_id);
-                    }
-                }
-            ]
-        });
-
-        dataTable.on('order.dt search.dt', function() {
-            let i = 1;
-            dataTable.cells(null, 0, {
-                search: 'applied',
-                order: 'applied'
-            }).every(function(cell) {
-                this.data(i++);
-            });
-        }).draw();
-        dataTable.on('draw', function() {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.forEach(function(tooltipTriggerEl) {
-                new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        });
-        setInterval(function() {
-            dataTable.ajax.reload(null, false);
-        }, 600000);
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+
+        const today = new Date();
+
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const firstDayOfMonth = `${year}-${(month + 1).toString().padStart(2, '0')}-01`;
+        const lastDayOfMonth = `${year}-${(month + 1).toString().padStart(2, '0')}-${daysInMonth}`;
+        startDateInput.value = firstDayOfMonth;
+        endDateInput.value = lastDayOfMonth;
     });
 </script>

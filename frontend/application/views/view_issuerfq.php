@@ -1,4 +1,4 @@
-<title>CRM | RFQ Form</title>
+<title>CRM | Issue RFQ Document</title>
 <div class="container-fluid">
     <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
         <div class="card-body px-4 py-3">

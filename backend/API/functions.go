@@ -190,16 +190,12 @@ func ListDocumentTypeTable(c *gin.Context) {
 	defer objListDocType.Close()
 	for objListDocType.Next() {
 		var objDocType DocumentTypeTable
-		var strPosition3 sql.NullString
-		err := objListDocType.Scan(&objDocType.Mdt_id, &objDocType.Mdt_name, &objDocType.Mdt_position1, &objDocType.Mdt_position2, &strPosition3, &objDocType.Mdt_status, &objDocType.Create_date, &objDocType.Create_by, &objDocType.Update_date, &objDocType.Update_by, &objDocType.Su_firstname, &objDocType.Su_lastname)
+		err := objListDocType.Scan(&objDocType.Mdt_id, &objDocType.Mdt_name, &objDocType.Mdt_position1, &objDocType.Mdt_position2, &objDocType.Map_id, &objDocType.Mdt_status, &objDocType.Create_date, &objDocType.Create_by, &objDocType.Update_date, &objDocType.Update_by, &objDocType.Su_firstname, &objDocType.Su_lastname)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
 			})
 			return
-		}
-		if strPosition3.Valid {
-			objDocType.Mdt_position3 = strPosition3.String
 		}
 		objDocumentTypeList = append(objDocumentTypeList, objDocType)
 	}
@@ -235,7 +231,7 @@ func MdtIsUnique(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := db.QueryRow("SELECT * FROM mst_document_type WHERE mdt_name = ? and mdt_id != ?", objDocumentType.Mdt_name, objDocumentType.Mdt_id).Scan(&objDocumentType.Mdt_id, &objDocumentType.Mdt_name, &objDocumentType.Mdt_position1, &objDocumentType.Mdt_position2, &objDocumentType.Mdt_position3, &objDocumentType.Mdt_status, &objDocumentType.Create_date, &objDocumentType.Update_date, &objDocumentType.Create_by, &objDocumentType.Update_by)
+	err := db.QueryRow("SELECT * FROM mst_document_type WHERE mdt_name = ? and mdt_id != ?", objDocumentType.Mdt_name, objDocumentType.Mdt_id).Scan(&objDocumentType.Mdt_id, &objDocumentType.Mdt_name, &objDocumentType.Mdt_position1, &objDocumentType.Mdt_position2, &objDocumentType.Map_id, &objDocumentType.Mdt_status, &objDocumentType.Create_date, &objDocumentType.Update_date, &objDocumentType.Create_by, &objDocumentType.Update_by)
 	if err == sql.ErrNoRows {
 		c.IndentedJSON(http.StatusOK, false)
 		return
@@ -248,7 +244,7 @@ func MdcnIsUnique(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := db.QueryRow("SELECT * FROM mst_document_control_no WHERE mdcn_position1 = ? and mdt_id = ? and mdcn_id != ?", objDocumentNo.Mdcn_position1, objDocumentNo.Mdt_id, objDocumentNo.Mdcn_id).Scan(&objDocumentNo.Mdcn_id, &objDocumentNo.Mdt_id, &objDocumentNo.Mdcn_position1, &objDocumentNo.Mdcn_position2, &objDocumentNo.Mdcn_position3, &objDocumentNo.Create_date, &objDocumentNo.Create_by, &objDocumentNo.Update_date, &objDocumentNo.Update_by)
+	err := db.QueryRow("SELECT * FROM mst_document_control_no WHERE mdcn_position1 = ? and mdt_id = ? and mdcn_id != ?", objDocumentNo.Mdcn_position1, objDocumentNo.Mdt_id, objDocumentNo.Mdcn_id).Scan(&objDocumentNo.Mdcn_id, &objDocumentNo.Mdt_id, &objDocumentNo.Mdcn_position1, &objDocumentNo.Mdcn_position2, &objDocumentNo.Create_date, &objDocumentNo.Create_by, &objDocumentNo.Update_date, &objDocumentNo.Update_by)
 	if err == sql.ErrNoRows {
 		c.IndentedJSON(http.StatusOK, false)
 		return
@@ -285,17 +281,12 @@ func InsertSmg(c *gin.Context) {
 }
 func InsertMdt(c *gin.Context) {
 	var objDocumentType DocumentType
-	var strPosition3 sql.NullString
 	if err := c.BindJSON(&objDocumentType); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if strPosition3.Valid {
-		objDocumentType.Mdt_position3 = strPosition3.String
-	}
-
-	objResult, err := db.Exec("INSERT INTO mst_document_type(mdt_name, mdt_position1, mdt_position2, mdt_position3, mdt_status, mdt_created_date, mdt_created_by, mdt_updated_date, mdt_updated_by) VALUES(?,?,?,?,?,?,?,?,?)", objDocumentType.Mdt_name, objDocumentType.Mdt_position1, objDocumentType.Mdt_position2, strPosition3, objDocumentType.Mdt_status, objDocumentType.Create_date, objDocumentType.Create_by, objDocumentType.Create_date, objDocumentType.Create_by)
+	objResult, err := db.Exec("INSERT INTO mst_document_type(mdt_name, mdt_position1, mdt_position2, map_id, mdt_status, mdt_created_date, mdt_created_by, mdt_updated_date, mdt_updated_by) VALUES(?,?,?,?,?,?,?,?,?)", objDocumentType.Mdt_name, objDocumentType.Mdt_position1, objDocumentType.Mdt_position2, objDocumentType.Map_id, objDocumentType.Mdt_status, objDocumentType.Create_date, objDocumentType.Create_by, objDocumentType.Create_date, objDocumentType.Create_by)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
@@ -310,21 +301,12 @@ func InsertMdt(c *gin.Context) {
 }
 func InsertMdcn(c *gin.Context) {
 	var objDocumentConNo DocControlNo
-	var strPosition2 sql.NullString
-	var strPosition3 sql.NullString
 	if err := c.BindJSON(&objDocumentConNo); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if strPosition2.Valid {
-		objDocumentConNo.Mdcn_position2 = strPosition2.String
-	}
-	if strPosition3.Valid {
-		objDocumentConNo.Mdcn_position3 = strPosition3.String
-	}
-
-	objResult, err := db.Exec("INSERT INTO mst_document_control_no(mdt_id, mdcn_position1, mdcn_position2, mdcn_position3, mdcn_created_date, mdcn_created_by, mdcn_updated_date, mdcn_updated_by) VALUES(?,?,?,?,?,?,?,?)", objDocumentConNo.Mdt_id, objDocumentConNo.Mdcn_position1, strPosition2, strPosition3, objDocumentConNo.Create_date, objDocumentConNo.Create_by, objDocumentConNo.Create_date, objDocumentConNo.Create_by)
+	objResult, err := db.Exec("INSERT INTO mst_document_control_no(mdt_id, mdcn_position1, mdcn_position2, mdcn_created_date, mdcn_created_by, mdcn_updated_date, mdcn_updated_by) VALUES(?,?,?,?,?,?,?)", objDocumentConNo.Mdt_id, objDocumentConNo.Mdcn_position1, objDocumentConNo.Mdcn_position2, objDocumentConNo.Create_date, objDocumentConNo.Create_by, objDocumentConNo.Create_date, objDocumentConNo.Create_by)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
@@ -354,17 +336,12 @@ func UpdateSmg(c *gin.Context) {
 }
 func UpdateMdt(c *gin.Context) {
 	var objDocumentType DocumentType
-	var strPosition3 sql.NullString
 	if err := c.BindJSON(&objDocumentType); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if strPosition3.Valid {
-		objDocumentType.Mdt_position3 = strPosition3.String
-	}
-
-	objResult, err := db.Exec("Update mst_document_type SET mdt_name = ?, mdt_position1 = ?, mdt_position2 = ?, mdt_position3 = ?, mdt_updated_date = ?, mdt_updated_by = ? WHERE mdt_id = ?", objDocumentType.Mdt_name, objDocumentType.Mdt_position1, objDocumentType.Mdt_position2, strPosition3, objDocumentType.Update_date, objDocumentType.Update_by, objDocumentType.Mdt_id)
+	objResult, err := db.Exec("Update mst_document_type SET mdt_name = ?, mdt_position1 = ?, mdt_position2 = ?, map_id = ?, mdt_updated_date = ?, mdt_updated_by = ? WHERE mdt_id = ?", objDocumentType.Mdt_name, objDocumentType.Mdt_position1, objDocumentType.Mdt_position2, objDocumentType.Map_id, objDocumentType.Update_date, objDocumentType.Update_by, objDocumentType.Mdt_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -500,9 +477,8 @@ func ListDocControlDetailTable(c *gin.Context) {
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
 		var strPosition2 sql.NullString
-		var strPosition3 sql.NullString
 
-		err := objListDocControl.Scan(&objDocControlTetail.Mdcn_id, &objDocControlTetail.Mdt_id, &objDocControlTetail.Mdcn_position1, &strPosition2, &strPosition3, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &objDocControlTetail.Mdt_name, &strUserFname, &strUserLname, &strUserSignPath, &strUserSignFile)
+		err := objListDocControl.Scan(&objDocControlTetail.Mdcn_id, &objDocControlTetail.Mdt_id, &objDocControlTetail.Mdcn_position1, &strPosition2, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &objDocControlTetail.Mdt_name, &strUserFname, &strUserLname, &strUserSignPath, &strUserSignFile)
 
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
@@ -513,9 +489,6 @@ func ListDocControlDetailTable(c *gin.Context) {
 
 		if strPosition2.Valid {
 			objDocControlTetail.Mdcn_position2 = strPosition2.String
-		}
-		if strPosition3.Valid {
-			objDocControlTetail.Mdcn_position3 = strPosition3.String
 		}
 		if strUserFname.Valid {
 			objDocControlTetail.Su_fname = strUserFname.String
@@ -634,30 +607,35 @@ func ChangeSmdStatus(c *gin.Context) {
 // Department ---------------------------
 func ListDepartmentTable(c *gin.Context) {
 	var objDepartmentList []DepartmentTable
-	objListDept, err := db.Query("SELECT sd.*, su.su_fname, su.su_lname, su.su_img_path, su.su_img_name FROM `sys_department` AS sd LEFT JOIN sys_user AS su ON sd.sd_updated_by = su.su_emp_code ORDER BY sd.sd_id")
+	objListDept, err := db.Query("SELECT sd.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file FROM `sys_department` AS sd LEFT JOIN sys_users AS su ON sd.sd_updated_by = su.su_username ORDER BY sd.sd_id")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
 		})
 		return
 	}
+
 	defer objListDept.Close()
 	for objListDept.Next() {
 		var objDepartment DepartmentTable
+		var strDeptAName sql.NullString
 		var strUserFname sql.NullString
 		var strUserLname sql.NullString
-		var strUserImgPath sql.NullString
-		var strUserImgName sql.NullString
+		var strUserSignPath sql.NullString
+		var strUserSignFile sql.NullString
 		var strCreateDate sql.NullString
 		var strUpdateDate sql.NullString
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
-		err := objListDept.Scan(&objDepartment.Sd_id, &objDepartment.Sd_plant_cd, &objDepartment.Sd_dept_cd, &objDepartment.Sd_dept_name, &objDepartment.Sd_status, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
+		err := objListDept.Scan(&objDepartment.Sd_id, &objDepartment.Sd_plant_cd, &objDepartment.Sd_dept_cd, &objDepartment.Sd_dept_name, &strDeptAName, &objDepartment.Sd_status, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &strUserFname, &strUserLname, &strUserSignPath, &strUserSignFile)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
 			})
 			return
+		}
+		if strDeptAName.Valid {
+			objDepartment.Sd_dept_aname = strDeptAName.String
 		}
 		if strUserFname.Valid {
 			objDepartment.Su_fname = strUserFname.String
@@ -665,11 +643,11 @@ func ListDepartmentTable(c *gin.Context) {
 		if strUserLname.Valid {
 			objDepartment.Su_lname = strUserLname.String
 		}
-		if strUserImgPath.Valid {
-			objDepartment.Su_img_path = strUserImgPath.String
+		if strUserSignPath.Valid {
+			objDepartment.Su_sign_path = strUserSignPath.String
 		}
-		if strUserImgName.Valid {
-			objDepartment.Su_img_name = strUserImgName.String
+		if strUserSignFile.Valid {
+			objDepartment.Su_sign_file = strUserSignFile.String
 		}
 		if strCreateDate.Valid {
 			objDepartment.Create_date = strCreateDate.String
@@ -716,7 +694,7 @@ func InsertSd(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("INSERT INTO sys_department(sd_plant_cd, sd_dept_cd, sd_dept_name, sd_status, sd_created_date, sd_created_by, sd_updated_date, sd_updated_by) VALUES(?,?,?,?,?,?,?,?)", objDepartmentData.Sd_plant_cd, objDepartmentData.Sd_name_cd, objDepartmentData.Sd_name, 1, objDepartmentData.Create_date, objDepartmentData.Create_by, objDepartmentData.Create_date, objDepartmentData.Create_by)
+	objResult, err := db.Exec("INSERT INTO sys_department(sd_plant_cd, sd_dept_cd, sd_dept_name, sd_dept_aname, sd_status, sd_created_date, sd_created_by, sd_updated_date, sd_updated_by) VALUES(?,?,?,?,?,?,?,?,?)", objDepartmentData.Sd_plant_cd, objDepartmentData.Sd_name_cd, objDepartmentData.Sd_Aname, objDepartmentData.Sd_name, 1, objDepartmentData.Create_date, objDepartmentData.Create_by, objDepartmentData.Create_date, objDepartmentData.Create_by)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
@@ -734,7 +712,7 @@ func UpdateSd(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update sys_department SET sd_dept_cd = ?, sd_dept_name = ?, sd_plant_cd = ?, sd_updated_date = ?, sd_updated_by = ? WHERE sd_id = ?", objDepartmentData.Sd_name_cd, objDepartmentData.Sd_name, objDepartmentData.Sd_plant_cd, objDepartmentData.Update_date, objDepartmentData.Update_by, objDepartmentData.Sd_id)
+	objResult, err := db.Exec("Update sys_department SET sd_dept_cd = ?, sd_dept_name = ?, sd_dept_aname = ?, sd_plant_cd = ?, sd_updated_date = ?, sd_updated_by = ? WHERE sd_id = ?", objDepartmentData.Sd_name_cd, objDepartmentData.Sd_name, objDepartmentData.Sd_Aname, objDepartmentData.Sd_plant_cd, objDepartmentData.Update_date, objDepartmentData.Update_by, objDepartmentData.Sd_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -762,7 +740,7 @@ func ChangeSdStatus(c *gin.Context) {
 // Consideration ---------------------------
 func ListConsiderationTable(c *gin.Context) {
 	var objConsiderationList []ConsiderationTable
-	objListConsider, err := db.Query("SELECT mc.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file FROM `mst_consideration` AS mc LEFT JOIN sys_users AS su ON mc.update_by = su.su_username ORDER BY mc.mc_id")
+	objListConsider, err := db.Query("SELECT mci.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file FROM `mst_consideration_item` AS mci LEFT JOIN sys_users AS su ON mci.mci_updated_by = su.su_username ORDER BY mci.mci_id")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -780,7 +758,7 @@ func ListConsiderationTable(c *gin.Context) {
 		var strUpdateDate sql.NullString
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
-		err := objListConsider.Scan(&objConsider.Mc_id, &objConsider.Mc_title, &objConsider.Mc_weight, &objConsider.Mc_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
+		err := objListConsider.Scan(&objConsider.Mci_id, &objConsider.Mci_name, &objConsider.Mci_calculate_type, &objConsider.Mci_status, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &strUserFname, &strUserLname, &strUserImgPath, &strUserImgName)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -831,7 +809,7 @@ func InsertConsideration(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("INSERT INTO mst_consideration(mc_title,mc_weight,create_date,create_by,update_date,update_by) VALUES(?,?,?,?,?,?)", objConsideration.Mc_title, objConsideration.Mc_weight, objConsideration.Create_date, objConsideration.Create_by, objConsideration.Create_date, objConsideration.Create_by)
+	objResult, err := db.Exec("INSERT INTO mst_consideration_item(mci_name,mci_calculate_type,mci_status,mci_created_date,mci_created_by,mci_updated_date,mci_updated_by) VALUES(?,?,?,?,?,?,?)", objConsideration.Mci_name, objConsideration.Mci_calculate_type, 1, objConsideration.Create_date, objConsideration.Create_by, objConsideration.Create_date, objConsideration.Create_by)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
@@ -849,7 +827,7 @@ func UpdateConsideration(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update mst_consideration SET mc_title = ?, mc_weight = ?, update_date = ?, update_by = ? WHERE mc_id = ?", objConsideration.Mc_title, objConsideration.Mc_weight, objConsideration.Update_date, objConsideration.Update_by, objConsideration.Mc_id)
+	objResult, err := db.Exec("Update mst_consideration_item SET mci_name = ?, mci_calculate_type = ?, mci_updated_date = ?, mci_updated_by = ? WHERE mci_id = ?", objConsideration.Mci_name, objConsideration.Mci_calculate_type, objConsideration.Update_date, objConsideration.Update_by, objConsideration.Mci_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -864,7 +842,7 @@ func ChangeConsiderationStatus(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update mst_consideration SET mc_status = ?, update_date = ?, update_by = ? WHERE mc_id = ?", objConsideration.Mc_status, objConsideration.Update_date, objConsideration.Update_by, objConsideration.Mc_id)
+	objResult, err := db.Exec("Update mst_consideration_item SET Mci_status = ?, mci_updated_date = ?, mci_updated_by = ? WHERE mci_id = ?", objConsideration.Mci_status, objConsideration.Update_date, objConsideration.Update_by, objConsideration.Mci_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -1198,8 +1176,7 @@ func ListDocType(c *gin.Context) {
 		var strUpdateDate sql.NullString
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
-		var strPosition3 sql.NullString
-		err := objListDocType.Scan(&objDocType.Mdt_id, &objDocType.Mdt_name, &objDocType.Mdt_position1, &objDocType.Mdt_position2, &strPosition3, &objDocType.Mdt_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
+		err := objListDocType.Scan(&objDocType.Mdt_id, &objDocType.Mdt_name, &objDocType.Mdt_position1, &objDocType.Mdt_position2, &objDocType.Map_id, &objDocType.Mdt_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -1218,9 +1195,7 @@ func ListDocType(c *gin.Context) {
 		if strUpdateBy.Valid {
 			objDocType.Update_by = strUpdateBy.String
 		}
-		if strPosition3.Valid {
-			objDocType.Mdt_position3 = strPosition3.String
-		}
+
 		objMenuGroupList = append(objMenuGroupList, objDocType)
 	}
 	err = objListDocType.Err()
@@ -1231,6 +1206,52 @@ func ListDocType(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusOK, objMenuGroupList)
+}
+func ListApprovePattern(c *gin.Context) {
+	var objAppPatternGroupList []ApprovePattern
+	objListAppPattern, err := db.Query("SELECT * FROM `mst_approve_pattern` WHERE map_status = 1")
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	defer objListAppPattern.Close()
+	for objListAppPattern.Next() {
+		var objDocType ApprovePattern
+		var strCreateDate sql.NullString
+		var strUpdateDate sql.NullString
+		var strCreateBy sql.NullString
+		var strUpdateBy sql.NullString
+		err := objListAppPattern.Scan(&objDocType.Map_id, &objDocType.Map_name, &objDocType.Map_detail, &objDocType.Map_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+		if strCreateDate.Valid {
+			objDocType.Create_date = strCreateDate.String
+		}
+		if strUpdateDate.Valid {
+			objDocType.Update_date = strUpdateDate.String
+		}
+		if strCreateBy.Valid {
+			objDocType.Create_by = strCreateBy.String
+		}
+		if strUpdateBy.Valid {
+			objDocType.Update_by = strUpdateBy.String
+		}
+		objAppPatternGroupList = append(objAppPatternGroupList, objDocType)
+	}
+	err = objListAppPattern.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, objAppPatternGroupList)
 }
 func ListMenuDetail(c *gin.Context) {
 	var objMenuDetailList []MenuDetail
@@ -1712,16 +1733,20 @@ func ListDepartment(c *gin.Context) {
 	defer objListDepartment.Close()
 	for objListDepartment.Next() {
 		var objDepartment Department
+		var strAName sql.NullString
 		var strCreateDate sql.NullString
 		var strUpdateDate sql.NullString
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
-		err := objListDepartment.Scan(&objDepartment.Sd_id, &objDepartment.Sd_plant_cd, &objDepartment.Sd_name_cd, &objDepartment.Sd_name, &objDepartment.Sd_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
+		err := objListDepartment.Scan(&objDepartment.Sd_id, &objDepartment.Sd_plant_cd, &objDepartment.Sd_name_cd, &objDepartment.Sd_name, &strAName, &objDepartment.Sd_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
 			})
 			return
+		}
+		if strAName.Valid {
+			objDepartment.Sd_Aname = strAName.String
 		}
 		if strCreateDate.Valid {
 			objDepartment.Create_date = strCreateDate.String
@@ -1748,7 +1773,7 @@ func ListDepartment(c *gin.Context) {
 }
 func ListConsideration(c *gin.Context) {
 	var objConsiderationList []Consideration
-	objConsideration, err := db.Query("SELECT * FROM `mst_consideration` WHERE mc_status=1")
+	objConsideration, err := db.Query("SELECT * FROM `mst_consideration_item` WHERE mci_status=1")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -1762,7 +1787,7 @@ func ListConsideration(c *gin.Context) {
 		var strUpdateDate sql.NullString
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
-		err := objConsideration.Scan(&objConsider.Mc_id, &objConsider.Mc_title, &objConsider.Mc_weight, &objConsider.Mc_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
+		err := objConsideration.Scan(&objConsider.Mci_id, &objConsider.Mci_name, &objConsider.Mci_calculate_type, &objConsider.Mci_status, &strCreateDate, &strUpdateDate, &strCreateBy, &strUpdateBy)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),

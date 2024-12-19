@@ -493,7 +493,7 @@
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
-                        contentType: 'application/json',
+                        contentType: 'application/json', 
                         url: API_URL + 'spd_table/insert',
                         data: JSON.stringify(add_form),
                         success: function(data) {

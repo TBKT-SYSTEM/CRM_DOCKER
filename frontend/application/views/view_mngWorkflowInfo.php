@@ -48,7 +48,7 @@
                                                 <?php
                                                 $option_swg = $this->ManageBackend->list_option("option/list_swg");
                                                 foreach ($option_swg as $op_swg) {
-                                                    echo '<option value="' . $op_swg['sd_id'] . '">' . $op_swg['sd_dept_name'] . '</option>';
+                                                    echo '<option value="' . $op_swg['swg_id'] . '" data-sd_id="' . $op_swg['sd_id'] . '">' . $op_swg['sd_dept_name'] . '</option>';
                                                 }
                                                 ?>
                                             </select>
@@ -853,7 +853,8 @@
     $('#selWorkflowGroup').on('change', function() {
         // alert(this.value);
         getMaxLevel(this.value);
-        listUserByDept(this.value);
+        listUserByDept($(this).find(':selected').data('sd_id'));
+        
         if ($.fn.DataTable.isDataTable('#tblWorkflowDetail')) {
             $('#tblWorkflowDetail').DataTable().destroy();
             $('#tblWorkflowDetail').empty();

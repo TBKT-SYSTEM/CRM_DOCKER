@@ -96,7 +96,10 @@ func Routy() {
 	router.GET("/rfq/file/:id", ListRfqFileId)
 	// router.GET("/rfq/getBtnRfq/:id", ListBtnRfq)
 	router.POST("/rfq/insert", InsertRfq)
-	router.PUT("/rfq/cancel/:id", CancelRfq)
+	router.PUT("/rfq/edit", EditRfq)
+	router.PUT("/rfq/cancel/:id/:reason", CancelRfq)
+	router.PUT("/rfq/reverse/:id", ReverseRfq)
+	router.PUT("/rfq/submit/:id", SubmitRfq)
 
 	router.GET("/manage_feasibility/table/:id", ListManageFeasibilityTable)
 	router.GET("/manage_feasibility/table_consern/:if_id/:sd_id", ListConsiderationScoreByid)
@@ -134,6 +137,7 @@ func Routy() {
 	router.GET("/option/list_department", ListDepartment)
 	router.GET("/option/list_mc", ListConsideration)
 	router.GET("/option/list_mdt", ListDocType)
+	router.GET("/option/list_map", ListApprovePattern)
 
 	router.GET("/view/feas_score/:id", ListConsiderationScore)
 	router.GET("/view/in_dept", ListIncharge)
