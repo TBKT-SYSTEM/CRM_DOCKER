@@ -88,7 +88,7 @@ class RfqForm extends CI_Controller
 		$pdf->SetX(85);
 		// Doc. No.
 		$doc_no = 'Doc. No. :';
-		$ir_doc_no = $this->input->get('ir_doc_no');
+		$ir_doc_no = $this->input->get('idc_running_no');
 		$width_docno = $pdf->GetStringWidth($doc_no);
 		$pdf->Cell($width_docno, 5, $doc_no);
 		$pdf->SetX($pdf->GetX() + 5);
@@ -97,7 +97,7 @@ class RfqForm extends CI_Controller
 		// Issue Date.
 		$pdf->SetX($pdf->GetX() + 5);
 		$issue_date = 'Issue Date :';
-		$ir_created_date = $this->input->get('ir_created_date');
+		$ir_created_date = $this->input->get('idc_created_date');
 		$width_issue_date = $pdf->GetStringWidth($issue_date) + 2;
 		$pdf->SetX($pdf->GetX() + 5);
 		$pdf->Cell($width_issue_date, 5, $issue_date);
@@ -107,16 +107,28 @@ class RfqForm extends CI_Controller
 		$pdf->Ln(8);
 		$pdf->SetX(85);
 		$ref_no = 'Ref. No. :';
-		$ir_ref_nbc = $this->input->get('ir_ref_nbc');
+		$ir_ref_nbc = $this->input->get('idc_refer_doc');
+		if ($ir_ref_nbc == '0' || $ir_ref_nbc == '') {
+			$ref_val = '-';
+		} else {
+			$ref_val = $this->db->select('idc_running_no')
+				->from('info_document_control')
+				->where('idc_id', (int)$ir_ref_nbc)
+				->get()
+				->row();
+			$ref_val = $ref_val->idc_running_no;
+		}
+
+
 		$width_ref_no = $pdf->GetStringWidth($ref_no);
 		$pdf->Cell($width_ref_no, 5, $ref_no);
 		$pdf->SetX($pdf->GetX() + 5);
-		$pdf->Cell(33, 5, $ir_ref_nbc, 'B', 0, 'C');
+		$pdf->Cell(33, 5, $ref_val, 'B', 0, 'C');
 
 		// Closing Date.
 		$pdf->SetX($pdf->GetX() + 3);
 		$closing_date = 'Closing Date :';
-		$ir_duedate = $this->input->get('ir_duedate');
+		$ir_duedate = $this->input->get('idc_closing_date');
 		$width_ir_duedate = $pdf->GetStringWidth($closing_date) + 2;
 		$pdf->SetX($pdf->GetX() + 5);
 		$pdf->Cell($width_ir_duedate, 5, $closing_date);
@@ -124,46 +136,45 @@ class RfqForm extends CI_Controller
 
 		// Attn 
 		$pdf->Ln(13);
+		$count_attn = 0;
+		$get_attn = $this->input->get('idat_item');
+		$attn_all = $this->db->select('mda_id, mda_name')->from('mst_document_attn')->order_by('mda_id', 'asc')->get()->result();
+
 		$pdf->SetX($pdf->GetX() - 5);
 		$attn = 'Attn. :';
-		$width_attn = $pdf->GetStringWidth($attn) + 2;
+		$width_attn = $pdf->GetStringWidth($attn) + 6.5;
 		$pdf->Cell($width_attn, 0, $attn);
 
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->SetY($pdf->GetY() - 3);
-		$pdf->SetX($pdf->GetX() + 15);
-		$pdf->Cell(9, 5, '', 0, 0, 'C', true);
-		$pu_dept = 'PU Dept.';
-		$width_pu_dept = $pdf->GetStringWidth($pu_dept) + 2;
-		$pdf->Cell($width_pu_dept, 5, $pu_dept);
+		for ($i = 0; $i < count($attn_all); $i++) {
+			$box_bg = '255, 255, 255';
 
-		$pdf->SetX($pdf->GetX() + 12);
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$pe_dept = 'PE Dept.';
-		$width_pe_dept = $pdf->GetStringWidth($pe_dept) + 2;
-		$pdf->Cell($width_pe_dept, 5, $pe_dept);
+			for ($j = 0; $j < count($get_attn); $j++) {
+				if ($get_attn[$j] == $attn_all[$i]->mda_id) {
+					$box_bg = '0, 0, 0';
+					break;
+				}
+			}
 
-		$pdf->SetX($pdf->GetX() + 12);
-		$pdf->SetFillColor(255, 255, 255);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$ce_dept = 'CE Dept.';
-		$width_ce_dept = $pdf->GetStringWidth($ce_dept) + 2;
-		$pdf->Cell($width_ce_dept, 5, $ce_dept);
+			if ($count_attn == 0) {
+				$pdf->SetFillColor((int) $box_bg);
+				$pdf->SetY($pdf->GetY() - 3);
+				$pdf->SetX($pdf->GetX() + 15);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$pu_dept = $attn_all[$i]->mda_name . ' Dept.';
+				$width_pu_dept = $pdf->GetStringWidth($pu_dept) + 2;
+				$pdf->Cell($width_pu_dept, 5, $pu_dept);
+			} else {
+				$pdf->SetFillColor((int)$box_bg);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$pe_dept = $attn_all[$i]->mda_name . ' Dept.';
+				$width_pe_dept = $pdf->GetStringWidth($pe_dept) + 2;
+				$pdf->Cell($width_pe_dept, 5, $pe_dept);
+			}
 
-		$pdf->SetX($pdf->GetX() + 12);
-		$pdf->SetFillColor(255, 255, 255);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$gdc_dept = 'GDC Dept.';
-		$width_gdc_dept = $pdf->GetStringWidth($gdc_dept) + 2;
-		$pdf->Cell($width_gdc_dept, 5, $gdc_dept);
+			$pdf->SetX($pdf->GetX() + 12);
+			$count_attn++;
+		}
 
-		$pdf->SetX($pdf->GetX() + 12);
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$scm_dept = 'SCM Dept.';
-		$width_scm_dept = $pdf->GetStringWidth($scm_dept) + 2;
-		$pdf->Cell($width_scm_dept, 5, $scm_dept);
 
 		// Customer 
 		$pdf->Ln(12);
@@ -174,28 +185,28 @@ class RfqForm extends CI_Controller
 
 		$pdf->SetY($pdf->GetY() - 3);
 		$pdf->SetX($pdf->GetX() + 15);
-		$ir_customer = $this->input->get('ir_customer');
-		$pdf->Cell(90, 5, $ir_customer, 'B', 0, 'L');
+		$ir_customer = $this->input->get('idc_customer_name');
+		$pdf->Cell(93, 5, $ir_customer, 'B', 0, 'L');
 
 		// Import From
-		$ir_customer = $this->input->get('ir_import_tran');
+		(int)$ir_customer_type = $this->input->get('idc_customer_type');
 		$boxOversea = '';
 		$boxDomestic = '';
-		if ($ir_customer == 1) {
+		if ($ir_customer_type == 1) {
 			$boxOversea = '0, 0, 0';
 			$boxDomestic = '255, 255, 255';
-		} else if ($ir_customer == 2) {
+		} else if ($ir_customer_type == 2) {
 			$boxOversea = '255, 255, 255';
 			$boxDomestic = '0, 0, 0';
 		}
-		$pdf->SetX($pdf->GetX() + 13.8);
+		$pdf->SetX($pdf->GetX() + 12.9);
 		$pdf->SetFillColor((int)$boxOversea);
 		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
 		$gdc_dept = 'Overseas';
 		$width_pu_dept = $pdf->GetStringWidth($gdc_dept) + 2;
 		$pdf->Cell($width_pu_dept, 5, $gdc_dept);
 
-		$pdf->SetX($pdf->GetX() + 13.5);
+		$pdf->SetX($pdf->GetX() + 11.7);
 		$pdf->SetFillColor((int)$boxDomestic);
 		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
 		$gdc_dept = 'Domestic';
@@ -203,95 +214,106 @@ class RfqForm extends CI_Controller
 		$pdf->Cell($width_pu_dept, 5, $gdc_dept);
 
 		// Subject
-		$mrt_id = $this->input->get('mrt_id');
-		$box_newp =	'';
-		$box_ecr =	'';
-		$box_eop =	'';
-		$box_other = '';
-		if ($mrt_id == 1) {
-			$box_newp = '0, 0, 0';
-			$box_ecr = '255, 255, 255';
-			$box_eop = '255, 255, 255';
-			$box_other = '255, 255, 255';
-		} else if ($mrt_id == 2) {
-			$box_newp = '255, 255, 255';
-			$box_ecr = '0, 0, 0';
-			$box_eop = '255, 255, 255';
-			$box_other = '255, 255, 255';
-		} else if ($mrt_id == 3) {
-			$box_newp = '255, 255, 255';
-			$box_ecr = '255, 255, 255';
-			$box_eop = '0, 0, 0';
-			$box_other = '255, 255, 255';
-		} else {
-			$box_newp = '255, 255, 255';
-			$box_ecr = '255, 255, 255';
-			$box_eop = '255, 255, 255';
-			$box_other = '0, 0, 0';
-		}
-
 		$pdf->Ln(12);
+		$count_mds = 0;
+		$get_mds = $this->input->get('mds_id');
+		$mds_all = $this->db->select('mds_id, mds_name')->from('mst_document_subject')->order_by('mds_id', 'asc')->get()->result();
+		$subject_note = '-';
+
 		$pdf->SetX($pdf->GetX() - 5);
 		$subj = 'Subject :';
 		$width_subj = $pdf->GetStringWidth($subj) + 2;
 		$pdf->Cell($width_subj, 0, $subj);
 
-		$pdf->SetFillColor((int)$box_newp);
-		$pdf->SetY($pdf->GetY() - 3);
-		$pdf->SetX($pdf->GetX() + 15);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$newp = 'New Project';
-		$width_newp = $pdf->GetStringWidth($newp) + 2;
-		$pdf->Cell($width_newp, 5, $newp);
+		for ($i = 0; $i < count($mds_all); $i++) {
+			$box_bg = '255, 255, 255';
 
-		$pdf->SetX($pdf->GetX() + 7.5);
-		$pdf->SetFillColor((int)$box_ecr);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$ecr = 'ECR / PCR';
-		$width_ecr = $pdf->GetStringWidth($ecr) + 2;
-		$pdf->Cell($width_ecr, 5, $ecr);
+			if ($get_mds == $mds_all[$i]->mds_id) {
+				$box_bg = '0, 0, 0';
+			}
 
-		$pdf->SetX($pdf->GetX() + 10);
-		$pdf->SetFillColor((int)$box_eop);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$eop = 'EOP / Service Parts';
-		$width_eop = $pdf->GetStringWidth($eop) + 2;
-		$pdf->Cell($width_eop, 5, $eop);
+			if ($count_mds == 0) {
+				$pdf->SetFillColor((int)$box_bg);
+				$pdf->SetY($pdf->GetY() - 3);
+				$pdf->SetX($pdf->GetX() + 15);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$newp = $mds_all[$i]->mds_name;
+				$width_newp = $pdf->GetStringWidth($newp) + 2;
+				$pdf->Cell($width_newp, 5, $newp);
+			} else {
+				$pdf->SetX($pdf->GetX() + 2);
+				$pdf->SetFillColor((int)$box_bg);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$ecr = $mds_all[$i]->mds_name;
+				$width_ecr = $pdf->GetStringWidth($ecr) + 2;
+				$pdf->Cell($width_ecr, 5, $ecr);
+			}
 
-		$pdf->SetX($pdf->GetX() + 12);
-		$pdf->SetFillColor((int)$box_other);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$gdc_dept = 'Other :';
-		$width_pu_dept = $pdf->GetStringWidth($gdc_dept) + 2;
-		$pdf->Cell($width_pu_dept, 5, $gdc_dept);
-		$pdf->Cell(33, 5, '', 'B', 0, 'L');
+			if ($mds_all[$i]->mds_name == 'Other') {
+				if ($get_mds == $mds_all[$i]->mds_id) {
+					$subject_note = $this->input->get('idc_subject_note');
+					$pdf->Cell(30, 5, $subject_note, 'B', 0, 'C');
+				} else {
+					$pdf->Cell(30, 5, $subject_note, 'B', 0, 'C');
+				}
+			}
+
+			$pdf->SetX($pdf->GetX() + 5);
+			$count_mds++;
+		}
 
 		// Enclosures
 		$pdf->Ln(12);
+		$count_mde = 0;
+		$get_mde = $this->input->get('mde_id');
+		$mde_all = $this->db->select('mde_id, mde_name')->from('mst_document_enclosures')->order_by('mde_id', 'asc')->get()->result();
+		$enclosures_note = '-';
+
 		$pdf->SetX($pdf->GetX() - 5);
 		$subj = 'Enclosures :';
 		$width_subj = $pdf->GetStringWidth($subj) + 2;
 		$pdf->Cell($width_subj, 0, $subj);
 
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->SetY($pdf->GetY() - 3);
-		$pdf->SetX($pdf->GetX() + 15);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$drawing = 'Drawing';
-		$width_drawing = $pdf->GetStringWidth($drawing) + 2;
-		$pdf->Cell($width_drawing, 5, $drawing);
+		for ($i = 0; $i < count($mde_all); $i++) {
+			$box_bg = '255, 255, 255';
 
-		$pdf->SetX($pdf->GetX() + 13);
-		$pdf->SetFillColor(255, 255, 255);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$eOther = 'Other :';
-		$width_eOther = $pdf->GetStringWidth($eOther) + 2;
-		$pdf->Cell($width_eOther, 5, $eOther);
-		$pdf->Cell(60, 5, '', 'B', 0, 'L');
+			if ($get_mde == $mde_all[$i]->mde_id) {
+				$box_bg = '0, 0, 0';
+			}
+
+			if ($count_mde == 0) {
+				$pdf->SetFillColor((int)$box_bg);
+				$pdf->SetY($pdf->GetY() - 3);
+				$pdf->SetX($pdf->GetX() + 15);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$newp = $mde_all[$i]->mde_name;
+				$width_newp = $pdf->GetStringWidth($newp) + 2;
+				$pdf->Cell($width_newp, 5, $newp);
+			} else {
+				$pdf->SetX($pdf->GetX() + 7.6);
+				$pdf->SetFillColor((int)$box_bg);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$ecr = $mde_all[$i]->mde_name;
+				$width_ecr = $pdf->GetStringWidth($ecr) + 2;
+				$pdf->Cell($width_ecr, 5, $ecr);
+			}
+
+			if ($mde_all[$i]->mde_name == 'Other') {
+				if ($get_mde == $mde_all[$i]->mde_id) {
+					$enclosures_note = $this->input->get('idc_subject_note');
+					$pdf->Cell(60, 5, $enclosures_note, 'B', 0, 'C');
+				} else {
+					$pdf->Cell(60, 5, $enclosures_note, 'B', 0, 'C');
+				}
+			}
+
+			$pdf->SetX($pdf->GetX() + 5);
+			$count_mde++;
+		}
 
 		// Project Life 
 		$pdf->Ln(10);
-		$ir_pro_life = $this->input->get('ir_pro_life');
+		$ir_pro_life = $this->input->get('idc_project_life');
 		$pdf->SetX($pdf->GetX() - 5);
 		$proj = 'Project Life :';
 		$width_proj = $pdf->GetStringWidth($proj);
@@ -300,7 +322,7 @@ class RfqForm extends CI_Controller
 		$pdf->Cell(33, 5, $ir_pro_life, 'B', 0, 'C');
 		$pdf->Cell(5, 5, 'Years', '', 0, 'L');
 
-		$ir_sop_tim = $this->input->get('ir_sop_tim');
+		$ir_sop_tim = $this->input->get('idc_project_start');
 		$pdf->SetX($pdf->GetX() + 38);
 		$pti = 'Program Timing info. :';
 		$width_pti = $pdf->GetStringWidth($pti);
@@ -319,23 +341,22 @@ class RfqForm extends CI_Controller
 		$pdf->Cell(40, 4, 'MODEL', 1, 0, 'C', true);
 		$pdf->Cell(50, 4, 'Remark', 1, 1, 'C', true);
 
-		$ir_id = $this->input->get('ir_id');
-		$consern = $this->db->select('irpn.irpn_part_no, irpn.irpn_part_name, irpn.irpn_model, irpn.irpn_remark')
-			->from('info_rfq_part_no irpn')
-			->join('info_rfq ir', 'ir.ir_id = irpn.ir_id', 'left')
-			->where('irpn.ir_id', $ir_id)
-			->where('irpn.irpn_status', 1)
-			->order_by('irpn.irpn_id', 'ASC')->get()->result();
+		$idc_id = $this->input->get('idc_id');
+		$consern = $this->db->select('idi_item_no, idi_item_name, idi_model, idi_remark')
+			->from('info_document_item')
+			->where('idc_id', $idc_id)
+			->where('idi_status', 1)
+			->order_by('idi_id', 'ASC')->get()->result();
 
 		for ($i = 0; $i < 20; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
 			$pdf->SetFont('THSarabunNew', 'B', 11);
 			$pdf->Cell(15, 4, $i + 1, 1, 0, "C");
 
-			$part_no = isset($consern[$i]->irpn_part_no) ? $consern[$i]->irpn_part_no : '';
-			$part_name = isset($consern[$i]->irpn_part_name) ? $consern[$i]->irpn_part_name : '';
-			$model = isset($consern[$i]->irpn_model) ? $consern[$i]->irpn_model : '';
-			$remark = isset($consern[$i]->irpn_remark) ? $consern[$i]->irpn_remark : '';
+			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
+			$part_name = isset($consern[$i]->idi_item_name) ? $consern[$i]->idi_item_name : '';
+			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
+			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
 			$pdf->Cell(35, 4, $part_no, 1, 0, 'C');
 			$pdf->Cell(55, 4, $part_name, 1, 0, 'C');
@@ -347,31 +368,22 @@ class RfqForm extends CI_Controller
 		$pdf->Ln(2);
 		$pdf->SetX($pdf->GetX() - 5);
 		$pdf->SetFont('THSarabunNew', 'B', 11);
-
-		$ir_pro_life = $this->input->get('ir_pro_life');
 		$val = 'Volume Information :';
 		$width_val = $pdf->GetStringWidth($val);
 		$pdf->Cell($width_val, 5, $val);
 
 		$pdf->Ln(5);
-		$years = [];
-		$volumes = [];
-		$countYears = $ir_sop_tim;
-		for ($i = 0; $i <= $ir_pro_life; $i++) {
-			if ($i == 0) {
-				$years[$i] = $countYears;
-				$volumes[$i] = rand(10000, 99999);
-			} else {
-				$years[$i] = $countYears += 1;
-				$volumes[$i] = rand(10000, 99999);
-			}
-		}
+		$countYears = $this->db->select('idv_year, idv_qty')
+			->from('info_document_volume')
+			->where('idc_id', $idc_id)
+			->where('idv_status', 1)
+			->order_by('idv_id', 'ASC')->get()->result();
 
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFillColor(235, 235, 235);
 		$pdf->Cell(15, 5, 'Year', 1, 0, 'R', true);
 		for ($i = 0; $i < 11; $i++) {
-			$year = isset($years[$i]) ? $years[$i] : '';
+			$year = isset($countYears[$i]->idv_year) ? $countYears[$i]->idv_year : '';
 			$pdf->Cell(16.35, 5, $year, 1, 0, 'C');
 		}
 
@@ -380,7 +392,7 @@ class RfqForm extends CI_Controller
 		$pdf->SetFillColor(235, 235, 235);
 		$pdf->Cell(15, 5, 'Volume', 1, 0, 'R', true);
 		for ($i = 0; $i < 11; $i++) {
-			$volume = isset($volumes[$i]) ? $volumes[$i] : '';
+			$volume = isset($countYears[$i]->idv_qty) ? $countYears[$i]->idv_qty : '';
 			$pdf->Cell(16.35, 5, $volume, 1, 0, 'C');
 		}
 
@@ -394,124 +406,116 @@ class RfqForm extends CI_Controller
 
 		// Purchase Cost
 		$pdf->Ln(10);
+
+		$count_mdpu = 0;
+		$get_mdpu = $this->input->get('idpu_item');
+		$mdpu_all = $this->db->select('mdpu_id, mdpu_name')->from('mst_document_purchase')->order_by('mdpu_id', 'asc')->get()->result();
+
 		$pdf->SetX($pdf->GetX() - 5);
 		$attn = 'Purchase Cost :';
 		$width_attn = $pdf->GetStringWidth($attn) + 2;
 		$pdf->Cell($width_attn, 0, $attn);
 
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->SetY($pdf->GetY() - 3);
-		$pdf->SetX($pdf->GetX() + 30);
-		$pdf->Cell(9, 5, '', 0, 0, 'C', true);
-		$pu_dept = 'Raw material';
-		$pdf->Cell(10, 5, $pu_dept);
+		for ($i = 0; $i < count($mdpu_all); $i++) {
+			$box_bg = '255, 255, 255';
 
-		$pdf->SetX($pdf->GetX() + 20);
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$pe_dept = 'Mold/Die';
-		$pdf->Cell(10, 5, $pe_dept);
+			for ($j = 0; $j < count($get_mdpu); $j++) {
+				if ($get_mdpu[$j] == $mdpu_all[$i]->mdpu_id) {
+					$box_bg = '0, 0, 0';
+					break;
+				}
+			}
 
-		$pdf->SetX($pdf->GetX() + 20);
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$ce_dept = 'Manufacturing';
-		$pdf->Cell(10, 5, $ce_dept);
+			if ($count_mdpu == 0) {
+				$pdf->SetFillColor((int) $box_bg);
+				$pdf->SetY($pdf->GetY() - 3);
+				$pdf->SetX($pdf->GetX() + 30);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$pu_dept = $mdpu_all[$i]->mdpu_name;
+				$pdf->Cell(30, 5, $pu_dept);
+			} else {
+				$pdf->SetFillColor((int)$box_bg);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$pe_dept = $mdpu_all[$i]->mdpu_name;
+				$pdf->Cell(30, 5, $pe_dept);
+			}
 
-		$pdf->SetX($pdf->GetX() + 20);
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$gdc_dept = 'Transportation';
-		$pdf->Cell(10, 5, $gdc_dept);
+			$count_mdpu++;
+		}
 
-		// Process Cost
-		$pdf->Ln(12);
+		// Purchase Cost
+		$pdf->Ln(10);
+		$count_mdpc = 0;
+		$get_mdpc = $this->input->get('idpc_item');
+		$mdpc_all = $this->db->select('mdpc_id, mdpc_name')->from('mst_document_process')->order_by('mdpc_id', 'asc')->get()->result();
+
 		$pdf->SetX($pdf->GetX() - 5);
 		$attn = 'Process Cost :';
 		$width_attn = $pdf->GetStringWidth($attn) + 2;
 		$pdf->Cell($width_attn, 0, $attn);
 
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->SetY($pdf->GetY() - 3);
-		$pdf->SetX($pdf->GetX() + 30);
-		$pdf->Cell(9, 5, '', 0, 0, 'C', true);
-		$pu_dept = 'Casting';
-		$pdf->Cell(10, 5, $pu_dept);
+		for ($i = 0; $i < count($mdpc_all); $i++) {
+			$box_bg = '255, 255, 255';
 
-		$pdf->SetX($pdf->GetX() + 20);
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$pe_dept = 'Machining';
-		$pdf->Cell(10, 5, $pe_dept);
+			for ($j = 0; $j < count($get_mdpc); $j++) {
+				if ($get_mdpc[$j] == $mdpc_all[$i]->mdpc_id) {
+					$box_bg = '0, 0, 0';
+					break;
+				}
+			}
 
-		$pdf->SetX($pdf->GetX() + 20);
-		$pdf->SetFillColor(255, 255, 255);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$ce_dept = 'Assembly';
-		$pdf->Cell(10, 5, $ce_dept);
+			if ($count_mdpc == 0) {
+				$pdf->SetFillColor((int) $box_bg);
+				$pdf->SetY($pdf->GetY() - 3);
+				$pdf->SetX($pdf->GetX() + 30);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$pu_dept = $mdpc_all[$i]->mdpc_name;
+				$pdf->Cell(30, 5, $pu_dept);
+			} else {
+				$pdf->SetFillColor((int)$box_bg);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$pe_dept = $mdpc_all[$i]->mdpc_name;
+				$pdf->Cell(30, 5, $pe_dept);
+			}
 
-		$pdf->SetX($pdf->GetX() + 20);
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$gdc_dept = 'Packaging and Delivery';
-		$width_gdc_dept = $pdf->GetStringWidth($gdc_dept) + 2;
-		$pdf->Cell(10, 5, $gdc_dept);
+			$count_mdpc++;
+		}
 
 		// Table Note
 		$pdf->Ln(10);
+		$idc_note1 = $this->input->get('idc_note1');
+		$idc_note1 .= "\n ";
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 12);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(73, 4, 'Note :', 1, 0, 'L', true);
+		$startY = $pdf->GetY();
+		$pdf->Cell(73, 4, 'Note :', 1, 1, 'L', true);
 		$pdf->SetFillColor(255, 255, 255);
-		$pdf->Cell(9, 4, '', 0, 0, 'C',);
+
+		$pdf->SetFont('THSarabunNew', 'B', 10);
+		$pdf->SetX($pdf->GetX() - 4);
+		$pdf->MultiCell(73, 4, $idc_note1, 'LBR', 'L');
+		$endY = $pdf->GetY();
+
+		$idc_note2 = $this->input->get('idc_note2');
+		$idc_note2 .= "\n ";
+		$pdf->SetY($startY); 
+		$pdf->SetX(88);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(113, 4, 'Comment/Additional info By S&M :', 1, 0, 'L', true);
+		$pdf->Cell(113, 4, 'Comment/Additional info By S&M :', 1, 1, 'L', true);
+		$pdf->SetFillColor(255, 255, 255);
 
-		$pdf->Ln();
 		$pdf->SetFont('THSarabunNew', 'B', 10);
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(73, 4, '1. Each cost should provide with breakdown. ', 'LR', 0, 'L',);
-		$pdf->Cell(9, 4, '', 0, 0, 'C',);
-		$pdf->Cell(113, 4, 'This RFQ issued for study cost to customer', 'LR', 0, 'L',);
-
-		$pdf->Ln();
-		$pdf->SetFont('THSarabunNew', 'B', 10);
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(73, 4, '2. Tooling development schedule (timelines) ', 'LR', 0, 'L',);
-		$pdf->Cell(9, 4, '', 0, 0, 'C',);
-		$pdf->Cell(113, 4, 'PU : 1. Please submit RM cost to S&M', 'LR', 0, 'L',);
-
-		$pdf->Ln();
-		$pdf->SetFont('THSarabunNew', 'B', 10);
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(73, 4, 'is required.', 'LR', 0, 'L',);
-		$pdf->Cell(9, 4, '', 0, 0, 'C',);
-		$pdf->Cell(113, 4, 'PE : 1. Please submit process cost to us', 'LR', 0, 'L',);
-
-		$pdf->Ln();
-		$pdf->SetFont('THSarabunNew', 'B', 10);
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(73, 4, '', 'LR', 0, 'L',);
-		$pdf->Cell(9, 4, '', 0, 0, 'C',);
-		$pdf->Cell(113, 4, '      2. Please submit Mold spec and Tooling Fee separately ', 'LR', 0, 'L',);
-
-		$pdf->Ln();
-		$pdf->SetFont('THSarabunNew', 'B', 10);
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(73, 4, '', 'LR', 0, 'L',);
-		$pdf->Cell(9, 4, '', 0, 0, 'C',);
-		$pdf->Cell(113, 4, 'PC&L : Please submit the packaging and transportation cost to S&M [Export pkg].', 'LR', 0, 'L',);
-
-		$pdf->Ln();
-		$pdf->SetFont('THSarabunNew', 'B', 10);
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(73, 4, '', 'LBR', 0, 'L',);
-		$pdf->Cell(9, 4, '', 0, 0, 'C',);
-		$pdf->Cell(113, 4, '', 'LBR', 0, 'L');
-
+		$pdf->SetX(88);
+		$pdf->MultiCell(113, 4, $idc_note2, 'LBR', 'L');
+		// $maxLength2 = 56;
+		// $lines2 = str_split($idc_note2, $maxLength2);
+		// foreach ($lines2 as $line) {
+		// 	$pdf->Cell(113, 4, $line, 'LR', 1, 'L');
+		// }
+		
 		// Table Sign
-		$pdf->Ln(10);
+		$pdf->Ln(5);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 11);
 		$pdf->SetFillColor(235, 235, 235);

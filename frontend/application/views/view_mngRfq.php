@@ -31,7 +31,10 @@
                                 <div class="col-md-6 mb-3">
                                     <div class="d-flex align-items-center flex-nowrap">
                                         <label class="col-auto fs-3 text-dark fw-semibold me-2" style="width: 120px;" for="inpImportFrom">Customer Type :</label>
-                                        <select type="text" class="form-select form-select-sm shadow-sm" id="inpImportFrom" name="ir_import_tran" onchange="filterData()"></select>
+                                        <select type="text" class="form-select form-select-sm shadow-sm" id="inpImportFrom" name="ir_import_tran" onchange="filterData()">
+                                            <option value="1">Domestic</option>
+                                            <option value="2">Overseas</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -45,7 +48,12 @@
                                 <div class="col-md-6 mb-3">
                                     <div class="d-flex align-items-center flex-nowrap">
                                         <label class="col-auto fs-3 text-dark fw-semibold me-2" style="width: 120px;">Issue Date :</label>
-                                        <input type="date" class="form-control form-control-sm shadow-sm" id="inpIssueDate" onchange="filterData()"></input>
+                                        <div class="input-group me-3">
+                                            <input type="date" class="form-control form-control-sm text-center" id="startDate">
+                                            <span class="input-group-text bg-info text-white fs-1 px-3" style="padding-top: 0rem !important; padding-bottom: 0rem !important;">TO</span>
+                                            <input type="date" class="form-control form-control-sm text-center" id="endDate">
+                                        </div>
+                                        <button class="btn btn-sm bg-info text-white card-hover shadow-sm" onclick="searchDate()">Search</button>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -151,314 +159,19 @@
     </div>
 </div>
 
-<!-- Modal for View Edit RFQ -->
-<div class="modal fade" id="mdlViewEdit" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header modal-colored-header bg-warning text-white">
-                <h4 class="modal-title text-white me-2" id="warning-header-modalLabel"></h4>
-                <span class="fs-4">( Read Only )</span>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="datatables">
-                    <!-- basic table -->
-                    <form id="view_edit_form" name="view_edit_form">
-                        <div class="row">
-                            <div class="col-12">
-                                <!------------------------------------------------------ Section 1  -------------------------------------------------------->
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="row" style="padding: 15px;">
-                                            <div class="col-md-7">
-                                                <h4 class="fs-5 fw-semibold">Section 1 : General Information</h4>
-                                            </div>
-                                            <hr>
-                                        </div>
-                                        <div class="row" style="padding: 15px;">
-                                            <!-------------------------- Attn. ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Attn. :</h4>
-                                                </div>
-                                                <!-- <input type="hidden" class="form-check-input me-2" name="ir_doc_no" id="inpDocNo"> -->
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_pu_dept" id="inpPuDeptView">
-                                                    <label class="form-check-label fw-semibold" for="inpPuDeptView">PU Dept.</label>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_pe_dept" id="inpPeDeptView">
-                                                    <label class="form-check-label fw-semibold" for="inpPeDeptView">PE Dept.</label>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_scm_dept" id="inpScmDeptView">
-                                                    <label class="form-check-label fw-semibold" for="inpScmDeptView">SCM Dept.</label>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_ce_dept" id="inpCeDeptView">
-                                                    <label class="form-check-label fw-semibold" for="inpCeDeptView">CE Dept.</label>
-                                                </div>
-                                                <div class="col-md-auto">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_gdc_dept" id="inpGdcDeptView">
-                                                    <label class="form-check-label fw-semibold" for="inpGdcDeptView">GDC Dept.</label>
-                                                </div>
-                                            </div>
-
-                                            <!-------------------------- Customer ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Customer :</h4>
-                                                </div>
-                                                <div class="d-flex col-md-10 me-3 gap-5">
-                                                    <div class="col">
-                                                        <select name="ir_import_tran" id="inpImportFromView" class="form-select"></select>
-                                                        <span class="invalid-feedback"></span>
-                                                    </div>
-                                                    <div class="col">
-                                                        <select name="ir_customer" id="inpCustomerView" class=" form-select" onchange=""></select>
-                                                        <span class="invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-------------------------- Subject ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Subject :</h4>
-                                                </div>
-                                                <div class="d-flex col-md-10 me-3 gap-5">
-                                                    <div class="col">
-                                                        <select name="ir_mrt" id="selRequirementView" class="form-select" onchange=""> </select>
-                                                        <span class="invalid-feedback"></span>
-                                                    </div>
-                                                    <div class="col">
-                                                        <input type="text" name="ir_other_mrt" id="inpOtherSubjectView" class="form-control" placeholder="Other Subject ..." disabled>
-                                                        <span class="invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-------------------------- Enclosures ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Enclosures :</h4>
-                                                </div>
-                                                <div class="d-flex col-md-10 me-3 gap-5">
-                                                    <div class="col">
-                                                        <select name="ir_enclosures" id="inpEnclosuresView" onchange="" class="form-select">
-                                                            <option value="">Select Enclosures</option>
-                                                            <option value="Drawing">Drawing</option>
-                                                            <option value="0">Other</option>
-                                                        </select>
-                                                        <span class="invalid-feedback"></span>
-                                                    </div>
-                                                    <div class="col">
-                                                        <input type="text" name="ir_other_enclosures" id="inpOtherEnclosuresView" class="form-control" placeholder="Other Enclosures ..." disabled>
-                                                        <span class="invalid-feedback"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-------------------------- Purchase Cost ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Purchase Cost :</h4>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_raw_puc" id="inpRawMaterialView">
-                                                    <label class="form-check-label fw-semibold" for="inpRawMaterialView">Raw material</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpMoldView" name="ir_mold_puc">
-                                                    <label class="form-check-label fw-semibold" for="inpMoldView">Mold/Die</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpMenuFacView" name="ir_menufac_puc">
-                                                    <label class="form-check-label fw-semibold" for="inpMenuFacView">Manufacturing</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-auto">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpTransportView" name="ir_transport_puc">
-                                                    <label class="form-check-label fw-semibold" for="inpTransportView">Transportation</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                            </div>
-
-                                            <!-------------------------- Process Cost ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Process Cost :</h4>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpCastView" name="ir_cast_poc">
-                                                    <label class="form-check-label fw-semibold" for="inpCastView">Casting</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpMachinView" name="ir_machin_poc">
-                                                    <label class="form-check-label fw-semibold" for="inpMachinView">Machining</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpAssemblyView" name="ir_assembly_poc">
-                                                    <label class="form-check-label fw-semibold" for="inpAssemblyView">Assembly</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-auto">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpPackView" name="ir_pack_poc">
-                                                    <label class="form-check-label fw-semibold col" for="inpPackView">Packaging and Delivery</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                            </div>
-
-                                            <!-------------------------- Note ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Note :</h4>
-                                                </div>
-                                                <div class="d-flex col-md-10 me-3 gap-5">
-                                                    <textarea name="ir_note" class="form-control" rows="4" id="inpNoteView"></textarea>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                            </div>
-
-                                            <!-------------------------- Comment / Additional  ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Comment / Additional :</h4>
-                                                </div>
-                                                <div class="d-flex col-md-10 me-3 gap-5">
-                                                    <textarea name="ir_comment" class="form-control" rows="4" id="inpCommentView"></textarea>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                            </div>
-
-                                            <!-------------------------- Closeing Date  ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Closeing Date :</h4>
-                                                </div>
-                                                <div class="d-flex col-md-3 me-3 gap-5">
-                                                    <input type="date" class="form-control" id="inpDuedateView" name="ir_duedate" min="" value="">
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!------------------------------------------------------ Section 2  -------------------------------------------------------->
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="row" style="padding: 15px;">
-                                            <div class="col-md-7 d-flex">
-                                                <h4 class="fs-5 fw-semibold me-2">Section 2 : Item Information</h4>
-                                            </div>
-                                            <hr>
-                                        </div>
-                                        <div class="row" style="padding: 15px;">
-                                            <!----------- Table Part No.  ------------>
-                                            <div class="table-responsive mb-5">
-                                                <table class="table table-hover text-wrap mb-0 align-middle table-b text-center bg-info-subtle border rounded shadow-sm" id="tblViewPartNo">
-                                                    <thead class="text-dark fs-4">
-                                                        <tr>
-                                                            <th class="border-bottom-0">
-                                                                <h6 class="fw-semibold mb-0">Part No.</h6>
-                                                            </th>
-                                                            <th class="border-bottom-0">
-                                                                <h6 class="fw-semibold mb-0">Part Name</h6>
-                                                            </th>
-                                                            <th class="border-bottom-0">
-                                                                <h6 class="fw-semibold mb-0">Model</h6>
-                                                            </th>
-                                                            <th class="border-bottom-0">
-                                                                <h6 class="fw-semibold mb-0">Remark</h6>
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody class="border-top text-wrap bg-white" id="tblViewBodyPartNo">
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <hr>
-                                            <div class="row" style="padding: 15px;">
-                                                <div class="col-md-7">
-                                                    <h4 class="fs-5 fw-semibold">Section 3 : Volume Information</h4>
-                                                </div>
-                                            </div>
-                                            <div class="row" style="padding: 15px;">
-
-                                                <!-------------------------- Project Life ---------------------------->
-                                                <div class="d-flex col-md-12 mb-3 align-items-center gap-5">
-                                                    <div class="d-flex col-md-4 align-items-center">
-                                                        <label for="" class="col-md-auto form-label fw-semibold me-3">Project Life :</label>
-
-                                                        <div class="col-md-6 me-3">
-                                                            <input type="number" min="1" max="10" class="form-control" id="inpProjectLifeView" name="ir_pro_life" onchange="" placeholder="Enter Number ..." value="1">
-                                                            <div class="invalid-feedback">
-                                                            </div>
-                                                        </div>
-                                                        <label for="" class="col form-label fw-semibold">Years</label>
-                                                    </div>
-
-                                                    <div class="d-flex col-md-4 align-items-center">
-                                                        <label for="" class="col-md-auto form-label fw-semibold me-3">Program Timing Info :</label>
-                                                        <div class="col">
-                                                            <input type="month" class="form-control" id="inpProTimView" name="ir_pro_tim" onchange="">
-                                                            <span class="invalid-feedback"></span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-5">
-                                                    <!----------- Table Project Life  ------------>
-                                                    <div class="table-responsive border rounded mb-5 shadow-sm">
-                                                        <table class="table text-wrap mb-0 align-middle text-center" id="tblViewProjectLife">
-                                                            <thead class="text-dark fs-4">
-                                                                <tr>
-                                                                    <th class="border-bottom-0 border-end">
-                                                                        <h6 class="fw-semibold mb-0">Year</h6>
-                                                                    </th>
-                                                                    <th class="border-bottom-0">
-                                                                        <h6 class="fw-semibold mb-0">Volume</h6>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody class="border-top text-wrap" id="tblViewBodyProjectLife">
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end Zero Configuration -->
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="reset" class="btn bg-warning-subtle text-warning waves-effect text-start" data-bs-dismiss="modal">
-                    Close
-                </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Modal for Edit RFQ -->
 <div class="modal fade" id="mdlEdit" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header modal-colored-header bg-warning text-white">
-                <h4 class="modal-title text-white me-2" id="warning-header-modalLabel"></h4>
-                <span class="fs-4">( Edit Form )</span>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header d-flex flex-wrap gap-3 mt-3">
+                <div class="d-flex align-items-center flex-grow-1 me-2">
+                    <label class="col-auto fs-5 text-dark fw-semibold me-2" id="myLargeModalLabel">RFQ Document No.</label>
+                    <input type="text" class="form-control flex-grow-1 shadow-sm" id="inpDocNoEdit" name="idc_running_no_edit" value="" placeholder="RFQ Document No." disabled>
+                </div>
+                <div class="d-flex align-items-center flex-grow-1">
+                    <label class="col-auto fs-5 text-dark fw-semibold me-2" id="myLargeModalLabel">Refer RFQ Document No.</label>
+                    <input type="text" class="form-control flex-grow-1 shadow-sm" id="inpDocNoRefEdit" name="idc_refer_doc_edit" value="" placeholder="Ref RFQ Document No." disabled>
+                </div>
             </div>
             <div class="modal-body">
                 <div class="datatables">
@@ -466,7 +179,6 @@
                     <form id="edit_form" name="edit_form" method="post">
                         <div class="row">
                             <div class="col-12">
-
                                 <!------------------------------------------------------ Section 1  -------------------------------------------------------->
                                 <div class="card">
                                     <div class="card-body">
@@ -478,32 +190,22 @@
                                         </div>
                                         <div class="row" style="padding: 15px;">
                                             <!-------------------------- Attn. ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center">
+                                            <div class="d-flex col-md-12 mb-3 align-items-center" name="attn_group">
                                                 <div class="col-md-2">
                                                     <h4 class="mb-2 fs-4 fw-semibold">Attn. :</h4>
                                                 </div>
-                                                <input type="hidden" class="form-control me-2" name="ir_id" id="inpIrIdEdit">
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_pu_dept" id="inpPuDeptEdit">
-                                                    <label class="form-check-label fw-semibold" for="inpPuDeptEdit">PU Dept.</label>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_pe_dept" id="inpPeDeptEdit">
-                                                    <label class="form-check-label fw-semibold" for="inpPeDept">PE Dept.</label>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_scm_dept" id="inpScmDeptEdit">
-                                                    <label class="form-check-label fw-semibold" for="inpScmDeptEdit">SCM Dept.</label>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_ce_dept" id="inpCeDeptEdit">
-                                                    <label class="form-check-label fw-semibold" for="inpCeDept">CE Dept.</label>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_gdc_dept" id="inpGdcDeptEdit">
-                                                    <label class="form-check-label fw-semibold" for="inpGdcDeptEdit">GDC Dept.</label>
-                                                </div>
+                                                <input type="hidden" class="form-control me-2" name="idc_id" id="inpIdcIdEdit">
+                                                <?php
+                                                $option_topic = $this->ManageBackend->list_option("option/list_attn");
+                                                foreach ($option_topic as $topic) {
+                                                    echo '<div class="col-md-2">';
+                                                    echo '<input type="checkbox" class="form-check-input me-2" name="ir_attn[]" id="' . $topic['mda_id'] . '" required>';
+                                                    echo '<label class="form-check-label fw-semibold" for="inpAttn' . $topic['mda_id'] . '">' . $topic['mda_name'] . ' Dept</label>';
+                                                    echo '</div>';
+                                                }
+                                                ?>
                                             </div>
+                                            <span class="invalid-feedback"></span>
 
                                             <!-------------------------- Customer ---------------------------->
                                             <div class="d-flex col-md-12 mb-3 align-items-center">
@@ -512,11 +214,14 @@
                                                 </div>
                                                 <div class="d-flex col-md-10 me-3 gap-5">
                                                     <div class="col">
-                                                        <select name="ir_import_tran" id="inpEditImportFrom" class="form-select"></select>
+                                                        <select name="idc_customer_type" id="inpEditImportFrom" class="select2 form-select">
+                                                            <option value="1">Domestic</option>
+                                                            <option value="2">Overseas</option>
+                                                        </select>
                                                         <span class="invalid-feedback"></span>
                                                     </div>
                                                     <div class="col">
-                                                        <select name="ir_customer" id="inpEditCustomer" class="form-select" onchange="changeEditCustomer()"></select>
+                                                        <select name="idc_customer_name" id="inpEditCustomer" class="select2 form-select" onchange="changeEditCustomer()"></select>
                                                         <span class="invalid-feedback"></span>
                                                     </div>
                                                 </div>
@@ -529,11 +234,11 @@
                                                 </div>
                                                 <div class="d-flex col-md-10 me-3 gap-5">
                                                     <div class="col">
-                                                        <select name="ir_mrt" id="selRequirementEdit" class="form-select" onchange="changeRequirement()"> </select>
+                                                        <select name="mds_id" id="selRequirementEdit" class="select2 form-select" onchange="changeRequirement()"> </select>
                                                         <span class="invalid-feedback"></span>
                                                     </div>
                                                     <div class="col">
-                                                        <input type="text" name="ir_other_mrt" id="inpOtherSubjectEdit" class="form-control" placeholder="Other Subject ..." disabled>
+                                                        <input type="text" name="idc_subject_note" id="inpOtherSubjectEdit" class="form-control" placeholder="Other Subject ..." disabled>
                                                         <span class="invalid-feedback"></span>
                                                     </div>
                                                 </div>
@@ -546,81 +251,62 @@
                                                 </div>
                                                 <div class="d-flex col-md-10 me-3 gap-5">
                                                     <div class="col">
-                                                        <select name="ir_enclosures" id="inpEnclosuresEdit" onchange="changeEnclosures()" class="form-select">
-                                                            <option value="">Select Enclosures</option>
-                                                            <option value="Drawing">Drawing</option>
-                                                            <option value="0">Other</option>
-                                                        </select>
+                                                        <select name="mde_id" id="inpEnclosuresEdit" onchange="changeEnclosures()" class="select2 form-select"></select>
                                                         <span class="invalid-feedback"></span>
                                                     </div>
                                                     <div class="col">
-                                                        <input type="text" name="ir_other_enclosures" id="inpOtherEnclosuresEdit" class="form-control" placeholder="Other Enclosures ..." disabled>
+                                                        <input type="text" name="idc_enclosures_note" id="inpOtherEnclosuresEdit" class="form-control" placeholder="Other Enclosures ..." disabled>
                                                         <span class="invalid-feedback"></span>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <!-------------------------- Purchase Cost ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center">
+                                            <div class="d-flex col-md-12 mb-3 align-items-center" name="mdpu_group">
                                                 <div class="col-md-2">
                                                     <h4 class="mb-2 fs-4 fw-semibold">Purchase Cost :</h4>
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" name="ir_raw_puc" id="inpRawMaterialEdit">
-                                                    <label class="form-check-label fw-semibold" for="inpRawMaterialEdit">Raw material</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpMoldEdit" name="ir_mold_puc">
-                                                    <label class="form-check-label fw-semibold" for="inpMoldEdit">Mold/Die</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpMenuFacEdit" name="ir_menufac_puc">
-                                                    <label class="form-check-label fw-semibold" for="inpMenuFacEdit">Manufacturing</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpTransportEdit" name="ir_transport_puc">
-                                                    <label class="form-check-label fw-semibold" for="inpTransportEdit">Transportation</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
+                                                <?php
+                                                $option_topic = $this->ManageBackend->list_option("option/list_mdpu");
+                                                foreach ($option_topic as $topic) {
+                                                    echo '<div class="col-md-2">';
+                                                    echo '<input type="checkbox" class="form-check-input me-2" name="ir_mdpu[]" id="' . $topic['mdpu_id'] . '">';
+                                                    echo '<label class="form-check-label fw-semibold" for="inpAttn' . $topic['mdpu_id'] . '">' . $topic['mdpu_name'] . '</label>';
+                                                    echo '</div>';
+                                                }
+                                                ?>
                                             </div>
-
+                                            <span class="invalid-feedback"></span>
                                             <!-------------------------- Process Cost ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center">
+                                            <div class="d-flex col-md-12 mb-3 align-items-center" name="mdpc_group">
                                                 <div class="col-md-2">
                                                     <h4 class="mb-2 fs-4 fw-semibold">Process Cost :</h4>
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpCastEdit" name="ir_cast_poc">
-                                                    <label class="form-check-label fw-semibold" for="inpCastEdit">Casting</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpMachinEdit" name="ir_machin_poc">
-                                                    <label class="form-check-label fw-semibold" for="inpMachinEdit">Machining</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpAssemblyEdit" name="ir_assembly_poc">
-                                                    <label class="form-check-label fw-semibold" for="inpAssemblyEdit">Assembly</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
-                                                <div class="col-md-auto">
-                                                    <input type="checkbox" class="form-check-input me-2" id="inpPackEdit" name="ir_pack_poc">
-                                                    <label class="form-check-label fw-semibold" for="inpPackEdit">Packaging and Delivery</label>
-                                                    <span class="invalid-feedback"></span>
-                                                </div>
+                                                <?php
+                                                $option_topic = $this->ManageBackend->list_option("option/list_mdpc");
+                                                foreach ($option_topic as $topic) {
+                                                    if (strlen($topic['mdpc_name']) > 14) {
+                                                        echo '<div class="col-md-3">';
+                                                        echo '<input type="checkbox" class="form-check-input me-2" name="ir_mdpc[]" id="' . $topic['mdpc_id'] . '">';
+                                                        echo '<label class="form-check-label fw-semibold col-auto" for="inpAttn' . $topic['mdpc_id'] . '">' . $topic['mdpc_name'] . '</label>';
+                                                        echo '</div>';
+                                                    } else {
+                                                        echo '<div class="col-md-2">';
+                                                        echo '<input type="checkbox" class="form-check-input me-2" name="ir_mdpc[]" id="' . $topic['mdpc_id'] . '">';
+                                                        echo '<label class="form-check-label fw-semibold col-auto" for="inpAttn' . $topic['mdpc_id'] . '">' . $topic['mdpc_name'] . '</label>';
+                                                        echo '</div>';
+                                                    }
+                                                }
+                                                ?>
                                             </div>
-
+                                            <span class="invalid-feedback"></span>
                                             <!-------------------------- Note ---------------------------->
                                             <div class="d-flex col-md-12 mb-3">
                                                 <div class="col-md-2">
                                                     <h4 class="mb-2 fs-4 fw-semibold">Note :</h4>
                                                 </div>
                                                 <div class="d-flex col-md-10 me-3 gap-5">
-                                                    <textarea name="ir_note" class="form-control" rows="4" id="inpNoteEdit"></textarea>
+                                                    <textarea name="idc_note1" class="form-control" rows="4" id="inpNoteEdit"></textarea>
                                                     <span class="invalid-feedback"></span>
                                                 </div>
                                             </div>
@@ -631,19 +317,31 @@
                                                     <h4 class="mb-2 fs-4 fw-semibold">Comment / Additional :</h4>
                                                 </div>
                                                 <div class="d-flex col-md-10 me-3 gap-5">
-                                                    <textarea name="ir_comment" class="form-control" rows="4" id="inpCommentEdit"></textarea>
+                                                    <textarea name="idc_note2" class="form-control" rows="4" id="inpCommentEdit"></textarea>
                                                     <span class="invalid-feedback"></span>
                                                 </div>
                                             </div>
 
                                             <!-------------------------- Closeing Date  ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3">
+                                            <div class="d-flex col-md-12 mb-3 align-items-center">
                                                 <div class="col-md-2">
                                                     <h4 class="mb-2 fs-4 fw-semibold">Closeing Date :</h4>
                                                 </div>
                                                 <div class="d-flex col-md-3 me-3 gap-5">
-                                                    <input type="date" class="form-control" id="inpDuedateEdit" name="ir_duedate" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d', strtotime('+7 days')); ?>">
+                                                    <input type="date" class="form-control" id="inpDuedateEdit" name="idc_closing_date" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>">
                                                     <span class="invalid-feedback"></span>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex col-md-12 mb-3 align-items-center">
+                                                <div class="col-md-2">
+                                                    <h4 class="mb-2 fs-4 fw-semibold">Phase :</h4>
+                                                </div>
+                                                <div class="d-flex col-md-3 me-5 gap-5">
+                                                    <select class="form-select" id="inpPlantCd" name="idc_plant_cd">
+                                                        <option value="51">Phase 10 (HO)</option>
+                                                        <option value="52">Phase 8 (Branch No. 1)</option>
+                                                    </select>
+                                                    <span class="col-auto invalid-feedback"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -666,6 +364,9 @@
                                                 <table class="table table-hover text-wrap mb-0 align-middle table-b text-center bg-info-subtle border rounded shadow-sm" id="tblPartNo">
                                                     <thead class="text-dark fs-4">
                                                         <tr>
+                                                            <th class="border-bottom-0">
+                                                                <h6 class="fw-semibold mb-0"></h6>
+                                                            </th>
                                                             <th class="border-bottom-0">
                                                                 <h6 class="fw-semibold mb-0">Part No.</h6>
                                                             </th>
@@ -701,7 +402,7 @@
                                                         <label for="" class="col-md-auto form-label fw-semibold me-3">Project Life :</label>
 
                                                         <div class="col-md-6 me-3">
-                                                            <input type="number" min="1" max="10" class="form-control" id="inpProjectLifeEdit" name="ir_pro_life" onchange="changeProLife()" placeholder="Enter Number ..." value="1">
+                                                            <input type="number" min="1" max="10" class="form-control" id="inpProjectLifeEdit" name="idc_project_life" onchange="changeProLife()" placeholder="Enter Number ..." value="1">
                                                             <div class="invalid-feedback">
                                                             </div>
                                                         </div>
@@ -711,7 +412,16 @@
                                                     <div class="d-flex col-md-4 align-items-center">
                                                         <label for="" class="col-md-auto form-label fw-semibold me-3">Program Timing Info :</label>
                                                         <div class="col">
-                                                            <input type="month" class="form-control" id="inpProTimEdit" name="ir_pro_tim" onchange="changeProLife()">
+                                                            <select class="select2 form-select" name="idc_project_start" id="inpProTim" onchange="changeProLife()">
+                                                                <?php
+                                                                echo '<option value="">Choose Year ...</option>';
+                                                                $year_cur = (int)date('Y');
+                                                                $year_end = $year_cur + 20;
+                                                                for ($i = $year_cur; $i <= $year_end; $i++) {
+                                                                    echo '<option value="' . $i . '">' . $i . '</option>';
+                                                                }
+                                                                ?>
+                                                            </select>
                                                             <span class="invalid-feedback"></span>
                                                         </div>
                                                     </div>
@@ -796,24 +506,265 @@
     let dataTable;
     let isProcessing = false;
 
-    async function saveChange(groupPart, groupVolume) {
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeDateInputs('startDate', 'endDate');
+    });
+
+    async function referRFQ(data, type) {
+        $('#mdlEdit #inpDocNoEdit').val(data.idc_running_no);
+        $.ajax({
+            url: API_URL + 'rfq/refer_doc/' + data.idc_refer_doc,
+            method: 'GET',
+            success: function(response) {
+                $('#mdlEdit #inpDocNoRefEdit').val(response.Running_no);
+            }
+        });
+        $('#inpIdcIdEdit').val(data.idc_id);
+        const checkboxesAttn = document.querySelectorAll('input[name="ir_attn[]"]');
+        checkboxesAttn.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        data.idat_item.forEach(id => {
+            checkboxesAttn.forEach(checkbox => {
+                if (checkbox.id === id) {
+                    checkbox.checked = true;
+                }
+            });
+        });
+
+        const selectCus = document.querySelectorAll('select[name="idc_customer_type"]');
+        selectCus.forEach(select => {
+            select.value = data.idc_customer_type;
+        });
+        document.querySelector('#select2-inpEditImportFrom-container').textContent = $('#inpEditImportFrom option:selected').text();
+        document.querySelector('#select2-inpEditImportFrom-container').setAttribute = ('title', $('#inpEditImportFrom option:selected').text());
+
+        const selectCusName = document.querySelectorAll('select[name="idc_customer_name"]');
+        let foundCusName = false;
+        selectCusName.forEach(select => {
+            select.value = data.idc_customer_name;
+            if (select.value == data.idc_customer_name) {
+                foundCusName = true;
+            }
+        });
+        if (!foundCusName && data.idc_customer_name) {
+            const newOption = document.createElement('option');
+            newOption.value = data.idc_customer_name;
+            newOption.textContent = data.idc_customer_name;
+            selectCusName.forEach(select => {
+                select.appendChild(newOption);
+                select.value = data.idc_customer_name;
+            });
+        }
+        document.querySelector('#select2-inpEditCustomer-container').textContent = $('#inpEditCustomer option:selected').text();
+        document.querySelector('#select2-inpEditCustomer-container').setAttribute = ('title', $('#inpEditCustomer option:selected').text());
+
+        const selectSubject = document.querySelectorAll('select[name="mds_id"]');
+        selectSubject.forEach(select => {
+            select.value = data.mds_id;
+        });
+
+        const isOtherSelected = $('#selRequirementEdit option:selected').text() === 'Other';
+        $('#inpOtherSubjectEdit').prop('disabled', !isOtherSelected);
+        $('#inpOtherSubjectEdit').val(isOtherSelected ? data.idc_subject_note : '');
+
+        const selectEnclosures = document.querySelectorAll('select[name="mde_id"]');
+        selectEnclosures.forEach(select => {
+            select.value = data.mde_id;
+        });
+        const isOtherEnclosures = $('#inpEnclosuresEdit option:selected').text() === 'Other';
+        $('#inpOtherEnclosuresEdit').prop('disabled', !isOtherEnclosures);
+        $('#inpOtherEnclosuresEdit').val(isOtherEnclosures ? data.idc_enclosures_note : '');
+
+        const checkboxesIdpu = document.querySelectorAll('input[name="ir_mdpu[]"]');
+        checkboxesIdpu.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        data.idpu_item.forEach(id => {
+            checkboxesIdpu.forEach(checkbox => {
+                if (checkbox.id === id) {
+                    checkbox.checked = true;
+                }
+            });
+        });
+
+        const checkboxesIdpc = document.querySelectorAll('input[name="ir_mdpc[]"]');
+        checkboxesIdpc.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        data.idpc_item.forEach(id => {
+            checkboxesIdpc.forEach(checkbox => {
+                if (checkbox.id === id) {
+                    checkbox.checked = true;
+                }
+            });
+        });
+
+        $('#inpNoteEdit').val(data.idc_note1);
+        $('#inpCommentEdit').val(data.idc_note2);
+        $('#inpDuedateEdit').val(data.idc_closing_date);
+
+        const selectPlant = document.querySelectorAll('select[name="idc_plant_cd"]');
+        selectPlant.forEach(select => {
+            select.value = data.idc_plant_cd;
+        });
+
+        $('#inpProjectLifeEdit').val(data.idc_project_life);
+
+        const selectProgramStart = document.querySelectorAll('select[name="idc_project_start"]');
+        selectProgramStart.forEach(select => {
+            select.value = data.idc_project_start;
+        });
+
+        const tableProLife = document.getElementById('tblProjectLifeEdit').querySelector('tbody');
+        let htmlProLife = '';
+        for (i = 0; i < data.ir_group_volume.length; i++) {
+            htmlProLife += '<tr>';
+            htmlProLife += '<td class="text-center col-6 border-end">' + data.ir_group_volume[i].idv_year + '</td>';
+            htmlProLife += '<td><div class="col"><input type="number" class="form-control text-center col-6" min="0" max="999999" id="inpVolume' + i + '" value="' + data.ir_group_volume[i].idv_qty + '"><span class="invalid-feedback"></span></div></td>';
+            htmlProLife += '</tr>';
+        }
+        tableProLife.innerHTML = htmlProLife;
+    }
+
+    function initializeDateInputs(startDateId, endDateId) {
+        const startDateInput = document.getElementById(startDateId);
+        const endDateInput = document.getElementById(endDateId);
+
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const firstDayOfMonth = `${year}-${(month + 1).toString().padStart(2, '0')}-01`;
+        const lastDayOfMonth = `${year}-${(month + 1).toString().padStart(2, '0')}-${daysInMonth}`;
+
+        startDateInput.value = firstDayOfMonth;
+        endDateInput.value = lastDayOfMonth;
+
+        startDateInput.addEventListener('change', validateDateRange);
+        endDateInput.addEventListener('change', validateDateRange);
+
+        function validateDateRange() {
+            if (new Date(endDateInput.value) < new Date(startDateInput.value)) {
+                endDateInput.value = startDateInput.value;
+            }
+        }
+    }
+    async function checkGroupAttn() {
+        const checkboxContainers = document.querySelectorAll('[name="attn_group"] input[type="checkbox"]');
+        const labelContainers = document.querySelectorAll('[name="attn_group"] label, [name="attn_group"]  h4');
+        let isChecked = false;
+
+        labelContainers.forEach(label => label.classList.remove('text-danger'));
+        checkboxContainers.forEach(checkbox => {
+            if (checkbox.checked) {
+                isChecked = true;
+            }
+        });
+
+        if (!isChecked) {
+            labelContainers.forEach(label => label.classList.add('text-danger'));
+            if (checkboxContainers.length > 0) {
+                checkboxContainers[0].focus();
+            }
+            return false;
+        }
+        return true;
+    }
+    async function checkGroupMdpu() {
+        const checkboxContainers = document.querySelectorAll('[name="mdpu_group"] input[type="checkbox"]');
+        const labelContainers = document.querySelectorAll('[name="mdpu_group"] label, [name="mdpu_group"]  h4');
+        let isChecked = false;
+
+        labelContainers.forEach(label => label.classList.remove('text-danger'));
+        checkboxContainers.forEach(checkbox => {
+            if (checkbox.checked) {
+                isChecked = true;
+            }
+        });
+
+        if (!isChecked) {
+            labelContainers.forEach(label => label.classList.add('text-danger'));
+            if (checkboxContainers.length > 0) {
+                checkboxContainers[0].focus();
+            }
+            return false;
+        }
+        return true;
+    }
+    async function checkGroupMdpc() {
+        const checkboxContainers = document.querySelectorAll('[name="mdpc_group"] input[type="checkbox"]');
+        const labelContainers = document.querySelectorAll('[name="mdpc_group"] label, [name="mdpc_group"]  h4');
+        let isChecked = false;
+
+        labelContainers.forEach(label => label.classList.remove('text-danger'));
+        checkboxContainers.forEach(checkbox => {
+            if (checkbox.checked) {
+                isChecked = true;
+            }
+        });
+
+        if (!isChecked) {
+            labelContainers.forEach(label => label.classList.add('text-danger'));
+            if (checkboxContainers.length > 0) {
+                checkboxContainers[0].focus();
+            }
+            return false;
+        }
+        return true;
+    }
+    async function saveChange(groupPart, groupVolume, mdt_id) {
         if (isProcessing) return;
         isProcessing = true;
-        event.preventDefault();
-        let chk = await Rfq_valid("edit");
 
+        let chkAttn = await checkGroupAttn();
+        if (!chkAttn) {
+            isProcessing = false;
+            return;
+        }
+
+        let chk = await Rfq_valid("edit");
         if (!chk) {
             isProcessing = false;
             return;
         }
 
+        let checkMdpu = await checkGroupMdpu();
+        if (!checkMdpu) {
+            isProcessing = false;
+            return;
+        }
+
+        let checkMdpc = await checkGroupMdpc();
+        if (!checkMdpc) {
+            isProcessing = false;
+            return;
+        }
+
+        form_okValid(document.edit_form.idc_note1);
+        form_okValid(document.edit_form.idc_note2);
+
+        if (document.edit_form.idc_project_life.value < 1 || document.edit_form.idc_project_life.value > 10) {
+            form_errValid(document.edit_form.idc_project_life, '*Please Enter Number 1-10');
+            isProcessing = false;
+            return;
+        } else {
+            form_okValid(document.edit_form.idc_project_life);
+        }
+
+        if (is_empty(document.edit_form.idc_project_start.value)) {
+            form_errValid(document.edit_form.idc_project_start, '*Please Select Program Timing Info');
+            isProcessing = false;
+            return;
+        } else {
+            form_okValid(document.edit_form.idc_project_start);
+        }
+        isProcessing = false;
+
         let groupPartData = [];
         let groupVolumeData = [];
         let hasError = false;
-        const formElements = document.edit_form.querySelectorAll('textarea');
-        formElements.forEach(element => {
-            form_okValid(element);
-        });
 
         $('#tblEditBodyPartNo tr:not(:last)').each(function() {
             if (hasError) return false;
@@ -823,7 +774,7 @@
                 const input = $(this).find('input');
 
                 if (input.length > 0) {
-                    if (input.attr('name') !== 'irpn_remark') {
+                    if (input.attr('name') !== 'idi_remark') {
                         if (is_empty(input.val())) {
                             form_errValid(input[0], "*Please Enter Value");
                             hasError = true;
@@ -888,16 +839,34 @@
         }
         // console.log(groupPartData);
 
+        if (document.edit_form.idc_project_life.value < 1 || document.edit_form.idc_project_life.value > 10) {
+            form_errValid(document.edit_form.idc_project_life, '*Please Enter Project Life 1-10');
+            return;
+        } else {
+            form_okValid(document.edit_form.idc_project_life);
+        }
+
+        if (is_empty(document.edit_form.idc_project_start.value)) {
+            form_errValid(document.edit_form.idc_project_start, '*Please Select Program Timing Info');
+            return;
+        } else {
+            form_okValid(document.edit_form.idc_project_start);
+        }
+
         $('#tblBodyProjectLifeEdit tr').each(function() {
             if (hasError) return false;
 
             let rowData = {};
-            const label = $(this).find('td:first-child label').text().trim();
+            const label = $(this).find('td:first-child').text().trim();
             const inputElement = $(this).find('td:last-child input');
             const inputValue = inputElement.val().trim();
 
             if (is_empty(inputValue)) {
                 form_errValid(inputElement[0], "*Please Enter Value");
+                hasError = true;
+                return false;
+            } else if (inputValue < 1 || inputValue > 999999) {
+                form_errValid(inputElement[0], "*Enter Volume 1-999999");
                 hasError = true;
                 return false;
             } else {
@@ -927,49 +896,66 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var edit_form = {};
-                let groupCheckBox = [{}];
-
+                let groupCheckBoxAttn = [];
                 $('#edit_form').serializeArray().forEach(function(item) {
                     if ($('input[name="' + item.name + '"]').attr('type') === 'checkbox') {
                         return;
                     }
-                    if (item.name == 'irpn_part_no' || item.name == 'irpn_part_name' || item.name == 'irpn_model' || item.name == 'irpn_remark') {
+                    if (item.name == 'idi_item_name' || item.name == 'idi_item_no' || item.name == 'idi_model' || item.name == 'idi_remark') {
                         return;
                     }
-                    if (item.name == 'ir_id' || item.name == 'ir_import_tran' || item.name == 'ir_mrt' || item.name == 'ir_enclosures' || item.name == 'ir_pro_life') {
+                    if (item.name == 'idc_customer_type' || item.name == 'mds_id' || item.name == 'mde_id' || item.name == 'idc_project_life' || item.name == 'idc_refer_doc' || item.name == 'idc_plant_cd') {
                         item.value = parseInt(item.value)
                     }
                     edit_form[item.name] = item.value;
                 });
 
-                $('#edit_form input[type="checkbox"]').each(function() {
-                    groupCheckBox[0][$(this).attr('name')] = $(this).is(':checked') ? 1 : 0;
+                groupPartData.forEach(item => {
+                    if (item.hasOwnProperty('idi_id')) {
+                        item.idi_id = parseInt(item.idi_id, 10);
+                    }
                 });
 
-                if (edit_form["ir_mrt"] == 0) {
-                    edit_form["ir_mrt"] = edit_form["ir_other_mrt"];
-                } else {
-                    edit_form["ir_mrt"] = document.edit_form.ir_mrt.options[document.edit_form.ir_mrt.selectedIndex].text;
+                if (is_empty(edit_form['idc_subject_note'])) {
+                    edit_form['idc_subject_note'] = '';
                 }
 
-                if (edit_form["ir_enclosures"] == 0) {
-                    edit_form["ir_enclosures"] = edit_form["ir_other_enclosures"];
-                } else {
-                    edit_form["ir_enclosures"] = document.edit_form.ir_enclosures.options[document.edit_form.ir_enclosures.selectedIndex].text;
+                if (is_empty(edit_form['idc_enclosures_note'])) {
+                    edit_form['idc_enclosures_note'] = '';
                 }
 
-                edit_form["ir_ref_fm"] = null;
-                edit_form["ir_ref_nbc"] = null;
-                edit_form["ir_created_date"] = getTimeNow();
-                edit_form["ir_created_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-                edit_form["ir_status"] = 1;
+                const checkboxesAttn = document.querySelectorAll('input[name="ir_attn[]"]:checked');
+                const checkedIdsAttn = Array.from(checkboxesAttn).map(checkbox => checkbox.id);
 
-                edit_form["ir_doc_no"] = '';
+                const checkboxesMdpu = document.querySelectorAll('input[name="ir_mdpu[]"]:checked');
+                const checkedIdsMdpu = Array.from(checkboxesMdpu).map(checkbox => checkbox.id);
+
+                const checkboxesMdpc = document.querySelectorAll('input[name="ir_mdpc[]"]:checked');
+                const checkedIdsMdpc = Array.from(checkboxesMdpc).map(checkbox => checkbox.id);
+
+                edit_form["idc_updated_date"] = getTimeNow();
+                edit_form["idc_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                edit_form["idc_result_confirm"] = 0;
+                edit_form["idc_status"] = 1;
+                edit_form["idc_issue_year"] = "<?php echo date('Y') ?>";
+                edit_form["idc_issue_month"] = "<?php echo date('m') ?>";
+                edit_form["idc_issue_seq_no"] = "0";
+                edit_form["mdt_id"] = mdt_id;
+
+                edit_form["idc_issue_date"] = '';
+                edit_form["idc_reply_date"] = '';
+                edit_form["idc_file_path"] = '';
+                edit_form["idc_physical_path"] = '';
+                edit_form["idc_cancel_reason"] = '';
+
                 edit_form["ir_group_part"] = groupPartData;
                 edit_form["ir_group_volume"] = groupVolumeData;
-                edit_form["ir_group_checkbox"] = groupCheckBox;
+                edit_form["idat_item"] = checkedIdsAttn;
+                edit_form["idpu_item"] = checkedIdsMdpu;
+                edit_form["idpc_item"] = checkedIdsMdpc;
+                edit_form["idc_running_no"] = '';
+                edit_form["idc_id"] = chk;
 
-                // console.log(edit_form);
                 $.ajax({
                     type: 'PUT',
                     dataType: 'json',
@@ -988,7 +974,13 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
-                            // $('#mdlEdit').modal('hide');
+                            const formElements = document.edit_form.querySelectorAll('input, select, textarea');
+                            formElements.forEach(element => {
+                                form_defaultValid(element);
+                            });
+                            $('#edit_form .select2').select2();
+                            var dataTable = $('#tblRFQ').DataTable();
+                            dataTable.ajax.reload(null, false);
                         } else {
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Updated RFQ!</p>",
@@ -1012,14 +1004,13 @@
         isProcessing = false;
     }
 
-
-
     async function changeProLife() {
         let proLife = document.getElementById('inpProjectLifeEdit');
-        let proTim = document.getElementById('inpProTimEdit');
+        let proTim = document.getElementById('inpProTim');
 
         if (proLife.value <= 0 || proLife.value > 10) {
             form_errValid(document.getElementById('inpProjectLifeEdit'), "*Please Enter Number 1-10");
+            document.getElementById('tlbBodyProjectLife').innerHTML = '';
             return;
         } else {
             form_okValid(document.getElementById('inpProjectLifeEdit'));
@@ -1028,10 +1019,10 @@
         if (!is_empty(proLife.value) && !is_empty(proTim.value)) {
             let html = '';
             let count = 1;
-            let year = proTim.value.substring(0, 4);
+            let year = proTim.value;
             for (let i = 0; i <= proLife.value; i++) {
                 html += '<tr>' +
-                    '<td class="text-center border-end"><label class="form-label">' + (parseInt(year) + i) + '</label></td>' +
+                    '<td class="text-center col-6 border-end">' + (parseInt(year) + i) + '</td>' +
                     '<td><div class="col"><input type="number" class="form-control text-center col-6" min="0" max="999999" id="inpVolume' + i + '"><span class="invalid-feedback"></span></div></td>' +
                     '</tr>';
             }
@@ -1040,7 +1031,7 @@
     }
 
     async function changeRequirement() {
-        let data = $('#selRequirementEdit').val();
+        let data = $('#selRequirementEdit option:selected').text();
         if (data == 'Other') {
             $('#inpOtherSubjectEdit').prop('disabled', false);
             $('#inpOtherSubjectEdit').focus();
@@ -1050,8 +1041,9 @@
     }
 
     async function changeEnclosures() {
-        let data = $('#inpEnclosuresEdit').val();
-        if (data == '0') {
+        let data = $('#inpEnclosuresEdit option:selected').text();
+
+        if (data == 'Other') {
             $('#inpOtherEnclosuresEdit').prop('disabled', false);
             $('#inpOtherEnclosuresEdit').focus();
         } else {
@@ -1067,33 +1059,13 @@
     }
 
     async function ViewAll() {
+        $('#inpImportFrom').prop('selectedIndex', 0);
+        $('#inpCustomer').val($('#inpCustomer option:first').val()).trigger('change');
+        $('#inpSearchDocNo').val('');
         dataTable
             .search('')
             .columns().search('')
             .draw();
-        $('#inpImportFrom').val('');
-        $('#inpCustomer').val('');
-        $('#inpIssueDate').val('');
-        $('#inpSearchDocNo').val('');
-    }
-
-    async function listImportfrom(id) {
-        $.ajax({
-            type: 'get',
-            url: API_URL + 'option/list_import',
-            success: function(result) {
-                var option_text = '<option value="">Choose Customer Type</option>';
-                $.each(result, function(key, value) {
-                    let sel = "";
-                    if (value.mif_id == id) {
-                        sel = "selected";
-                        chkCus = true;
-                    }
-                    option_text += '<option value="' + value.mif_id + '" ' + sel + '>' + value.mif_name + '</option>';
-                })
-                $('#inpImportFrom').html(option_text);
-            }
-        })
     }
 
     async function listCustomer() {
@@ -1101,12 +1073,13 @@
             type: 'get',
             url: 'http://192.168.161.106/etax_invoice_system_debug/api/customers',
             success: function(result) {
-                var option_text = '<option value="">Choose Costomer Name</option>';
+                var option_text = '<option value="" disabled selected>Choose Costomer Name</option>';
                 $.each(result, function(key, value) {
                     option_text += '<option value="' + value.MC_CUST_ANAME + '">' + value.MC_CUST_ANAME + '&nbsp( ' + value.MC_CUST_CD + ' )' + '</option>';
                 })
                 option_text += '<option value="Other">Other</option>';
                 $('#inpCustomer').html(option_text);
+                $('#inpEditCustomer').html(option_text);
             }
         })
     }
@@ -1166,7 +1139,6 @@
         const elementId = event.target.id
         var customerType = $('#inpImportFrom').val();
         var customerName = $('#inpCustomer').val();
-        var issueDate = $('#inpIssueDate').val();
         var docNo = $('#inpSearchDocNo').val();
 
         if (elementId === "inpCustomer") {
@@ -1205,17 +1177,12 @@
         if (is_empty(customerName)) {
             customerName = '';
         }
-        if (is_empty(issueDate)) {
-            issueDate = '';
-        }
 
         dataTable
             .columns(1)
             .search(customerType)
             .columns(3)
             .search(customerName)
-            .columns(6)
-            .search(issueDate)
             .columns(2)
             .search(docNo)
             .draw();
@@ -1226,24 +1193,26 @@
         if (type == 'view') {
             for (let i = 0; i < data.length; i++) {
                 html += '<tr>';
-                html += '<td>' + data[i].irpn_part_no + '</td>';
-                html += '<td>' + data[i].irpn_part_name + '</td>';
-                html += '<td>' + data[i].irpn_model + '</td>';
-                html += '<td>' + data[i].irpn_remark + '</td>';
+                html += '<td>' + data[i].idi_item_no + '</td>';
+                html += '<td>' + data[i].idi_item_name + '</td>';
+                html += '<td>' + data[i].idi_model + '</td>';
+                html += '<td>' + data[i].idi_remark + '</td>';
                 html += '</tr>';
             }
             document.getElementById('tblViewBodyPartNo').innerHTML = html;
         } else {
             for (let i = 0; i < data.length; i++) {
                 html += '<tr>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="irpn_part_no" value="' + data[i].irpn_part_no + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="irpn_part_name" value="' + data[i].irpn_part_name + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="irpn_model" value="' + data[i].irpn_model + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="irpn_remark" value="' + data[i].irpn_remark + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div><button type="button" onclick="deletePartNoByItem(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnDeletePartNo" name="btnDeletePartNo" data-id="' + data[i].irpn_id + '"><i class="ti ti-trash-x fs-6"></i></button></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="hidden" name="idi_id" value="' + data[i].idi_id + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_no" value="' + data[i].idi_item_no + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_name" value="' + data[i].idi_item_name + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_model" value="' + data[i].idi_model + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_remark" value="' + data[i].idi_remark + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div><button type="button" onclick="deletePartNoByItem(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnDeletePartNo" name="btnDeletePartNo" data-id="' + data[i].idi_id + '"><i class="ti ti-trash-x fs-6"></i></button></td>';
                 html += '</tr>';
             }
             html += '<tr>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="hidden" id="inpId" value="0"><span class="invalid-feedback"></span></div></td>';
             html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartNo" placeholder="Part No"><span class="invalid-feedback"></span></div></td>';
             html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartName" placeholder="Part Name"><span class="invalid-feedback"></span></div></td>';
             html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpModel" placeholder="Model"><span class="invalid-feedback"></span></div></td>';
@@ -1289,10 +1258,11 @@
         const tbody = document.getElementById('tblEditBodyPartNo');
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
-        <td><div class="col"><input class="form-control text-center" type="text" name="irpn_part_no" value="${partNo.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="irpn_part_name" value="${partName.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="irpn_model" value="${model.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="irpn_remark" value="${remark.value.trim()}"><span class="invalid-feedback"></span></div></td>
+        <td><div class="col"><input class="form-control text-center" type="hidden" name="idi_id" value="0"><span class="invalid-feedback"></span></div></td>
+        <td><div class="col"><input class="form-control text-center" type="text" name="idi_item_no" value="${partNo.value.trim()}"><span class="invalid-feedback"></span></div></td>
+        <td><div class="col"><input class="form-control text-center" type="text" name="idi_item_name" value="${partName.value.trim()}"><span class="invalid-feedback"></span></div></td>
+        <td><div class="col"><input class="form-control text-center" type="text" name="idi_model" value="${model.value.trim()}"><span class="invalid-feedback"></span></div></td>
+        <td><div class="col"><input class="form-control text-center" type="text" name="idi_remark" value="${remark.value.trim()}"><span class="invalid-feedback"></span></div></td>
         <td>
             <button type="button" onclick="deletePartNoByItem(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm">
                 <i class="ti ti-trash-x fs-6"></i>
@@ -1380,6 +1350,20 @@
         }
     }
 
+    function listSubject() {
+        $.ajax({
+            type: 'get',
+            url: API_URL + 'option/list_mds',
+            success: function(result) {
+                var option_text = '<option value="" disabled selected>Select Subject</option>';
+                $.each(result, function(key, value) {
+                    option_text += '<option value="' + value.mds_id + '">' + value.mds_name + '</option>';
+                })
+                $('#selRequirementEdit').html(option_text);
+            }
+        })
+    }
+
     async function listEnclosuresView(name, type) {
         const formElem = document.querySelector(type == 'edit' ? 'form[name="edit_form"]' : 'form[name="view_edit_form"]');
         const element = formElem.ir_enclosures;
@@ -1409,144 +1393,182 @@
     }
 
     function editModal(id) {
-        event.preventDefault();
         if ($('#mdlEdit').hasClass('show')) {
             $('#mdlEdit').modal('hide');
         }
-        $('#mdlEdit').modal('show');
-        $.ajax({
-            method: 'GET',
-            url: API_URL + 'rfq/' + id,
-            success: function(data) {
-                if (!data.Error) {
-                    console.log(data);
-                    $('#mdlEdit .modal-header h4').text(data.ir_doc_no);
 
-                    document.edit_form.ir_id.value = data.ir_id;
-                    document.edit_form.ir_pu_dept.checked = data.ir_group_checkbox[0]['ir_pu_dept'] == 1;
-                    document.edit_form.ir_pe_dept.checked = data.ir_group_checkbox[0]['ir_pe_dept'] == 1;
-                    document.edit_form.ir_scm_dept.checked = data.ir_group_checkbox[0]['ir_scm_dept'] == 1;
-                    document.edit_form.ir_ce_dept.checked = data.ir_group_checkbox[0]['ir_ce_dept'] == 1;
-                    document.edit_form.ir_gdc_dept.checked = data.ir_group_checkbox[0]['ir_gdc_dept'] == 1;
-
-                    document.edit_form.ir_raw_puc.checked = data.ir_group_checkbox[0]['ir_raw_puc'] == 1;
-                    document.edit_form.ir_mold_puc.checked = data.ir_group_checkbox[0]['ir_mold_puc'] == 1;
-                    document.edit_form.ir_menufac_puc.checked = data.ir_group_checkbox[0]['ir_menufac_puc'] == 1;
-                    document.edit_form.ir_transport_puc.checked = data.ir_group_checkbox[0]['ir_transport_puc'] == 1;
-
-                    document.edit_form.ir_cast_poc.checked = data.ir_group_checkbox[0]['ir_cast_poc'] == 1;
-                    document.edit_form.ir_machin_poc.checked = data.ir_group_checkbox[0]['ir_machin_poc'] == 1;
-                    document.edit_form.ir_assembly_poc.checked = data.ir_group_checkbox[0]['ir_assembly_poc'] == 1;
-                    document.edit_form.ir_pack_poc.checked = data.ir_group_checkbox[0]['ir_pack_poc'] == 1;
-
-                    document.edit_form.ir_note.value = data.ir_note;
-                    document.edit_form.ir_comment.value = data.ir_comment;
-                    document.edit_form.ir_duedate.value = data.ir_duedate.substring(0, 10);
-
-                    listImportfromView(data.ir_import_tran, 'edit');
-                    listCustomerView(data.ir_customer, 'edit');
-                    listSubjectView(data.mrt_id, 'edit');
-                    listEnclosuresView(data.ir_enclosures, 'edit');
-
-                    listTablePartNo(data.ir_group_part, 'edit');
-                    listTableProLife(data.ir_group_volume, 'edit');
-
-                    document.edit_form.ir_pro_life.value = data.ir_pro_life;
-                    document.edit_form.ir_pro_tim.value = data.ir_sop_tim;
-
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.Error,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $('#mdlEdit').modal('hide');
-                        }
-                    });
-
-                }
-
-                $('#btnSaveChange').on('click', function() {
-                    saveChange(data.ir_group_part, data.ir_group_volume);
-                });
-
+        Swal.fire({
+            title: 'Loading...',
+            text: 'Please wait while we load the data and initialize the form.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
             }
-        })
+        });
+
+        $('#mdlEdit')
+            .off('shown.bs.modal')
+            .on('shown.bs.modal', function() {
+                const modal = $(this);
+
+                new Promise((resolve) => {
+                        modal.find('select.select2').select2({
+                            dropdownParent: modal,
+                            width: '100%'
+                        });
+                        setTimeout(() => resolve(), 100);
+                    })
+                    .then(() => {
+                        return new Promise((resolve, reject) => {
+                            $.ajax({
+                                method: 'GET',
+                                url: API_URL + 'rfq/' + id,
+                                success: function(data) {
+                                    if (!data.Error) {
+                                        referRFQ(data, '( Edit Form )');
+                                        listTablePartNo(data.ir_group_part, 'edit');
+                                        resolve(data);
+                                    } else {
+                                        reject(data.Error);
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    reject('Failed to fetch data.');
+                                }
+                            });
+                        });
+                    })
+                    .then((data) => {
+                        modal.find('select.select2').select2({
+                            dropdownParent: modal,
+                            width: '100%'
+                        });
+                        $('#btnSaveChange')
+                            .off('click')
+                            .on('click', function() {
+                                saveChange(data.ir_group_part, data.ir_group_volume, data.mdt_id);
+                            });
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#mdlEdit').modal('hide');
+                            }
+                        });
+                    })
+                    .finally(() => {
+                        Swal.close();
+                    });
+            });
+
+        $('#mdlEdit').modal('show');
 
         $('#mdlEdit').on('hidden.bs.modal', function() {
             const formElements = document.edit_form.querySelectorAll('input, select, textarea');
             formElements.forEach(element => {
                 form_defaultValid(element);
             });
-
-        })
-
+        });
     }
 
     function viewEditModal(id) {
-        event.preventDefault();
-        $.ajax({
-            method: 'GET',
-            url: API_URL + 'rfq/' + id,
-            success: function(data) {
-                if (!data.Error) {
-                    $('#mdlViewEdit .modal-header h4').text(data.ir_doc_no);
-                    document.querySelectorAll('#view_edit_form input, #view_edit_form select,  #view_edit_form textarea').forEach(element => element.disabled = true);
+        if ($('#mdlEdit').hasClass('show')) {
+            $('#mdlEdit').modal('hide');
+        }
 
-                    document.view_edit_form.ir_pu_dept.checked = data.ir_group_checkbox[0]['ir_pu_dept'] == 1;
-                    document.view_edit_form.ir_pe_dept.checked = data.ir_group_checkbox[0]['ir_pe_dept'] == 1;
-                    document.view_edit_form.ir_scm_dept.checked = data.ir_group_checkbox[0]['ir_scm_dept'] == 1;
-                    document.view_edit_form.ir_ce_dept.checked = data.ir_group_checkbox[0]['ir_ce_dept'] == 1;
-                    document.view_edit_form.ir_gdc_dept.checked = data.ir_group_checkbox[0]['ir_gdc_dept'] == 1;
-
-                    document.view_edit_form.ir_raw_puc.checked = data.ir_group_checkbox[0]['ir_raw_puc'] == 1;
-                    document.view_edit_form.ir_mold_puc.checked = data.ir_group_checkbox[0]['ir_mold_puc'] == 1;
-                    document.view_edit_form.ir_menufac_puc.checked = data.ir_group_checkbox[0]['ir_menufac_puc'] == 1;
-                    document.view_edit_form.ir_transport_puc.checked = data.ir_group_checkbox[0]['ir_transport_puc'] == 1;
-
-                    document.view_edit_form.ir_cast_poc.checked = data.ir_group_checkbox[0]['ir_cast_poc'] == 1;
-                    document.view_edit_form.ir_machin_poc.checked = data.ir_group_checkbox[0]['ir_machin_poc'] == 1;
-                    document.view_edit_form.ir_assembly_poc.checked = data.ir_group_checkbox[0]['ir_assembly_poc'] == 1;
-                    document.view_edit_form.ir_pack_poc.checked = data.ir_group_checkbox[0]['ir_pack_poc'] == 1;
-
-                    listSubjectView(data.mrt_id, 'view');
-                    listEnclosuresView(data.ir_enclosures, 'view');
-
-                    document.view_edit_form.ir_note.value = data.ir_note;
-                    document.view_edit_form.ir_comment.value = data.ir_comment;
-                    document.view_edit_form.ir_duedate.value = data.ir_duedate.substring(0, 10);
-
-                    listImportfromView(data.ir_import_tran, 'view');
-                    listCustomerView(data.ir_customer, 'view');
-                    listTablePartNo(data.ir_group_part, 'view');
-                    listTableProLife(data.ir_group_volume, 'view');
-
-                    document.view_edit_form.ir_pro_life.value = data.ir_pro_life;
-                    document.view_edit_form.ir_pro_tim.value = data.ir_sop_tim;
-
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.Error,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $('#mdlViewEdit').modal('hide');
-                        }
-                    });
-
-                }
+        Swal.fire({
+            title: 'Loading...',
+            text: 'Please wait while we load the data and initialize the form.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
             }
-        })
+        });
+
+        $('#mdlEdit')
+            .off('shown.bs.modal')
+            .on('shown.bs.modal', function() {
+                const modal = $(this);
+                new Promise((resolve) => {
+                        modal.find('select.select2').select2({
+                            dropdownParent: modal,
+                            width: '100%'
+                        });
+                        setTimeout(() => resolve(), 100);
+                    })
+                    .then(() => {
+                        return new Promise((resolve, reject) => {
+                            $.ajax({
+                                method: 'GET',
+                                url: API_URL + 'rfq/' + id,
+                                success: function(data) {
+                                    if (!data.Error) {
+                                        referRFQ(data, '( View Only )');
+                                        listTablePartNo(data.ir_group_part, 'edit');
+                                        resolve(data);
+                                        document.querySelectorAll('#edit_form input, #edit_form select,  #edit_form textarea, #edit_form button').forEach(element => element.disabled = true);
+                                        $('#btnSaveChange').hide();
+                                        $('#edit_form *').css('cursor', 'not-allowed');
+                                    } else {
+                                        reject(data.Error);
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    reject('Failed to fetch data.');
+                                }
+                            });
+                        });
+                    })
+                    .then((data) => {
+                        modal.find('select.select2').select2({
+                            dropdownParent: modal,
+                            width: '100%'
+                        });
+                        $('#btnSaveChange')
+                            .off('click')
+                            .on('click', function() {
+                                saveChange(data.ir_group_part, data.ir_group_volume, data.mdt_id);
+                            });
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#mdlEdit').modal('hide');
+                            }
+                        });
+                    })
+                    .finally(() => {
+                        Swal.close();
+                    });
+            });
+
+        $('#mdlEdit').modal('show');
+
+        $('#mdlEdit').on('hidden.bs.modal', function() {
+            const formElements = document.edit_form.querySelectorAll('input, select, textarea');
+            formElements.forEach(element => {
+                form_defaultValid(element);
+            });
+            document.querySelectorAll('#edit_form input, #edit_form select,  #edit_form textarea, #edit_form button').forEach(element => element.disabled = false);
+            $('#btnSaveChange').show();
+            $('#edit_form *').css('cursor', 'pointer');
+        });
     }
 
     async function changeEditCustomer() {
-        const customerInput = document.edit_form.ir_customer.value;
+        const customerInput = $('#inpEditCustomer').val();
 
         if (customerInput === 'Other') {
             $('#customCustomerModal').modal('show');
@@ -1616,19 +1638,19 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'irpn_part_no',
+                    data: 'idi_item_no',
                 },
                 {
                     className: 'text-center',
-                    data: 'irpn_part_name',
+                    data: 'idi_item_name',
                 },
                 {
                     className: 'text-center',
-                    data: 'irpn_model',
+                    data: 'idi_model',
                 },
                 {
                     className: 'text-center',
-                    data: 'irpn_remark',
+                    data: 'idi_remark',
                 }
             ]
         });
@@ -1660,24 +1682,16 @@
             type: 'get',
             url: API_URL + 'rfq/' + ir_id,
             success: async function(result) {
-
                 let param = {
                     ...result
                 };
 
-                let IssueDate = param.ir_created_date.split(" ")[0];
-                param.ir_created_date = formatDate(IssueDate);
+                let IssueDate = param.idc_created_date.split(" ")[0];
+                param.idc_created_date = formatDate(IssueDate);
 
-                let Duedate = param.ir_duedate.split(" ")[0];
-                param.ir_duedate = formatDate(Duedate);
+                let Duedate = param.idc_closing_date.split(" ")[0];
+                param.idc_closing_date = formatDate(Duedate);
 
-                param.ir_sop_tim = param.ir_sop_tim.substring(0, 4);
-
-                if (param.ir_ref_nbc == 0) {
-                    param.ir_ref_nbc = '';
-                }
-
-                // console.log(param);
                 let pdfUrl = '<?php echo base_url(); ?>RfqForm/createPDF?' + $.param(param);
                 window.open(pdfUrl, '_blank');
             }
@@ -1686,6 +1700,7 @@
 
     function rfqCancel(id) {
         event.preventDefault();
+        let userID = '<?php echo $this->session->userdata('sessUsr'); ?>';
         Swal.fire({
             title: 'Are you sure?',
             text: "Do you want to cancel RFQ?",
@@ -1701,7 +1716,58 @@
                 const cancelReason = result.value;
                 $.ajax({
                     method: 'PUT',
-                    url: API_URL + 'rfq/cancel/' + id + '/' + cancelReason,
+                    url: API_URL + 'rfq/cancel/' + id + '/' + cancelReason + '/' + userID,
+                    success: function(data) {
+                        if (data != false) {
+                            Swal.fire({
+                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Cancel RFQ Success!</p>",
+                                icon: 'success',
+                                showClass: {
+                                    popup: 'animate__animated animate__fadeInDown'
+                                },
+                                hideClass: {
+                                    popup: 'animate__animated animate__fadeOutUp'
+                                }
+                            })
+                            var dataTable = $('#tblRFQ').DataTable();
+                            dataTable.ajax.reload(null, false);
+                        } else {
+                            Swal.fire({
+                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Cancel RFQ!</p>",
+                                icon: 'error',
+                                showClass: {
+                                    popup: 'animate__animated animate__fadeInDown'
+                                },
+                                hideClass: {
+                                    popup: 'animate__animated animate__fadeOutUp'
+                                }
+                            })
+                            var dataTable = $('#tblRFQ').DataTable();
+                            dataTable.ajax.reload(null, false);
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+    function genNBC(id) {
+        event.preventDefault();
+        let userID = '<?php echo $this->session->userdata('sessUsr'); ?>';
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to Genarate NBC?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const cancelReason = result.value;
+                $.ajax({
+                    method: 'GET',
+                    url: API_URL + 'rfq/checkApprove/' + id,
                     success: function(data) {
                         if (data != false) {
                             Swal.fire({
@@ -1738,6 +1804,7 @@
 
     function rfqReverse(id) {
         event.preventDefault();
+        let userID = '<?php echo $this->session->userdata('sessUsr'); ?>';
         Swal.fire({
             title: 'Are you sure?',
             text: "Do you want to reverse RFQ?",
@@ -1750,7 +1817,7 @@
             if (result.isConfirmed) {
                 $.ajax({
                     method: 'PUT',
-                    url: API_URL + 'rfq/reverse/' + id,
+                    url: API_URL + 'rfq/reverse/' + id + '/' + userID,
                     success: function(data) {
                         if (data != false) {
                             Swal.fire({
@@ -1788,18 +1855,87 @@
     function rfqSubmit(id) {
         event.preventDefault();
         Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to submit RFQ?",
+            title: 'Do you want to generate another document?',
+            html: `
+                    <div class="row border-top p-3">
+                        <div class="col-md-4 align-items-center border-end" style="border-width: 2px !important; border-color:rgb(186, 203, 250) !important">
+                            <div class="form-check d-flex">
+                                <input type="checkbox" class="form-check-input me-2" id="nbcCheck">
+                                <span class="invalid-feedback"></span>
+                                <label class="form-check-label fw-semibold text-primary" for="nbcCheck">NBC</label>
+                            </div>
+                            <div class="form-check d-flex">
+                                <input type="checkbox" class="form-check-input me-2" id="feasibilityCheck">
+                                <span class="invalid-feedback"></span>
+                                <label class="form-check-label fw-semibold text-primary" for="feasibilityCheck">Feasibility</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="align-items-center">
+                                <label class="col-auto me-2 fs-3 fw-semibold d-flex justtify-content-start mb-1 px-1" for="intReplydate">NBC Reply Date:</label>
+                                <div class="col-10">
+                                    <input type="date" id="intReplydate" name="idc_reply_date" class="form-control form-control-sm" min="<?php echo date('Y-m-d'); ?>">
+                                    <span class="invalid-feedback fs-2"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="mt-3 fw-semibold fs-4">If you're sure, please click submit for get approval. </lab>
+                    </div>
+                `,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, submit it!'
+            confirmButtonText: 'Yes, submit it!',
+            didOpen: () => {
+                setTimeout(() => {
+                    const content = document.querySelector('.swal2-html-container');
+                    if (content) {
+                        content.style.overflowX = 'hidden';
+                    }
+                }, 100);
+            },
+            preConfirm: () => {
+                const nbcCheck = document.getElementById('nbcCheck').checked;
+                const feasibilityCheck = document.getElementById('feasibilityCheck').checked;
+                const intReplydate = document.getElementById('intReplydate').value;
+                if (nbcCheck && is_empty(intReplydate)) {
+                    let inpReply = document.getElementById('intReplydate');
+                    form_errValid(inpReply, '*Please select NBC Reply Date.');
+                    return false;
+                }
+                if (!nbcCheck && intReplydate) {
+                    let inpReply = document.getElementById('intReplydate');
+                    form_errValid(inpReply, '*Please check NBC box.');
+                    return false;
+                }
+                return {
+                    nbcCheck,
+                    feasibilityCheck,
+                    intReplydate
+                };
+            }
         }).then((result) => {
             if (result.isConfirmed) {
+                const nbcCheck = result.value.nbcCheck;
+                const feasibilityCheck = result.value.feasibilityCheck;
+                const intReplydate = result.value.intReplydate;
+                const createDate = '<?php echo date('Y-m-d H:i:s'); ?>';
+                const userID = '<?php echo $this->session->userdata('sessUsr'); ?>';
+                var data = {
+                    nbcCheck: nbcCheck,
+                    feasibilityCheck: feasibilityCheck,
+                    intReplydate: intReplydate,
+                    createDate: createDate,
+                    createBy: userID
+                }
+                console.log(data);
                 $.ajax({
                     method: 'PUT',
                     url: API_URL + 'rfq/submit/' + id,
+                    data: JSON.stringify(data),
+                    dataType: 'json',
                     success: function(data) {
                         if (data != false) {
                             Swal.fire({
@@ -1834,17 +1970,19 @@
         })
     }
 
-    function showStatus(status) {
+    function showStatus(status, id) {
         if (status == 1) {
-            return '<span class="badge bg-info-subtle text-info fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-send fs-4"></i>Open</span>'
-        } else if (status == 5) {
-            return '<span class="badge bg-warning-subtle text-warning fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-clock-hour-4 fs-4"></i>Wait Approve</span>'
+            return '<span class="badge bg-info-subtle text-info fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-send fs-4"></i>Open</span>';
+        } else if (status == 2) {
+            return '<span class="badge bg-warning-subtle text-warning fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-clock-hour-4 fs-4"></i>Wait Approve</span>';
         } else if (status == 6) {
-            return '<span class="badge text-perple fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #ffafbb !important; color: #C7253E !important"><i class="ti ti-repeat-off fs-4"></i>Rejected</span>'
+            return '<span class="badge text-perple fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #ffafbb !important; color: #C7253E !important"><i class="ti ti-repeat-off fs-4"></i>Rejected</span>';
         } else if (status == 9) {
-            return '<span class="badge bg-success-subtle text-success fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-check fs-4"></i>Approved</span>'
+            return '<span class="badge bg-success-subtle text-success fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-check fs-4"></i>Approved</span>';
+        } else if (status == 5) {
+            return '<span class="badge bg-danger-subtle text-danger fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-x fs-4"></i>Cancel</span>';
         } else {
-            return '<span class="badge bg-danger-subtle text-danger fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-x fs-4"></i>Cancel</span>'
+            return '';
         }
     }
 
@@ -1865,51 +2003,82 @@
                     <i class="ti ti-x" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
-        } else if (status == 5) {
+        } else if (status == 2) {
             return `
             <div class="d-flex justify-content-evenly gap-1">
                 <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
-                    <i class="ti ti-zoom-exclamation" data-bs-target="#mdlViewEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
+                    <i class="ti ti-zoom-exclamation" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
                 </button>
                 <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
                     <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
         } else if (status == 9) {
+            let html = '';
+            $.ajax({
+                method: 'GET',
+                url: API_URL + 'rfq/checkApprove/' + id,
+                dataType: 'json',
+                success: function(data) {
+                    console.log(data);
+                    if (data) {
+                        html += ``;
+                    } else {
+                        html += `<button id="btnPDF" onclick="genNBC(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate NBC">
+                                    <i class="ti ti-checklist" style="font-size: 1.5rem !important;"></i>
+                                </button>`;
+                    }
+                }
+            })
             return `
             <div class="d-flex justify-content-evenly gap-1">
                 <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
-                    <i class="ti ti-zoom-exclamation" data-bs-target="#mdlViewEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
+                    <i class="ti ti-zoom-exclamation" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
                 </button>
                 <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
                     <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
                 </button>
-                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate NBC">
-                    <i class="ti ti-checklist" style="font-size: 1.5rem !important;"></i>
-                </button>
+                ${html}
             </div>`;
-        } else {
+        } else if (status == 5) {
             return `
             <div class="d-flex justify-content-evenly gap-1">
                 <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
-                    <i class="ti ti-zoom-exclamation" data-bs-target="#mdlViewEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
+                    <i class="ti ti-zoom-exclamation" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
                 </button>
                 <button type="button" onclick="rfqReverse(${id})" class="btn bg-info-subtle text-info rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Reverse">
                     <i class="ti ti-arrow-back-up" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
+        } else {
+            return '';
         }
     }
 
-    $(document).ready(function() {
-        listImportfrom();
-        listCustomer();
+    function listEnclosures() {
+        $.ajax({
+            type: 'get',
+            url: API_URL + 'option/list_mde',
+            success: function(result) {
+                var option_text = '<option value="" disabled selected>Select Enclosures</option>';
+                $.each(result, function(key, value) {
+                    option_text += '<option value="' + value.mde_id + '">' + value.mde_name + '</option>';
+                })
+                $('#inpEnclosuresEdit').html(option_text);
+            }
+        })
+    }
+
+    function searchDate() {
+        event.preventDefault();
         if ($.fn.DataTable.isDataTable('#tblRFQ')) {
             $('#tblRFQ').DataTable().destroy();
         }
+        let stratDate = $('#startDate').val();
+        let endDate = $('#endDate').val();
         dataTable = $('#tblRFQ').DataTable({
             ajax: {
-                url: API_URL + 'rfq/table'
+                url: API_URL + 'rfq/table/RFQ/' + stratDate + '/' + endDate,
             },
             columnDefs: [{
                 searchable: true,
@@ -1923,34 +2092,34 @@
             ],
             columns: [{
                     className: 'text-center',
-                    data: 'ir_id'
+                    data: 'idc_id'
                 },
                 {
                     className: 'text-center col-1',
-                    data: 'ir_import_tran',
+                    data: 'idc_customer_type',
                     render: function(data, type, row) {
-                        if (row.ir_import_tran == 1) {
+                        if (row.idc_customer_type == 1) {
                             return 'Overseas';
-                        } else if (row.ir_import_tran == 2) {
+                        } else if (row.idc_customer_type == 2) {
                             return 'Domestic';
                         }
                     }
                 },
                 {
                     className: 'text-center',
-                    data: 'ir_doc_no',
+                    data: 'idc_running_no',
                 },
                 {
                     className: 'text-center',
-                    data: 'ir_customer',
+                    data: 'idc_customer_name',
                 },
                 {
                     className: 'text-center',
-                    data: 'ir_id',
+                    data: 'idc_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
                             disp = '<div class="d-flex justify-content-around gap-1">' +
-                                '<button type="button" onclick="modalPartno(\'' + row.ir_id + '\' , \'' + row.ir_doc_no + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
+                                '<button type="button" onclick="modalPartno(\'' + row.idc_id + '\' , \'' + row.idc_running_no + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
                                 '</div>';
                         }
                         return disp;
@@ -1958,32 +2127,32 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'ir_status',
+                    data: 'idc_status',
                     "render": function(data, type, row) {
-                        return showStatus(row.ir_status);
+                        return showStatus(row.idc_status);
                     }
                 },
                 {
                     className: 'text-center',
-                    data: 'ir_created_date',
+                    data: 'idc_created_date',
                     "render": function(data, type, row) {
-                        return row.ir_created_date.substring(0, 10);
+                        return row.idc_created_date.substring(0, 10);
                     }
                 },
                 {
                     className: 'text-center',
-                    data: 'ir_created_by',
+                    data: 'idc_created_by',
                     "render": function(data, type, row) {
                         if (type === 'display') {
                             if (row.create_by != "") {
-                                let emp_code = row.ir_created_by.substring(2, 7);
+                                let emp_code = row.idc_created_by.substring(2, 7);
                                 let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
                                 disp = '<div class="d-flex align-items-center justify-content-center">' +
                                     '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
                                     '<div class="ms-3">' +
                                     '<div class="user-meta-info">' +
                                     '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + '</h6>' +
-                                    '<span class="user-work fs-3" data-occupation="' + row.ir_created_by + '">' + row.ir_created_by + '</span>' +
+                                    '<span class="user-work fs-3" data-occupation="' + row.idc_created_by + '">' + row.idc_created_by + '</span>' +
                                     '</div></div></div>';
                             } else {
                                 disp = "";
@@ -1994,9 +2163,146 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'ir_id',
+                    data: 'idc_id',
                     "render": function(data, type, row) {
-                        return showbtnAction(row.ir_status, row.ir_id);
+                        return showbtnAction(row.idc_status, row.idc_id);
+                    }
+                }
+            ]
+        });
+
+        dataTable.on('order.dt search.dt', function() {
+            let i = 1;
+            dataTable.cells(null, 0, {
+                search: 'applied',
+                order: 'applied'
+            }).every(function(cell) {
+                this.data(i++);
+            });
+        }).draw();
+        dataTable.on('draw', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+        setInterval(function() {
+            dataTable.ajax.reload(null, false);
+        }, 600000);
+    }
+
+    $(document).ready(function() {
+
+        listCustomer();
+        listSubject();
+        listEnclosures();
+        $('#inpCustomer').select2();
+        $('.select2-container--default .select2-selection--single, .select2-container--default .select2-selection__rendered').css({
+            'height': '30px',
+            'line-height': '30px',
+            'font-size': '12px',
+        });
+        $('.select2-container--default .select2-selection__arrow').css({
+            'height': '35px',
+            'line-height': '35px',
+        });
+
+
+        if ($.fn.DataTable.isDataTable('#tblRFQ')) {
+            $('#tblRFQ').DataTable().destroy();
+        }
+        let stratDate = $('#startDate').val();
+        let endDate = $('#endDate').val();
+        dataTable = $('#tblRFQ').DataTable({
+            ajax: {
+                url: API_URL + 'rfq/table/RFQ/' + stratDate + '/' + endDate,
+            },
+            columnDefs: [{
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }, ],
+            scrollX: true,
+            bSort: false,
+            order: [
+                [1, 'asc']
+            ],
+            columns: [{
+                    className: 'text-center',
+                    data: 'idc_id'
+                },
+                {
+                    className: 'text-center col-1',
+                    data: 'idc_customer_type',
+                    render: function(data, type, row) {
+                        if (row.idc_customer_type == 1) {
+                            return 'Overseas';
+                        } else if (row.idc_customer_type == 2) {
+                            return 'Domestic';
+                        }
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'idc_running_no',
+                },
+                {
+                    className: 'text-center',
+                    data: 'idc_customer_name',
+                },
+                {
+                    className: 'text-center',
+                    data: 'idc_id',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            disp = '<div class="d-flex justify-content-around gap-1">' +
+                                '<button type="button" onclick="modalPartno(\'' + row.idc_id + '\' , \'' + row.idc_running_no + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
+                                '</div>';
+                        }
+                        return disp;
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'idc_status',
+                    "render": function(data, type, row) {
+                        return showStatus(row.idc_status);
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'idc_created_date',
+                    "render": function(data, type, row) {
+                        return row.idc_created_date.substring(0, 10);
+                    }
+                },
+                {
+                    className: 'text-center',
+                    data: 'idc_created_by',
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (row.create_by != "") {
+                                let emp_code = row.idc_created_by.substring(2, 7);
+                                let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
+                                disp = '<div class="d-flex align-items-center justify-content-center">' +
+                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+                                    '<div class="ms-3">' +
+                                    '<div class="user-meta-info">' +
+                                    '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + '</h6>' +
+                                    '<span class="user-work fs-3" data-occupation="' + row.idc_created_by + '">' + row.idc_created_by + '</span>' +
+                                    '</div></div></div>';
+                            } else {
+                                disp = "";
+                            }
+                        }
+                        return disp;
+                    },
+                },
+                {
+                    className: 'text-center',
+                    data: 'idc_id',
+                    "render": function(data, type, row) {
+                        return showbtnAction(row.idc_status, row.idc_id);
                     }
                 }
             ]

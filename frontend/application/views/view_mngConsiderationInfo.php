@@ -28,7 +28,7 @@
                         <ul class="nav nav-pills nav-fill" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <a class="nav-link active" data-bs-toggle="tab" href="#navpill-111" role="tab" aria-selected="true">
-                                    <span>Incharge</span>
+                                    <span>Consideration Item Detail</span>
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
@@ -47,49 +47,62 @@
                                                     <i class="ti ti-file-text text-primary fs-6"></i>
                                                 </div>
                                                 <div>
-                                                    <h4 class="mb-1 fs-4 fw-semibold">Register Incharge</h4>
+                                                    <h4 class="mb-1 fs-4 fw-semibold">Register Consideration Item Detail</h4>
                                                     <p class="fs-3 mb-0">Input for register</p>
                                                 </div>
                                             </div>
-                                            <div class="col-lg">
-                                                <div class="mb-3 row align-items-center">
-                                                    <label for="selTitle" class="form-label fw-semibold col-sm-3 col-form-label">Title</label>
-                                                    <div class="col-sm-8">
-                                                        <select class="form-control" id="selTitle">
-                                                            <option value="" selected disabled>Choose title</option>
-                                                            <?php
-                                                            $option_consider = $this->ManageBackend->list_option("option/list_mc");
-                                                            foreach ($option_consider as $consider) {
-                                                                echo '<option value="' . $consider['mc_id'] . '">' . $consider['mc_title'] . '</option>';
-                                                            }
-                                                            ?>
-                                                        </select>
-                                                        <span class="form_error"></span>
+                                            <form class="row" id="add_form" method="post">
+                                                <div class="col-lg">
+                                                    <div class="mb-3 row align-items-center">
+                                                        <label for="selConsern" class="form-label fw-semibold col-auto col-form-label">Topic</label>
+                                                        <div class="col-sm-8">
+                                                            <select class="form-select" id="selConsern" name="mci_id">
+                                                                <option value="" selected disabled>Choose Topic</option>
+                                                                <?php
+                                                                $option_topic = $this->ManageBackend->list_option("option/list_mc");
+                                                                $number = 1;
+                                                                foreach ($option_topic as $topic) {
+                                                                    echo '<option value="' . $topic['mci_id'] . '">' . $number . ' ) ' . $topic['mci_name'] . '</option>';
+                                                                    $number++;
+                                                                }
+                                                                ?>
+                                                            </select>
+                                                            <span class="form_error"></span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg">
-                                                <div class="mb-3 row align-items-center">
-                                                    <label for="selDept" class="form-label fw-semibold col-sm-3 col-form-label">Department</label>
-                                                    <div class="col-sm-8">
-                                                        <select class="form-control" id="selDept">
-                                                            <option value="" selected disabled>Choose department</option>
-                                                            <?php
-                                                            $option_dept = $this->ManageBackend->list_option("option/list_department");
-                                                            foreach ($option_dept as $dept) {
-                                                                echo '<option value="' . $dept['sd_id'] . '">' . $dept['sd_dept_name'] . '</option>';
-                                                            }
-                                                            ?>
-                                                        </select>
-                                                        <span class="form_error"></span>
+                                                <div class="col-lg">
+                                                    <div class="mb-3 row align-items-center">
+                                                        <label for="selWeight" class="form-label fw-semibold col-auto col-form-label">Weight</label>
+                                                        <div class="col-sm-8">
+                                                            <input type="number" class="form-control" id="selWeight" name="mcip_weight" placeholder="Enter Weight 0 - 5" min="0" max="5" step="0.25">
+                                                            <span class="form_error"></span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <button type="button" class="btn btn btn-primary" id="btnRegisterConsiderationDetail" onclick="addIncharge()">
-                                                    <i class="ti ti-plus me-1"></i> Register
-                                                </button>
-                                            </div>
+                                                <div class="col-lg">
+                                                    <div class="mb-3 row align-items-center">
+                                                        <label for="selDept" class="form-label fw-semibold col-auto col-form-label">Department</label>
+                                                        <div class="col-sm-8">
+                                                            <select class="form-select" id="selDept" name="sd_id">
+                                                                <option value="" selected disabled>Choose department</option>
+                                                                <?php
+                                                                $option_dept = $this->ManageBackend->list_option("option/list_department");
+                                                                foreach ($option_dept as $dept) {
+                                                                    echo '<option value="' . $dept['sd_id'] . '">' . '( ' . $dept['sd_dept_aname'] . ' ) ' . $dept['sd_dept_name'] . '</option>';
+                                                                }
+                                                                ?>
+                                                            </select>
+                                                            <span class="form_error"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <button type="button" class="btn btn btn-primary" id="btnRegisterConsiderationDetail" onclick="addIncharge()">
+                                                        <i class="ti ti-plus me-1"></i> Register
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
                                         <div class="row border" style="padding: 15px;">
                                             <div class="hstack mb-3 pb-1">
@@ -107,8 +120,9 @@
                                                         <!-- start row -->
                                                         <tr>
                                                             <th>No.</th>
-                                                            <th>Consideration</th>
-                                                            <th>Incharge</th>
+                                                            <th>Consideration Name</th>
+                                                            <th>Weight</th>
+                                                            <th>Department</th>
                                                             <th>Updated Date</th>
                                                             <th>Updated By</th>
                                                             <th>Status</th>
@@ -137,9 +151,9 @@
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="mb-3 row align-items-center">
-                                                    <label for="inpTitle" class="form-label fw-semibold col-sm-3 col-form-label">Title</label>
-                                                    <div class="col-lg-12">
-                                                        <input type="text" id="inpTitle" class="form-control" placeholder="Enter Title">
+                                                    <label for="inpTitle" class="form-label fw-semibold col-auto col-form-label">Calculate Name</label>
+                                                    <div class="col-lg-10">
+                                                        <input type="text" id="inpTitle" class="form-control" placeholder="Enter Name">
                                                         <span class="form_error"></span>
                                                     </div>
                                                 </div>
@@ -178,7 +192,7 @@
                                                         <!-- start row -->
                                                         <tr>
                                                             <th>No.</th>
-                                                            <th>Name</th>
+                                                            <th>Consideration Name</th>
                                                             <th>Calculate Type</th>
                                                             <th>Updated Date</th>
                                                             <th>Updated By</th>
@@ -212,7 +226,7 @@
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
                 <h4 class="modal-title" id="myLargeModalLabel">
-                    Edits Incharge
+                    Edits Item Consideration
                 </h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -220,20 +234,27 @@
                 <form id="frmEditConsideration" name="frmEditConsideration">
                     <div class="container-fluid">
                         <div class="mb-3 row align-items-center">
-                            <label for="edtmc" class="form-label fw-semibold col-sm-3 col-form-label">Title</label>
+                            <label for="edtMci" class="form-label fw-semibold col-sm-3 col-form-label">Topic</label>
                             <div class="col-sm-9">
-                                <select class="form-control" id="edtmc" name="mc_id"></select>
+                                <select class="form-select" id="edtMci" name="mci_id"></select>
+                                <span class="form_error"></span>
+                            </div>
+                        </div>
+                        <div class="mb-3 row align-items-center">
+                            <label for="edtWeight" class="form-label fw-semibold col-sm-3 col-form-label">Weight</label>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" id="edtWeight" name="mcip_weight" min="0" max="5" step="0.25">
                                 <span class="form_error"></span>
                             </div>
                         </div>
                         <div class="mb-3 row align-items-center">
                             <label for="edtDept" class="form-label fw-semibold col-sm-3 col-form-label">Department</label>
                             <div class="col-sm-9">
-                                <select class="form-control" id="edtDept" name="sd_id"></select>
+                                <select class="form-select" id="edtDept" name="sd_id"></select>
                                 <span class="form_error"></span>
                             </div>
                         </div>
-                        <input type="hidden" id="Incharge_id" name="mci_id">
+                        <input type="hidden" id="item_id" name="mcip_id">
                     </div>
             </div>
             <div class="modal-footer">
@@ -436,10 +457,10 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var status_form = {};
-                status_form["mc_id"] = id;
-                status_form["mc_status"] = status;
-                status_form["update_date"] = getTimeNow();
-                status_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                status_form["mci_id"] = id;
+                status_form["mci_status"] = status;
+                status_form["mci_updated_date"] = getTimeNow();
+                status_form["mci_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                 $.ajax({
                     type: 'PUT',
                     dataType: 'json',
@@ -498,10 +519,11 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var add_form = {
-                        "mc_id": parseInt($('#selTitle').val()),
+                        "mci_id": parseInt($('#selConsern').val()),
+                        "mcip_weight": $('#selWeight').val(),
                         "sd_id": parseInt($('#selDept').val()),
-                        "create_date": getTimeNow(),
-                        "create_by": "<?php echo $this->session->userdata('sessUsr') ?>"
+                        "mcip_created_date": getTimeNow(),
+                        "mcip_created_by": "<?php echo $this->session->userdata('sessUsr') ?>"
                     };
                     $.ajax({
                         type: 'POST',
@@ -513,7 +535,7 @@
                             // console.log(data);
                             if (data != false) {
                                 Swal.fire({
-                                    html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Incharge success!</p>",
+                                    html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Item success!</p>",
                                     icon: 'success',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
@@ -524,9 +546,10 @@
                                 })
                                 var dataTable = $('#tblIncharge').DataTable();
                                 dataTable.ajax.reload(null, false);
+                                $('#add_form')[0].reset();
                             } else {
                                 Swal.fire({
-                                    html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Incharge!</p>",
+                                    html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add Item!</p>",
                                     icon: 'error',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
@@ -564,14 +587,13 @@
                 if (result.isConfirmed) {
                     var edit_form = {};
                     $('#frmEditConsideration').serializeArray().forEach(function(item) {
-                        if (item.name == 'mc_id' || item.name == 'sd_id' || item.name == 'mci_id') {
+                        if (item.name == 'mcip_id' || item.name == 'sd_id' || item.name == 'mci_id') {
                             item.value = parseInt(item.value)
                         }
                         edit_form[item.name] = item.value;
                     })
-                    edit_form["update_date"] = getTimeNow();
-                    edit_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
-
+                    edit_form["mcip_updated_date"] = getTimeNow();
+                    edit_form["mcip_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
@@ -581,7 +603,7 @@
                         success: function(data) {
                             if (data != false) {
                                 Swal.fire({
-                                    html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Incharge success!</p>",
+                                    html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Item Success!</p>",
                                     icon: 'success',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
@@ -594,7 +616,7 @@
 
                             } else {
                                 Swal.fire({
-                                    html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Incharge!</p>",
+                                    html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Edit Item!</p>",
                                     icon: 'error',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
@@ -627,10 +649,10 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var status_form = {};
-                status_form["mci_id"] = id;
-                status_form["mci_status"] = status;
-                status_form["update_date"] = getTimeNow();
-                status_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
+                status_form["mcip_id"] = id;
+                status_form["mcip_status"] = status;
+                status_form["mcip_updated_date"] = getTimeNow();
+                status_form["mcip_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                 $.ajax({
                     type: 'PUT',
                     dataType: 'json',
@@ -641,7 +663,7 @@
                         // console.log(data);
                         if (data != false) {
                             Swal.fire({
-                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status Incharge success!</p>",
+                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Update status Item success!</p>",
                                 icon: 'success',
                                 showClass: {
                                     popup: 'animate__animated animate__fadeInDown'
@@ -654,7 +676,7 @@
                             dataTable.ajax.reload(null, false);
                         } else {
                             Swal.fire({
-                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status Incharge!</p>",
+                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status Item!</p>",
                                 icon: 'error',
                                 showClass: {
                                     popup: 'animate__animated animate__fadeInDown'
@@ -695,10 +717,11 @@
         $('#edtConsiderationId').val(id);
     }
 
-    function editDetailModal(mc_id, sd_id, id) {
+    function editDetailModal(mcip_id, mci_id, mdip_weight, sd_id) {
         event.preventDefault();
-        $('#Incharge_id').val(id);
-        editConsiderationOption(mc_id);
+        $('#item_id').val(mcip_id);
+        $('#edtWeight').val(mdip_weight);
+        editConsiderationOption(mci_id);
         editDepartmentOption(sd_id);
     }
 
@@ -707,15 +730,15 @@
             type: 'get',
             url: API_URL + 'option/list_mc',
             success: function(result) {
-                var option_text = '<option value="" selected disabled>Choose consideration</option>';
+                var option_text = '<option value="" selected disabled>Choose Consideration</option>';
                 $.each(result, function(key, value) {
                     let sel = "";
-                    if (value.mc_id == id) {
+                    if (value.mci_id == id) {
                         sel = "selected";
                     }
-                    option_text += '<option value="' + value.mc_id + '" ' + sel + '>' + value.mc_title + '</option>';
+                    option_text += '<option value="' + value.mci_id + '" ' + sel + '>' + value.mci_name + '</option>';
                 })
-                $('#edtmc').html(option_text);
+                $('#edtMci').html(option_text);
             }
         })
     }
@@ -725,13 +748,13 @@
             type: 'get',
             url: API_URL + 'option/list_department',
             success: function(result) {
-                var option_text = '<option value="" selected disabled>Choose department</option>';
+                var option_text = '<option value="" selected disabled>Choose Department</option>';
                 $.each(result, function(key, value) {
                     let sel = "";
                     if (value.sd_id == id) {
                         sel = "selected";
                     }
-                    option_text += '<option value="' + value.sd_id + '" ' + sel + '>' + value.sd_dept_name + '</option>';
+                    option_text += '<option value="' + value.sd_id + '" ' + sel + '>' + '(' + value.sd_dept_aname + ') ' + value.sd_dept_name + '</option>';
                 })
                 $('#edtDept').html(option_text);
             }
@@ -757,11 +780,11 @@
             ],
             columns: [{
                     className: 'text-center',
-                    data: 'mci_id'
+                    data: 'mcip_id'
                 },
                 {
                     className: 'text-center',
-                    data: 'mc_title',
+                    data: 'mci_name',
                     render: function(data, type, row) {
                         if (type === 'display') {
                             disp = '<div class="text-warp">' + data + '</div>';
@@ -771,25 +794,29 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'sd_name'
+                    data: 'mcip_weight'
                 },
                 {
                     className: 'text-center',
-                    data: 'update_date'
+                    data: 'sd_dept_name'
+                },
+                {
+                    className: 'text-center',
+                    data: 'mcip_updated_date'
                 },
                 {
                     className: 'text-center text-nowrap',
-                    data: 'update_by',
+                    data: 'mcip_updated_by',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            let emp_code = row.update_by.substring(2, 7);
+                            let emp_code = row.mcip_updated_by.substring(2, 7);
                             let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
                             disp = '<div class="d-flex align-items-center justify-content-center">' +
                                 '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35" onerror="this.onerror=null;this.src=\'http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png\';">' +
                                 '<div class="ms-3">' +
                                 '<div class="user-meta-info">' +
-                                '<h6 class="user-name mb-0" data-name="' + row.su_fname + ' ' + row.su_lname + '">' + row.su_fname + ' ' + row.su_lname + '</h6>' +
-                                '<span class="user-work fs-3" data-occupation="' + row.update_by + '">' + row.update_by + '</span>' +
+                                '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + ' ' + row.su_lastname + '</h6>' +
+                                '<span class="user-work fs-3" data-occupation="' + row.mcip_updated_by + '">' + row.mcip_updated_by + '</span>' +
                                 '</div></div></div>';
                         }
                         return disp;
@@ -800,10 +827,10 @@
                     data: 'mci_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            if (row.mci_status) {
-                                disp = '<a onclick="change_mci_status(' + row.mci_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
+                            if (row.mcip_status) {
+                                disp = '<a onclick="change_mci_status(' + row.mcip_id + ',0)"><label class="switch"><input type="checkbox" checked disabled><span class="slider round"></span></label></a>';
                             } else {
-                                disp = '<a onclick="change_mci_status(' + row.mci_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
+                                disp = '<a onclick="change_mci_status(' + row.mcip_id + ',1)"><label class="switch"><input type="checkbox" disabled><span class="slider round"></span></label></a>';
                             }
                         }
                         return disp;
@@ -814,7 +841,7 @@
                     data: 'mci_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<button type="button" onclick="editDetailModal(\'' + row.mc_id + '\',\'' + row.sd_id + '\',\'' + row.mci_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditIncharge">' +
+                            disp = '<button type="button" onclick="editDetailModal(\'' + row.mcip_id + '\',\'' + row.mci_id + '\',\'' + row.mcip_weight + '\',\'' + row.sd_id + '\')" class="btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlEditIncharge">' +
                                 '<i class="ti ti-pencil me-1"></i>Edit</button>';
                         }
                         return disp;

@@ -170,12 +170,12 @@ class ManageFeasibility extends CI_Controller
 		$pdf->Cell(50, 4, 'Remark', 1, 1, 'C', true);
 
 		$ir_id = $this->input->get('ir_id');
-		$consern = $this->db->select('irpn.irpn_part_no, irpn.irpn_part_name, irpn.irpn_model, irpn.irpn_remark')
-			->from('info_rfq_part_no irpn')
-			->join('info_rfq ir', 'ir.ir_id = irpn.ir_id', 'left')
-			->where('irpn.ir_id', $ir_id)
-			->where('irpn.irpn_status', 1)
-			->order_by('irpn.irpn_id', 'ASC')->get()->result();
+		// $consern = $this->db->select('irpn.irpn_part_no, irpn.irpn_part_name, irpn.irpn_model, irpn.irpn_remark')
+		// 	->from('info_rfq_part_no irpn')
+		// 	->join('info_rfq ir', 'ir.ir_id = irpn.ir_id', 'left')
+		// 	->where('irpn.ir_id', $ir_id)
+		// 	->where('irpn.irpn_status', 1)
+		// 	->order_by('irpn.irpn_id', 'ASC')->get()->result();
 
 		for ($i = 0; $i < 20; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
@@ -378,23 +378,24 @@ class ManageFeasibility extends CI_Controller
 		$pdf->Cell(45, 5, 'Comment', 1, 0, 'C', true);
 		$pdf->Cell(25, 5, 'P.I.C', 1, 1, 'C', true);
 
-		$consern = $this->db->select('mc.mc_weight, ifcp.ifcp_score, (ifcp.ifcp_score * mc.mc_weight) AS total, mc.mc_title, ifcp.ifcp_comment, GROUP_CONCAT( DISTINCT sd.sd_dept_cd ORDER BY sd.sd_dept_cd SEPARATOR ", " ) AS sd_names')
-			->from('info_feasibility_consern_point ifcp')
-			->join('info_feasibility inf', 'ifcp.if_id = inf.if_id', 'left')
-			->join('mst_consideration mc', 'mc.mc_id = ifcp.mc_id', 'left')
-			->join('mst_consideration_incharge mci', 'mci.mc_id = mc.mc_id', 'left')
-			->join('sys_department sd', 'sd.sd_id = mci.sd_id', 'left')
-			->where('inf.if_id', 4)
-			->group_by('inf.if_id, ifcp.mc_id, mc.mc_weight, mc.mc_title, ifcp.ifcp_score, ifcp.ifcp_comment')
-			->order_by('ifcp.mc_id', 'ASC')->get()->result();
+		// $consern = $this->db->select('mc.mc_weight, ifcp.ifcp_score, (ifcp.ifcp_score * mc.mc_weight) AS total, mc.mc_title, ifcp.ifcp_comment, GROUP_CONCAT( DISTINCT sd.sd_dept_cd ORDER BY sd.sd_dept_cd SEPARATOR ", " ) AS sd_names')
+		// 	->from('info_feasibility_consern_point ifcp')
+		// 	->join('info_feasibility inf', 'ifcp.if_id = inf.if_id', 'left')
+		// 	->join('mst_consideration mc', 'mc.mc_id = ifcp.mc_id', 'left')
+		// 	->join('mst_consideration_incharge mci', 'mci.mc_id = mc.mc_id', 'left')
+		// 	->join('sys_department sd', 'sd.sd_id = mci.sd_id', 'left')
+		// 	->where('inf.if_id', 4)
+		// 	->group_by('inf.if_id, ifcp.mc_id, mc.mc_weight, mc.mc_title, ifcp.ifcp_score, ifcp.ifcp_comment')
+		// 	->order_by('ifcp.mc_id', 'ASC')->get()->result();
 
 		$sum_total = 0;
+		$consern = [];
 
 		for ($i = 0; $i < count($consern); $i++) {
-			if ($consern[$i]->ifcp_score == 0) {
-				$consern[$i]->ifcp_score = "";
-				$consern[$i]->total = "-";
-			}
+			// if ($consern[$i]->ifcp_score == 0) {
+			// 	$consern[$i]->ifcp_score = "";
+			// 	$consern[$i]->total = "-";
+			// }
 
 			$sum_total += (int)$consern[$i]->total;
 			$count_title = strlen($consern[$i]->mc_title);

@@ -3,8 +3,10 @@ package API
 import (
 	"crypto/md5"
 	"database/sql"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -263,6 +265,44 @@ func Login(c *gin.Context) {
 		}
 	}
 
+}
+func ApproveByEmail(c *gin.Context) {
+	var objUserCheck Users
+	var objUser Users
+	run_no := c.Param("document")
+	log.Println(run_no)
+	run_no_bytes, err := base64.StdEncoding.DecodeString(run_no)
+	if err != nil {
+		fmt.Println("Error decoding Base64:", err)
+		return
+	}
+	log.Println(string(run_no_bytes))
+
+	// var strDept sql.NullInt64
+	// var strUserImgPath sql.NullString
+	// var strUserImgName sql.NullString
+	var strCreateDate sql.NullString
+	var strUpdateDate sql.NullString
+	var strCreateBy sql.NullString
+	var strUpdateBy sql.NullString
+
+	if err := c.BindJSON(&objUserCheck); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	hash := md5.New()
+	hash.Write([]byte(objUserCheck.Su_password))
+	strEncodePassword := hex.EncodeToString(hash.Sum(nil))
+	// log.Println(objUserCheck.Su_password)
+	// log.Println(strEncodePassword)
+
+	Login1 := db.QueryRow("SELECT * FROM sys_users WHERE su_username = ? AND su_password = ?", objUserCheck.Su_username, strEncodePassword).Scan(&objUser.Su_id, &objUser.Spg_id, &objUser.Su_username, &objUser.Su_password, &objUser.Su_firstname, &objUser.Su_lastname, &objUser.Su_email, &objUser.Sd_id, &objUser.Su_sign_path, &objUser.Su_sign_file, &objUser.Su_status, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &objUser.Su_last_accress)
+
+	if Login1 == sql.ErrNoRows {
+		c.IndentedJSON(http.StatusOK, "Username or Password incorrect")
+		return
+	}
+	c.IndentedJSON(http.StatusOK, objUser)
 }
 func LogLogin(c *gin.Context) {
 	var objLog Log

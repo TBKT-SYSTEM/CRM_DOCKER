@@ -20,4 +20,9 @@ class Welcome extends CI_Controller {
 		$this->ManageBackend->chkLogin();
 		$this->load->view('view_login');
 	}
+
+	public function approveEmail()
+	{
+		$this->load->view('view_approve_email');
+	}
 }

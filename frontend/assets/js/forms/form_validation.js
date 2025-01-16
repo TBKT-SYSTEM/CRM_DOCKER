@@ -108,16 +108,45 @@ function form_err(element, message) {
 
 function form_errValid(element, message) {
     element.classList.add('is-invalid');
-    element.nextElementSibling.style.display = "block";
-    element.nextElementSibling.innerHTML = message;
+    if (element.classList.contains('select2')) {
+        const select2Selection = element.parentElement.querySelector('.select2-selection.select2-selection--single');
+        select2Selection.style.borderColor = 'var(--bs-danger2)';
+        select2Selection.style.paddingRight = 'calc(1.5em + 16px)';
+        select2Selection.style.backgroundImage = 'url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 width=%2712%27 height=%2712%27 fill=%27none%27 stroke=%27%23FA896B%27%3e%3ccircle cx=%276%27 cy=%276%27 r=%274.5%27/%3e%3cpath stroke-linejoin=%27round%27 d=%27M5.8 3.6h.4L6 6.5z%27/%3e%3ccircle cx=%276%27 cy=%278.2%27 r=%270.6%27 fill=%27%23FA896B%27 stroke=%27none%27/%3e%3c/svg%3e")';
+        select2Selection.style.backgroundRepeat = 'no-repeat';
+        select2Selection.style.backgroundPosition = 'right calc(2.375em + 4px) center';
+        select2Selection.style.backgroundSize = 'calc(0.75em + 8px) calc(0.75em + 8px)';
+    }
+    let invalidFeedback = element.parentElement.querySelector('.invalid-feedback');
+    if (invalidFeedback) {
+        invalidFeedback.style.display = "block";
+        invalidFeedback.innerHTML = message;
+    }
     element.focus();
 }
+
 
 function form_okValid(element) {
     element.classList.remove('is-invalid');
     element.classList.add('is-valid');
-    element.nextElementSibling.style.display = "none";
+    if (element.classList.contains('select2')) {
+        const select2Selection = element.parentElement.querySelector('.selection .select2-selection.select2-selection--single');
+        if (select2Selection) {
+            select2Selection.style.borderColor = 'var(--bs-success)';
+            select2Selection.style.paddingRight = 'calc(1.5em + 16px)';
+            select2Selection.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%2313DEB9%27 d=%27M2.3 6.73l-1.7-2.2c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z%27/%3E%3C/svg%3E")';
+            select2Selection.style.backgroundRepeat = 'no-repeat';
+            select2Selection.style.backgroundPosition = 'right calc(2.375em + 4px) center';
+            select2Selection.style.backgroundSize = 'calc(0.75em + 8px) calc(0.75em + 8px)';
+        }
+    }
+    let invalidFeedback = element.parentElement.querySelector('.invalid-feedback');
+    if (invalidFeedback) {
+        invalidFeedback.style.display = "none";
+    }
+
 }
+
 
 function form_defaultValid(element) {
     element.classList.remove('is-valid');
@@ -793,7 +822,8 @@ async function swd_validate(formType) {
                     unique_data = {
                         "swd_level_no": parseInt(appLv.value),
                         "swg_id": parseInt(swg_id.value),
-                        "swd_id": id
+                        "swd_id": id,
+                        "su_id": parseInt(userid.value),
                     }
                     try {
                         var chk_unique = await is_unique(unique_data, url);
@@ -821,9 +851,9 @@ async function mc_validate(formType) {
         weight = document.getElementById("inpCal")
         id = 0
     } else {
-        title = document.edit_formConsider.mc_title
-        weight = document.edit_formConsider.mc_weight
-        let getid = document.edit_formConsider.mc_id
+        title = document.edit_formConsider.mci_name
+        weight = document.edit_formConsider.mci_calculate_type
+        let getid = document.edit_formConsider.mci_id
         id = parseInt(getid.value)
     }
 
@@ -833,7 +863,7 @@ async function mc_validate(formType) {
     } else {
         form_ok(title);
         if (is_empty(weight.value)) {
-            form_err(weight, "*Please Select Calculate Type"); 
+            form_err(weight, "*Please Select Calculate Type");
             return false;
         } else {
             form_ok(weight);
@@ -842,44 +872,63 @@ async function mc_validate(formType) {
     }
 }
 async function incharge_validate(formType) {
-    var title, dept, id, url, unique_data;
+    var consern, dept, id, url, unique_data;
     url = API_URL + "incharge/is_unique"
     if (formType == "add") {
-        title = document.getElementById("selTitle")
+        consern = document.getElementById("selConsern")
+        weight = document.getElementById("selWeight")
         dept = document.getElementById("selDept")
         id = 0
     } else {
-        title = document.frmEditConsideration.mc_id
+        consern = document.frmEditConsideration.mci_id
+        weight = document.frmEditConsideration.mcip_weight
         dept = document.frmEditConsideration.sd_id
-        let getid = document.frmEditConsideration.mci_id
+        let getid = document.frmEditConsideration.item_id
         id = parseInt(getid.value)
     }
 
-    if (is_empty(title.value)) {
-        form_err(title, "*Please Enter title");
+    if (is_empty(consern.value)) {
+        form_err(consern, "*Please Select Consideration");
         return false;
     } else {
-        form_ok(title);
-        if (is_empty(dept.value)) {
-            form_err(dept, "*Please Enter department");
+        form_ok(consern);
+        if (is_empty(weight.value)) {
+            form_err(weight, "*Please Enter Weight 0-5");
             return false;
         } else {
-            unique_data = {
-                "mc_id": parseInt(title.value),
-                "sd_id": parseInt(dept.value),
-                "mci_id": id
-            }
-            try {
-                var chk_unique = await is_unique(unique_data, url);
-                if (chk_unique) {
-                    form_err(dept, "*Incharge is Duplicate");
+            if (weight.value < 0 || weight.value > 5) {
+                form_err(weight, "*Please Enter Weight 0-5");
+                return false;
+            } else {
+                form_ok(weight);
+                if (is_empty(dept.value)) {
+                    form_err(dept, "*Please Select Department");
                     return false;
                 } else {
-                    form_ok(dept);
-                    return true;
+                    if (formType == "edit") {
+                        url = API_URL + "incharge/is_unique_edit";
+                    }
+                    unique_data = {
+                        "mcip_id": id,
+                        "mci_id": parseInt(consern.value),
+                        "mcip_weight": weight.value,
+                        "sd_id": parseInt(dept.value),
+                    }
+                    try {
+                        var chk_unique = await is_unique(unique_data, url);
+                        if (chk_unique) {
+                            form_err(consern, "*Data is Duplicate");
+                            form_err(weight, "*Data is Duplicate");
+                            form_err(dept, "*Data is Duplicate");
+                            return false;
+                        } else {
+                            form_ok(dept);
+                            return true;
+                        }
+                    } catch (err) {
+                        console.log(err); // Handle error
+                    }
                 }
-            } catch (err) {
-                console.log(err); // Handle error
             }
         }
     }
@@ -1301,119 +1350,118 @@ async function Rfq_validate(formType) {
 }
 
 async function Rfq_valid(formType) {
-    var url, urlDocNo, ir_doc, ir_import_tran, ir_customer, ir_mrt, ir_other_mrt, ir_enclosures, ir_other_enclosures, ir_duedate;
+    var id, urlDocNo, ir_doc, ir_doc_no, idc_customer_type, idc_customer_name, mds_id, idc_subject_note, mde_id, idc_enclosures_note, idc_closing_date, idc_plant_cd;
 
-    urlDocNo = API_URL + "rfq/doc_no/2"; // 2 = RFQ Format Doc
-    url = API_URL + "rfq/last_id";
+    urlDocNo = API_URL + "rfq/doc_no/RFQ";
     ir_doc_no = await getDocNo(urlDocNo);
-    ir_doc = ir_doc_no['doc_no'] + '-';
+    ir_doc = "";
 
     if (formType == "add") {
-        ir_import_tran = document.add_form.ir_import_tran;
-        ir_customer = document.add_form.ir_customer;
-        ir_mrt = document.add_form.ir_mrt;
-        ir_other_mrt = document.add_form.ir_other_mrt;
-        ir_enclosures = document.add_form.ir_enclosures;
-        ir_other_enclosures = document.add_form.ir_other_enclosures;
-        ir_duedate = document.add_form.ir_duedate;
-        refcon = document.getElementById('inpDocNo');
+        idc_plant_cd = document.add_form.idc_plant_cd;
+        idc_customer_type = document.add_form.idc_customer_type;
+        idc_customer_name = document.add_form.idc_customer_name;
+        mds_id = document.add_form.mds_id;
+        idc_subject_note = document.add_form.idc_subject_note;
+        mde_id = document.add_form.mde_id;
+        idc_enclosures_note = document.add_form.idc_enclosures_note;
+        idc_closing_date = document.add_form.idc_closing_date;
         id = 0;
     } else {
-        ir_import_tran = document.edit_form.ir_import_tran;
-        ir_customer = document.edit_form.ir_customer;
-        ir_mrt = document.edit_form.ir_mrt;
-        ir_other_mrt = document.edit_form.ir_other_mrt;
-        ir_enclosures = document.edit_form.ir_enclosures;
-        ir_other_enclosures = document.edit_form.ir_other_enclosures;
-        ir_duedate = document.edit_form.ir_duedate;
-        let getid = document.edit_form.ir_id;
+        idc_plant_cd = document.edit_form.idc_plant_cd;
+        idc_customer_type = document.edit_form.idc_customer_type;
+        idc_customer_name = document.edit_form.idc_customer_name;
+        mds_id = document.edit_form.mds_id;
+        idc_subject_note = document.edit_form.idc_subject_note;
+        mde_id = document.edit_form.mde_id;
+        idc_enclosures_note = document.edit_form.idc_enclosures_note;
+        idc_closing_date = document.edit_form.idc_closing_date;
+        let getid = document.edit_form.idc_id;
         id = parseInt(getid.value);
     }
-
-    if (is_empty(ir_import_tran.value)) {
-        form_errValid(ir_import_tran, "*Please Select Customer Type");
+    if (is_empty(idc_customer_type.value)) {
+        form_errValid(idc_plant_cd, "*Please Select Plant");
         return false;
     } else {
-        form_okValid(ir_import_tran);
-        if (is_empty(ir_customer.value)) {
-            form_errValid(ir_customer, "*Please Select Customer Name");
+        form_okValid(idc_plant_cd);
+    }
+
+    if (is_empty(idc_customer_type.value)) {
+        form_errValid(idc_customer_type, "*Please Select Customer Type");
+        return false;
+    } else {
+        form_okValid(idc_customer_type);
+        if (is_empty(idc_customer_name.value)) {
+            form_errValid(idc_customer_name, "*Please Select Customer Name");
             return false;
         } else {
-            form_okValid(ir_customer);
-            if (is_empty(ir_mrt.value)) {
-                form_errValid(ir_mrt, "*Please Subject");
+            form_okValid(idc_customer_name);
+            if (is_empty(mds_id.value)) {
+                form_errValid(mds_id, "*Please Subject");
                 return false;
             } else {
-                form_okValid(ir_mrt);
-                if (ir_other_mrt.disabled) {
-                    form_okValid(ir_other_mrt);
+                form_okValid(mds_id);
+                if (idc_subject_note.disabled) {
+                    form_okValid(idc_subject_note);
                 } else {
-                    if (is_empty(ir_other_mrt.value)) {
-                        form_errValid(ir_other_mrt, "*Please Enter Other Subject");
+                    if (is_empty(idc_subject_note.value)) {
+                        form_errValid(idc_subject_note, "*Please Enter Other Subject");
                         return false;
                     } else {
-                        form_okValid(ir_other_mrt);
+                        form_okValid(idc_subject_note);
                     }
                 }
                 ////// Enclosures
-                if (is_empty(ir_enclosures.value)) {
-                    form_errValid(ir_enclosures, "*Please Select Enclosures");
+                if (is_empty(mde_id.value)) {
+                    form_errValid(mde_id, "*Please Select Enclosures");
                     return false;
                 } else {
-                    form_okValid(ir_enclosures);
-                    if (ir_other_enclosures.disabled) {
-                        form_okValid(ir_other_enclosures);
+                    form_okValid(mde_id);
+                    if (idc_enclosures_note.disabled) {
+                        form_okValid(idc_enclosures_note);
                     } else {
-                        if (is_empty(ir_other_enclosures.value)) {
-                            form_errValid(ir_other_enclosures, "*Please Enter Other Enclosures");
+                        if (is_empty(idc_enclosures_note.value)) {
+                            form_errValid(idc_enclosures_note, "*Please Enter Other Enclosures");
                             return false;
                         } else {
-                            form_okValid(ir_other_enclosures);
-                            if (is_empty(ir_duedate.value)) {
-                                form_errValid(ir_duedate, "*Please Select Due Date");
-                                return false;
-                            }
-                            else {
-                                form_okValid(ir_duedate);
-                            }
+                            form_okValid(idc_enclosures_note);
                         }
                     }
                 }
+                if (is_empty(idc_closing_date.value) || idc_closing_date.value == '') {
+                    form_errValid(idc_closing_date, "*Please Select Due Date");
+                    return false;
+                }
+                else {
+                    form_okValid(idc_closing_date);
+                }
+
                 if (formType == "add") {
                     try {
-                        var last_id = await getLastId(url);
-                        if (typeof last_id['last_id'] != "number") {
+                        if (typeof ir_doc_no['doc_cur_no_po2'] != "number") {
                             return false;
                         } else {
-                            if (++last_id['last_id'] < 10) {
-                                if (last_id['last_id'] == 0) {
+                            if (++ir_doc_no['doc_cur_no_po2'] < 10) {
+                                if (ir_doc_no['doc_cur_no_po2'] == 0) {
                                     ir_doc += "001";
                                 } else {
-                                    ir_doc += "00" + last_id['last_id'];
+                                    ir_doc += "00" + ir_doc_no['doc_cur_no_po2'];
                                 }
-                            } else if (last_id['last_id'] < 100) {
-                                ir_doc += "0" + last_id['last_id'];
+                            } else if (ir_doc_no['doc_cur_no_po2'] < 100) {
+                                ir_doc += "0" + ir_doc_no['doc_cur_no_po2'];
                             } else {
-                                ir_doc += last_id['last_id'];
+                                ir_doc += ir_doc_no['doc_cur_no_po2'];
                             }
-                            return true, ir_doc;
+                            return true, ir_doc_no['doc_run_no'] + '-' + ir_doc;
                         }
                     } catch (err) {
                         console.log(err); // Handle error
                     }
                 } else {
-                    if (ir_customer.value == "Other") {
-                        form_errValid(ir_customer, "*Please Enter Other Customer Name");
+                    // console.log(id);
+                    if (!id) {
                         return false;
-                    } else {
-                        if (is_empty(ir_duedate.value)) {
-                            form_errValid(ir_duedate, "*Please Select Due Date");
-                            return false;
-                        } else {
-                            form_okValid(ir_duedate);
-                            return true, id;
-                        }
-                    }
+                    } 
+                    return true, id;
                 }
             }
         }

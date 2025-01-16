@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/form_validation.css" />
     <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/switch_toggle.css" />
+    <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/select2.min.css" />
     {another_css}
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
@@ -119,10 +120,13 @@
     <script src="<?php echo base_url() ?>assets/js/app.min.js"></script>
     <script src="<?php echo base_url() ?>assets/libs/apexcharts/dist/apexcharts.min.js"></script>
     <script src="<?php echo base_url() ?>assets/libs/simplebar/dist/simplebar.js"></script>
+    
     {another_chart_js}
-
+    
     <!-- <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script> -->
     {another_js}
+    <script src="<?php echo base_url() ?>assets/js/notification.js"></script>    
+    <script src="<?php echo base_url() ?>assets/js/select2.min.js"></script>    
 </body>
 
 </html>

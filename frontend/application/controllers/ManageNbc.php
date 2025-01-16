@@ -151,7 +151,7 @@ class ManageNbc extends CI_Controller
 		$pdf->Cell(50, 4, 'Remark', 1, 1, 'C', true);
 
 		// $ir_id = $this->input->get('ir_id');
-		// $consern = $this->db->select('irpn.irpn_part_no, irpn.irpn_part_name, irpn.irpn_model, irpn.irpn_remark')
+		// 0 = $this->db->select('irpn.irpn_part_no, irpn.irpn_part_name, irpn.irpn_model, irpn.irpn_remark')
 		// 	->from('info_rfq_part_no irpn')
 		// 	->join('info_rfq ir', 'ir.ir_id = irpn.ir_id', 'left')
 		// 	->where('irpn.ir_id', $ir_id)

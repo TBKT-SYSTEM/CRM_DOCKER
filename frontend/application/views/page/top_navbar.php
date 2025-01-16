@@ -1,7 +1,7 @@
    <!--  Header Start -->
    <header class="app-header">
        <nav class="navbar navbar-expand-lg navbar-light">
-           <ul class="navbar-nav">
+           <!-- <ul class="navbar-nav">
                <li class="nav-item d-block d-xl-none">
                    <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
                        <i class="ti ti-menu-2"></i>
@@ -13,9 +13,82 @@
                        <div class="notification bg-primary rounded-circle"></div>
                    </a>
                </li>
-           </ul>
+           </ul> -->
            <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
-               <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+               <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-between w-100">
+                   <input type="hidden" value="<?php echo $this->session->userdata('sessUsrId'); ?>" id="suID">
+                   <input type="hidden" value="<?php echo $this->session->userdata('sessUsr'); ?>" id="sessUsr">
+                   <li class="nav-item dropdown">
+                       <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown" aria-expanded="false">
+                           <i class="ti ti-bell-ringing"></i>
+                           <div class="notification bg-primary rounded-circle"></div>
+                       </a>
+                       <div class="dropdown-menu content-dd dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1" style="right: -320px !important;">
+                           <div class="profile-dropdown position-relative" data-simplebar>
+                               <div class="d-flex align-items-center justify-content-between py-3 px-7 border-bottom">
+                                   <h5 class="mb-0 fs-5 fw-semibold">Notifications</h5>
+                                   <span class="badge text-bg-primary rounded-4 px-3 py-1 lh-sm" id="notificationCount"></span>
+                               </div>
+                               <div class="message-body px-1" data-simplebar style="max-height: 360px; overflow-y: auto;" id="notificationBody">
+                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item bg-info-subtle mb-1">
+                                       <span class="me-3">
+                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
+                                       </span>
+                                       <div class="w-100">
+                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
+                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
+                                       </div>
+                                   </a>
+                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item bg-info-subtle mb-1">
+                                       <span class="me-3">
+                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
+                                       </span>
+                                       <div class="w-100">
+                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
+                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
+                                       </div>
+                                   </a>
+                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item mb-1">
+                                       <span class="me-3">
+                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
+                                       </span>
+                                       <div class="w-100">
+                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
+                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
+                                       </div>
+                                   </a>
+                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item mb-1">
+                                       <span class="me-3">
+                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
+                                       </span>
+                                       <div class="w-100">
+                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
+                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
+                                       </div>
+                                   </a>
+                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item mb-1">
+                                       <span class="me-3">
+                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
+                                       </span>
+                                       <div class="w-100">
+                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
+                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
+                                       </div>
+                                   </a>
+                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item mb-1">
+                                       <span class="me-3">
+                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
+                                       </span>
+                                       <div class="w-100">
+                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
+                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
+                                       </div>
+                                   </a>
+                               </div>
+                           </div>
+                       </div>
+                   </li>
+
                    <li class="nav-item dropdown">
                        <a class="nav-link pe-0" href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown" aria-expanded="false">
                            <div class="d-flex align-items-center">
@@ -24,7 +97,7 @@
                                     $sessUsr = $this->session->userdata('sessUsr');
                                     $firstPart = substr($sessUsr, 2, 7);
                                     ?>
-                                   <img class="rounded-circle" width="35" height="35" alt="" src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/<?php echo $firstPart ?>.jpg"  onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png'">
+                                   <img class="rounded-circle" width="35" height="35" alt="" src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/<?php echo $firstPart ?>.jpg" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png'">
                                </div>
                                <span class="material-symbols-outlined" style="font-size: 30px;">arrow_drop_down</span>
                            </div>

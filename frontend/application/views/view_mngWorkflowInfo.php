@@ -165,7 +165,7 @@
                                                                 <?php
                                                                 $option_dept = $this->ManageBackend->list_option("option/list_department");
                                                                 foreach ($option_dept as $dept) {
-                                                                    echo '<option value="' . $dept['sd_id'] . '">' . $dept['sd_dept_name'] . '</option>';
+                                                                    echo '<option value="' . $dept['sd_id'] . '">' . '( ' . $dept['sd_dept_aname'] . ' ) ' . $dept['sd_dept_name'] . '</option>';
                                                                 }
                                                                 ?>
                                                             </select>
@@ -854,7 +854,7 @@
         // alert(this.value);
         getMaxLevel(this.value);
         listUserByDept($(this).find(':selected').data('sd_id'));
-        
+
         if ($.fn.DataTable.isDataTable('#tblWorkflowDetail')) {
             $('#tblWorkflowDetail').DataTable().destroy();
             $('#tblWorkflowDetail').empty();

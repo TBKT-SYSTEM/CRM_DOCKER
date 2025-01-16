@@ -240,7 +240,8 @@ func SwdIsUnique(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := db.QueryRow("SELECT * FROM sys_workflow_detail WHERE swd_level_no = ? and swg_id = ? and swd_id != ?", objWorkflowDetail.Swd_level_no, objWorkflowDetail.Swg_id, objWorkflowDetail.Swd_id).Scan(&objWorkflowDetail.Swd_id, &objWorkflowDetail.Swd_level_no, &objWorkflowDetail.Su_id, &objWorkflowDetail.Swg_id, &objWorkflowDetail.Sat_id, &objWorkflowDetail.Swd_status, &objWorkflowDetail.Create_date, &objWorkflowDetail.Update_date, &objWorkflowDetail.Create_by, &objWorkflowDetail.Update_by)
+
+	err := db.QueryRow("SELECT * FROM sys_workflow_detail WHERE swd_level_no = ? and swg_id = ? and su_id = ?", objWorkflowDetail.Swd_level_no, objWorkflowDetail.Swg_id, objWorkflowDetail.Swd_id).Scan(&objWorkflowDetail.Swd_id, &objWorkflowDetail.Swd_level_no, &objWorkflowDetail.Su_id, &objWorkflowDetail.Swg_id, &objWorkflowDetail.Sat_id, &objWorkflowDetail.Swd_status, &objWorkflowDetail.Create_date, &objWorkflowDetail.Update_date, &objWorkflowDetail.Create_by, &objWorkflowDetail.Update_by)
 	if err == sql.ErrNoRows {
 		c.IndentedJSON(http.StatusOK, false)
 		return

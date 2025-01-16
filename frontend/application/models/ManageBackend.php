@@ -134,7 +134,7 @@ class ManageBackend extends CI_Model
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if ($httpCode === 200) {
             $menu_list = json_decode($response, true);
-            echo json_encode($menu_list);
+            // echo json_encode($menu_list);
         } else {
             echo "<script>console.log('Debug Objects: " . $httpCode . "' );</script>";
         }

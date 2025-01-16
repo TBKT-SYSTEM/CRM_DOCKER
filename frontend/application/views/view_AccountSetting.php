@@ -26,12 +26,12 @@
                     <span class="d-none d-md-block">Account</span>
                 </button>
             </li>
-            <li class="nav-item" role="presentation">
+            <!-- <li class="nav-item" role="presentation">
                 <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-4" id="pills-security-tab" data-bs-toggle="pill" data-bs-target="#pills-security" type="button" role="tab" aria-controls="pills-security" aria-selected="false" tabindex="-1">
                     <i class="ti ti-lock me-2 fs-6"></i>
                     <span class="d-none d-md-block">Security</span>
                 </button>
-            </li>
+            </li> -->
             <li class="nav-item" role="presentation">
                 <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-4" id="pills-signature-tab" data-bs-toggle="pill" data-bs-target="#pills-signature" type="button" role="tab" aria-controls="pills-signature" aria-selected="false" tabindex="-1">
                     <i class="ti ti-signature me-2 fs-6"></i>
@@ -82,9 +82,11 @@
                                                     <input type="email" name="su_email" value="<?php echo $userData['su_email']; ?>" class="form-control" id="inpEmail" placeholder="info@modernize.com">
                                                     <span class="form_error"></span>
                                                 </div>
+                                            </div>
+                                            <div class="col-lg-6">
                                                 <div class="mb-3">
                                                     <label for="selPlant" class="form-label">Plant</label>
-                                                    <select class="form-select" name="spc_id" aria-label="Default select example" id="selPlant" disabled >
+                                                    <select class="form-select" name="spc_id" aria-label="Default select example" id="selPlant" disabled>
                                                         <option value="" disabled selected>Choose plant</option>
                                                         <?php
                                                         if ($plantSess == 51) {
@@ -93,25 +95,6 @@
                                                             $optionResult = '<option value="52" disabled selected >Phase 8</option>';
                                                         }
                                                         echo $optionResult;
-                                                        ?>
-                                                    </select>
-                                                    <span class="form_error"></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <label for="selPermissionGroup" class="form-label">Permission Group</label>
-                                                    <select class="form-select" name="spg_id" aria-label="Default select example" id="selPermissionGroup" disabled>
-                                                        <option value="" disabled selected>Choose permission group</option>
-                                                        <?php
-                                                        $option_spg = $this->ManageBackend->list_option("option/list_spg");
-                                                        foreach ($option_spg as $op_spg) {
-                                                            $sel = "";
-                                                            if ($op_spg['spg_id'] == $userData['spg_id']) {
-                                                                $sel = "selected";
-                                                            }
-                                                            echo '<option value="' . $op_spg['spg_id'] . '" ' . $sel . '>' . $op_spg['spg_name'] . '</option>';
-                                                        }
                                                         ?>
                                                     </select>
                                                     <span class="form_error"></span>

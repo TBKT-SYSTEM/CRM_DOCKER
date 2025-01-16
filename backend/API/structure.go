@@ -235,6 +235,56 @@ type DocumentType struct {
 	Create_by     string `json:"mdt_created_by"`
 	Update_by     string `json:"mdt_updated_by"`
 }
+type DocEnclosures struct {
+	Mde_id       int    `json:"mde_id"`
+	Mde_name     string `json:"mde_name"`
+	Mde_required int    `json:"mde_required"`
+	Mde_status   int    `json:"mde_status"`
+	Create_date  string `json:"mde_created_date"`
+	Create_by    string `json:"mde_created_by"`
+	Update_date  string `json:"mde_updated_date"`
+	Update_by    string `json:"mde_updated_by"`
+}
+type DocSubject struct {
+	Mds_id       int    `json:"mds_id"`
+	Mds_name     string `json:"mds_name"`
+	Mds_required int    `json:"mds_required"`
+	Mds_status   int    `json:"mds_status"`
+	Create_date  string `json:"mds_created_date"`
+	Create_by    string `json:"mds_created_by"`
+	Update_date  string `json:"mds_updated_date"`
+	Update_by    string `json:"mds_updated_by"`
+}
+type Packing struct {
+	Mdpc_id       int    `json:"mdpc_id"`
+	Mdpc_name     string `json:"mdpc_name"`
+	Mdpc_required int    `json:"mdpc_required"`
+	Mdpc_status   int    `json:"mdpc_status"`
+	Create_date   string `json:"mdpc_created_date"`
+	Create_by     string `json:"mdpc_created_by"`
+	Update_date   string `json:"mdpc_updated_date"`
+	Update_by     string `json:"mdpc_updated_by"`
+}
+type Purchase struct {
+	Mdpu_id       int    `json:"mdpu_id"`
+	Mdpu_name     string `json:"mdpu_name"`
+	Mdpu_required int    `json:"mdpu_required"`
+	Mdpu_status   int    `json:"mdpu_status"`
+	Create_date   string `json:"mdpu_created_date"`
+	Create_by     string `json:"mdpu_created_by"`
+	Update_date   string `json:"mdpu_updated_date"`
+	Update_by     string `json:"mdpu_updated_by"`
+}
+type Attn struct {
+	Mda_id      int    `json:"mda_id"`
+	Mda_name    string `json:"mda_name"`
+	Sd_id       int    `json:"sd_id"`
+	Mda_status  int    `json:"mda_status"`
+	Create_date string `json:"mda_created_date"`
+	Create_by   string `json:"mda_created_by"`
+	Update_date string `json:"mda_updated_date"`
+	Update_by   string `json:"mda_updated_by"`
+}
 type ApprovePattern struct {
 	Map_id      int    `json:"map_id"`
 	Map_name    string `json:"map_name"`
@@ -439,56 +489,99 @@ type Feasibility1 struct {
 	Su_id           string              `json:"su_id"`
 	Doc_type        int                 `json:"doc_type"`
 }
-
+type GetPartNoByIdData struct {
+	Data []RfqGroupPart `json:"data"`
+}
 type RfqGroupPart struct {
-	Irpn_id    int    `json:"irpn_id"`
-	IrPartNo   string `json:"irpn_part_no"`
-	IrPartName string `json:"irpn_part_name"`
-	IrModel    string `json:"irpn_model"`
-	IrRemark   string `json:"irpn_remark"`
+	Idi_id        int    `json:"idi_id"`
+	Idi_item_no   string `json:"idi_item_no"`
+	Idi_item_name string `json:"idi_item_name"`
+	Idi_model     string `json:"idi_model"`
+	Idi_remark    string `json:"idi_remark"`
 }
 
 type RfqGroupVolume struct {
 	Year   string `json:"year"`
 	Volume string `json:"volume"`
 }
-
-type RfqGroupCheckbox struct {
-	IrPuDept       int `json:"ir_pu_dept"`
-	IrPeDept       int `json:"ir_pe_dept"`
-	IrScmDept      int `json:"ir_scm_dept"`
-	IrCeDept       int `json:"ir_ce_dept"`
-	IrGdcDept      int `json:"ir_gdc_dept"`
-	IrRawPuc       int `json:"ir_raw_puc"`
-	IrMoldPuc      int `json:"ir_mold_puc"`
-	IrMenufacPuc   int `json:"ir_menufac_puc"`
-	IrTransportPuc int `json:"ir_transport_puc"`
-	IrCastPoc      int `json:"ir_cast_poc"`
-	IrMachinPoc    int `json:"ir_machin_poc"`
-	IrAssemblyPoc  int `json:"ir_assembly_poc"`
-	IrPackPoc      int `json:"ir_pack_poc"`
+type RfqGroupVolumeDetail struct {
+	Idv_id   int    `json:"idv_id"`
+	Idv_year string `json:"idv_year"`
+	Idv_qty  string `json:"idv_qty"`
 }
-
+type GetRfq struct {
+	Idc_id              int                    `json:"idc_id"`
+	Mdt_id              int                    `json:"mdt_id"`
+	Idc_refer_doc       int                    `json:"idc_refer_doc"`
+	Idc_running_no      string                 `json:"idc_running_no"`
+	Idc_issue_year      string                 `json:"idc_issue_year"`
+	Idc_issue_month     string                 `json:"idc_issue_month"`
+	Idc_issue_seq_no    string                 `json:"idc_issue_seq_no"`
+	Idc_customer_type   int                    `json:"idc_customer_type"`
+	Idc_customer_name   string                 `json:"idc_customer_name"`
+	Idc_plant_cd        int                    `json:"idc_plant_cd"`
+	Mds_id              int                    `json:"mds_id"`
+	Idc_subject_note    string                 `json:"idc_subject_note"`
+	Mde_id              int                    `json:"mde_id"`
+	Idc_enclosures_note string                 `json:"idc_enclosures_note"`
+	Idc_project_life    int                    `json:"idc_project_life"`
+	Idc_project_start   string                 `json:"idc_project_start"`
+	Idc_issue_date      string                 `json:"idc_issue_date"`
+	Idc_closing_date    string                 `json:"idc_closing_date"`
+	Idc_reply_date      string                 `json:"idc_reply_date"`
+	Idc_result_confirm  int                    `json:"idc_result_confirm"`
+	Idc_status          int                    `json:"idc_status"`
+	Idc_note1           string                 `json:"idc_note1"`
+	Idc_note2           string                 `json:"idc_note2"`
+	Idc_file_path       string                 `json:"idc_file_path"`
+	Idc_physical_path   string                 `json:"idc_physical_path"`
+	Idc_cancel_reason   string                 `json:"idc_cancel_reason"`
+	Idc_created_date    string                 `json:"idc_created_date"`
+	Idc_created_by      string                 `json:"idc_created_by"`
+	Idc_updated_date    string                 `json:"idc_updated_date"`
+	Idc_updated_by      string                 `json:"idc_updated_by"`
+	Idat_item           []string               `json:"idat_item"`
+	Idpu_item           []string               `json:"idpu_item"`
+	Idpc_item           []string               `json:"idpc_item"`
+	IrGroupPart         []RfqGroupPart         `json:"ir_group_part"`
+	IrGroupVolume       []RfqGroupVolumeDetail `json:"ir_group_volume"`
+}
 type Rfq struct {
-	IrId            int                `json:"ir_id"`
-	IrDocNo         string             `json:"ir_doc_no"`
-	IrCustomer      string             `json:"ir_customer"`
-	IrImportTran    int                `json:"ir_import_tran"`
-	IrMrt           string             `json:"ir_mrt"`
-	IrEnclosures    string             `json:"ir_enclosures"`
-	IrRefFm         int                `json:"ir_ref_fm"`
-	IrRefNbc        int                `json:"ir_ref_nbc"`
-	IrProLife       int                `json:"ir_pro_life"`
-	IrProTim        string             `json:"ir_pro_tim"`
-	IrDueDate       string             `json:"ir_duedate"`
-	IrNote          string             `json:"ir_note"`
-	IrComment       string             `json:"ir_comment"`
-	IrCreatedDate   string             `json:"ir_created_date"`
-	IrCreatedBy     string             `json:"ir_created_by"`
-	IrStatus        int                `json:"ir_status"`
-	IrGroupPart     []RfqGroupPart     `json:"ir_group_part"`
-	IrGroupVolume   []RfqGroupVolume   `json:"ir_group_volume"`
-	IrGroupCheckbox []RfqGroupCheckbox `json:"ir_group_checkbox"`
+	Idc_id              int              `json:"idc_id"`
+	Mdt_id              int              `json:"mdt_id"`
+	Idc_refer_doc       int              `json:"idc_refer_doc"`
+	Idc_running_no      string           `json:"idc_running_no"`
+	Idc_issue_year      string           `json:"idc_issue_year"`
+	Idc_issue_month     string           `json:"idc_issue_month"`
+	Idc_issue_seq_no    string           `json:"idc_issue_seq_no"`
+	Idc_customer_type   int              `json:"idc_customer_type"`
+	Idc_customer_name   string           `json:"idc_customer_name"`
+	Idc_plant_cd        int              `json:"idc_plant_cd"`
+	Mds_id              int              `json:"mds_id"`
+	Idc_subject_note    string           `json:"idc_subject_note"`
+	Mde_id              int              `json:"mde_id"`
+	Idc_enclosures_note string           `json:"idc_enclosures_note"`
+	Idc_project_life    int              `json:"idc_project_life"`
+	Idc_project_start   string           `json:"idc_project_start"`
+	Idc_issue_date      string           `json:"idc_issue_date"`
+	Idc_closing_date    string           `json:"idc_closing_date"`
+	Idc_reply_date      string           `json:"idc_reply_date"`
+	Idc_result_confirm  int              `json:"idc_result_confirm"`
+	Idc_status          int              `json:"idc_status"`
+	Idc_note1           string           `json:"idc_note1"`
+	Idc_note2           string           `json:"idc_note2"`
+	Idc_file_path       string           `json:"idc_file_path"`
+	Idc_physical_path   string           `json:"idc_physical_path"`
+	Idc_cancel_reason   string           `json:"idc_cancel_reason"`
+	Idc_created_date    string           `json:"idc_created_date"`
+	Idc_created_by      string           `json:"idc_created_by"`
+	Idc_updated_date    string           `json:"idc_updated_date"`
+	Idc_updated_by      string           `json:"idc_updated_by"`
+	Idat_item           []string         `json:"idat_item"`
+	Idpu_item           []string         `json:"idpu_item"`
+	Idpc_item           []string         `json:"idpc_item"`
+	IrGroupPart         []RfqGroupPart   `json:"ir_group_part"`
+	IrGroupVolume       []RfqGroupVolume `json:"ir_group_volume"`
 }
 
 type RfqData struct {
@@ -496,31 +589,40 @@ type RfqData struct {
 }
 
 type RfqTable struct {
-	Ir_id           string             `json:"ir_id"`
-	Ir_doc_no       string             `json:"ir_doc_no"`
-	Ir_customer     string             `json:"ir_customer"`
-	Ir_import_tran  int                `json:"ir_import_tran"`
-	Ir_mrt          string             `json:"mrt_id"`
-	Ir_enclosures   string             `json:"ir_enclosures"`
-	Ir_ref_fm       int                `json:"ir_ref_fm"`
-	Ir_ref_nbc      int                `json:"ir_ref_nbc"`
-	Ir_pro_life     string             `json:"ir_pro_life"`
-	Ir_pro_tim      string             `json:"ir_sop_tim"`
-	Ir_duedate      string             `json:"ir_duedate"`
-	Ir_note         string             `json:"ir_note"`
-	Ir_comment      string             `json:"ir_comment"`
-	Ir_status       int                `json:"ir_status"`
-	Create_date     string             `json:"ir_created_date"`
-	Create_by       string             `json:"ir_created_by"`
-	Update_date     string             `json:"ir_updated_date"`
-	Update_by       string             `json:"ir_updated_by"`
-	Su_firstname    string             `json:"su_firstname"`
-	Su_lastname     string             `json:"su_lastname"`
-	Su_sign_path    string             `json:"su_sign_path"`
-	Su_sign_file    string             `json:"su_sign_file"`
-	IrGroupPart     []RfqGroupPart     `json:"ir_group_part"`
-	IrGroupVolume   []RfqGroupVolume   `json:"ir_group_volume"`
-	IrGroupCheckbox []RfqGroupCheckbox `json:"ir_group_checkbox"`
+	Idc_id              int    `json:"idc_id"`
+	Mdt_id              int    `json:"mdt_id"`
+	Idc_refer_doc       int    `json:"idc_refer_doc"`
+	Idc_running_no      string `json:"idc_running_no"`
+	Idc_issue_year      string `json:"idc_issue_year"`
+	Idc_issue_month     string `json:"idc_issue_month"`
+	Idc_issue_seq_no    string `json:"idc_issue_seq_no"`
+	Idc_customer_type   int    `json:"idc_customer_type"`
+	Idc_customer_name   string `json:"idc_customer_name"`
+	Idc_plant_cd        int    `json:"idc_plant_cd"`
+	Mds_id              int    `json:"mds_id"`
+	Idc_subject_note    string `json:"idc_subject_note"`
+	Mde_id              int    `json:"mde_id"`
+	Idc_enclosures_note string `json:"idc_enclosures_note"`
+	Idc_project_life    int    `json:"idc_project_life"`
+	Idc_project_start   string `json:"idc_project_start"`
+	Idc_issue_date      string `json:"idc_issue_date"`
+	Idc_closing_date    string `json:"idc_closing_date"`
+	Idc_reply_date      string `json:"idc_reply_date"`
+	Idc_result_confirm  int    `json:"idc_result_confirm"`
+	Idc_status          int    `json:"idc_status"`
+	Idc_note1           string `json:"idc_note1"`
+	Idc_note2           string `json:"idc_note2"`
+	Idc_file_path       string `json:"idc_file_path"`
+	Idc_physical_path   string `json:"idc_physical_path"`
+	Idc_cancel_reason   string `json:"idc_cancel_reason"`
+	Idc_created_date    string `json:"idc_created_date"`
+	Idc_created_by      string `json:"idc_created_by"`
+	Idc_updated_date    string `json:"idc_updated_date"`
+	Idc_updated_by      string `json:"idc_updated_by"`
+	Su_firstname        string `json:"su_firstname"`
+	Su_lastname         string `json:"su_lastname"`
+	Su_sign_path        string `json:"su_sign_path"`
+	Su_sign_file        string `json:"su_sign_file"`
 }
 
 type GetRfqFileByIdData struct {
@@ -558,9 +660,11 @@ type GetLastID struct {
 }
 
 type GetDocNo struct {
-	Doc_type   string `json:"doc_type"`
-	Doc_con_no string `json:"doc_con_no"`
-	Doc_no     string `json:"doc_no"`
+	Mdt_id         int    `json:"mdt_id"`
+	Doc_mst        string `json:"doc_mst"`
+	Doc_cur_no_po1 string `json:"doc_cur_no_po1"`
+	Doc_cur_no_po2 int    `json:"doc_cur_no_po2"`
+	Doc_run_no     string `json:"doc_run_no"`
 }
 
 type ManageConsernData struct {
@@ -763,43 +867,33 @@ type ConsiderInchargeData struct {
 	Data []ConsiderInchargeTable `json:"data"`
 }
 type ConsiderInchargeTable struct {
-	Mci_id      int    `json:"mci_id"`
-	Mc_id       int    `json:"mc_id"`
-	Sd_id       int    `json:"sd_id"`
-	Mci_status  int    `json:"mci_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
-	Mc_title    string `json:"mc_title"`
-	Sd_name     string `json:"sd_name"`
-	Su_fname    string `json:"su_fname"`
-	Su_lname    string `json:"su_lname"`
-	Su_img_path string `json:"su_img_path"`
-	Su_img_name string `json:"su_img_name"`
+	Mcip_id      int    `json:"mcip_id"`
+	Mci_id       int    `json:"mci_id"`
+	Mcip_weight  string `json:"mcip_weight"`
+	Sd_id        int    `json:"sd_id"`
+	Mcip_status  int    `json:"mcip_status"`
+	Create_date  string `json:"mcip_created_date"`
+	Create_by    string `json:"mcip_created_by"`
+	Update_date  string `json:"mcip_updated_date"`
+	Update_by    string `json:"mcip_updated_by"`
+	Mci_name     string `json:"mci_name"`
+	Sd_dept_name string `json:"sd_dept_name"`
+	Su_firstname string `json:"su_firstname"`
+	Su_lastname  string `json:"su_lastname"`
+	Su_sign_path string `json:"su_sign_path"`
+	Su_sign_file string `json:"su_sign_file"`
 }
 type ConsiderIncharge struct {
+	Mcip_id     int    `json:"mcip_id"`
 	Mci_id      int    `json:"mci_id"`
-	Mc_id       int    `json:"mc_id"`
+	Mcip_weight string `json:"mcip_weight"`
 	Sd_id       int    `json:"sd_id"`
-	Mci_status  int    `json:"mci_status"`
-	Create_date string `json:"create_date"`
-	Update_date string `json:"update_date"`
-	Create_by   string `json:"create_by"`
-	Update_by   string `json:"update_by"`
+	Mcip_status int    `json:"mcip_status"`
+	Create_date string `json:"mcip_created_date"`
+	Create_by   string `json:"mcip_created_by"`
+	Update_date string `json:"mcip_updated_date"`
+	Update_by   string `json:"mcip_updated_by"`
 }
-
-type GetPartNoByIdData struct {
-	Data []GetPartNoById `json:"data"`
-}
-type GetPartNoById struct {
-	Irpn_id        int    `json:"irpn_id"`
-	Irpn_part_no   string `json:"irpn_part_no"`
-	Irpn_part_name string `json:"irpn_part_name"`
-	Irpn_model     string `json:"irpn_model"`
-	Irpn_remark    string `json:"irpn_remark"`
-}
-
 type ViewFeasibilityScore struct {
 	Mc_id          int     `json:"mc_id"`
 	Mc_title       string  `json:"mc_title"`
@@ -825,4 +919,16 @@ type InchargeDepartment struct {
 	Create_by   string `json:"create_by"`
 	Update_by   string `json:"update_by"`
 	Sd_name     string `json:"sd_name"`
+}
+
+type Notify struct {
+	Su_id            int    `json:"su_id"`
+	Ida_created_by   string `json:"ida_created_by"`
+	Snc_id           int    `json:"snc_id"`
+	Snc_type         int    `json:"snc_type"`
+	Ida_id           int    `json:"ida_id"`
+	Snc_show_users   string `json:"snc_show_users"`
+	Snc_read_status  int    `json:"snc_read_status"`
+	Snc_created_date string `json:"snc_created_date"`
+	Snc_updated_date string `json:"snc_updated_date"`
 }
