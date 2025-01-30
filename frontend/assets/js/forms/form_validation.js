@@ -828,10 +828,10 @@ async function swd_validate(formType) {
                     try {
                         var chk_unique = await is_unique(unique_data, url);
                         if (chk_unique) {
-                            form_err(appLv, "*approve is Duplicate");
+                            form_err(userid, "*Users is already exist");
                             return false;
                         } else {
-                            form_ok(appLv);
+                            form_ok(userid);
                             return true;
                         }
                     } catch (err) {

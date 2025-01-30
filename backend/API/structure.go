@@ -623,6 +623,50 @@ type RfqTable struct {
 	Su_lastname         string `json:"su_lastname"`
 	Su_sign_path        string `json:"su_sign_path"`
 	Su_sign_file        string `json:"su_sign_file"`
+	Btn_nbc             string `json:"btn_nbc"`
+}
+
+type NbcData struct {
+	Data []NbcTable `json:"data"`
+}
+
+type NbcTable struct {
+	Idc_id              int    `json:"idc_id"`
+	Mdt_id              int    `json:"mdt_id"`
+	Idc_refer_doc       int    `json:"idc_refer_doc"`
+	Idc_running_no      string `json:"idc_running_no"`
+	Idc_issue_year      string `json:"idc_issue_year"`
+	Idc_issue_month     string `json:"idc_issue_month"`
+	Idc_issue_seq_no    string `json:"idc_issue_seq_no"`
+	Idc_customer_type   int    `json:"idc_customer_type"`
+	Idc_customer_name   string `json:"idc_customer_name"`
+	Idc_plant_cd        int    `json:"idc_plant_cd"`
+	Mds_id              int    `json:"mds_id"`
+	Idc_subject_note    string `json:"idc_subject_note"`
+	Mde_id              int    `json:"mde_id"`
+	Idc_enclosures_note string `json:"idc_enclosures_note"`
+	Idc_project_life    int    `json:"idc_project_life"`
+	Idc_project_start   string `json:"idc_project_start"`
+	Idc_issue_date      string `json:"idc_issue_date"`
+	Idc_closing_date    string `json:"idc_closing_date"`
+	Idc_reply_date      string `json:"idc_reply_date"`
+	Idc_result_confirm  int    `json:"idc_result_confirm"`
+	Idc_status          int    `json:"idc_status"`
+	Idc_note1           string `json:"idc_note1"`
+	Idc_note2           string `json:"idc_note2"`
+	Idc_file_path       string `json:"idc_file_path"`
+	Idc_physical_path   string `json:"idc_physical_path"`
+	Idc_cancel_reason   string `json:"idc_cancel_reason"`
+	Idc_created_date    string `json:"idc_created_date"`
+	Idc_created_by      string `json:"idc_created_by"`
+	Idc_updated_date    string `json:"idc_updated_date"`
+	Idc_updated_by      string `json:"idc_updated_by"`
+	Su_firstname        string `json:"su_firstname"`
+	Su_lastname         string `json:"su_lastname"`
+	Su_sign_path        string `json:"su_sign_path"`
+	Su_sign_file        string `json:"su_sign_file"`
+	Btn_nbc             string `json:"btn_nbc"`
+	Run_no              string `json:"run_no"`
 }
 
 type GetRfqFileByIdData struct {
@@ -931,4 +975,24 @@ type Notify struct {
 	Snc_read_status  int    `json:"snc_read_status"`
 	Snc_created_date string `json:"snc_created_date"`
 	Snc_updated_date string `json:"snc_updated_date"`
+}
+type RemainTaskData struct {
+	Data []RemainTask `json:"data"`
+}
+type RemainTask struct {
+	Ida_id           int    `json:"ida_id"`
+	Idc_id           int    `json:"idc_id"`
+	Doc_type         string `json:"doc_type"`
+	Doc_no           string `json:"doc_no"`
+	Refer_doc        string `json:"refer_doc"`
+	Idc_customer     string `json:"idc_customer"`
+	Ida_seq_no       int    `json:"ida_seq_no"`
+	Su_id            int    `json:"su_id"`
+	Ida_status       int    `json:"ida_status"`
+	Prev_ida_action  int    `json:"ida_prev_action"`
+	Swg_id           int    `json:"swg_id"`
+	Work_flow        string `json:"work_flow"`
+	Idc_created_date string `json:"idc_created_date"`
+	Idc_created_by   string `json:"idc_created_by"`
+	Su_firstname     string `json:"su_firstname"`
 }

@@ -1608,10 +1608,16 @@
         return btnText;
     }
 
-    function modalPartno(id, ir_doc_no) {
+    function modalPartno(id, ir_doc_no, idc_refer_doc) {
         event.preventDefault();
         $('#inpDocNo').val(ir_doc_no);
-        $('#inpDocNoRef').val('-');
+        $.ajax({
+            url: API_URL + 'rfq/refer_doc/' + idc_refer_doc,
+            method: 'GET',
+            success: function(response) {
+                $('#inpDocNoRef').val(response.Running_no);
+            }
+        });
         if ($.fn.DataTable.isDataTable('#tblPartNo')) {
             $('#tblPartNo').DataTable().destroy();
         }
@@ -1766,9 +1772,11 @@
             if (result.isConfirmed) {
                 const cancelReason = result.value;
                 $.ajax({
-                    method: 'GET',
-                    url: API_URL + 'rfq/checkApprove/' + id,
+                    method: 'PUT',
+                    url: API_URL + 'rfq/nbc/' + id + '/' + userID,
                     success: function(data) {
+                        console.log(data);
+
                         if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Cancel RFQ Success!</p>",
@@ -1930,7 +1938,7 @@
                     createDate: createDate,
                     createBy: userID
                 }
-                console.log(data);
+                // console.log(data);
                 $.ajax({
                     method: 'PUT',
                     url: API_URL + 'rfq/submit/' + id,
@@ -1986,7 +1994,7 @@
         }
     }
 
-    function showbtnAction(status, id) {
+    function showbtnAction(status, id, btnNbc) {
         if (status == 1 || status == 6) {
             return `
             <div class="d-flex justify-content-evenly gap-1">
@@ -2014,22 +2022,7 @@
                 </button>
             </div>`;
         } else if (status == 9) {
-            let html = '';
-            $.ajax({
-                method: 'GET',
-                url: API_URL + 'rfq/checkApprove/' + id,
-                dataType: 'json',
-                success: function(data) {
-                    console.log(data);
-                    if (data) {
-                        html += ``;
-                    } else {
-                        html += `<button id="btnPDF" onclick="genNBC(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate NBC">
-                                    <i class="ti ti-checklist" style="font-size: 1.5rem !important;"></i>
-                                </button>`;
-                    }
-                }
-            })
+            const display = btnNbc === "true" ? 'd-none' : '';
             return `
             <div class="d-flex justify-content-evenly gap-1">
                 <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
@@ -2038,7 +2031,9 @@
                 <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
                     <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
                 </button>
-                ${html}
+                <button id="btnPDF" onclick="genNBC(${id})" class="${display} btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate NBC">
+                    <i class="ti ti-checklist" style="font-size: 1.5rem !important;"></i>
+                </button>
             </div>`;
         } else if (status == 5) {
             return `
@@ -2119,7 +2114,7 @@
                     "render": function(data, type, row) {
                         if (type === 'display') {
                             disp = '<div class="d-flex justify-content-around gap-1">' +
-                                '<button type="button" onclick="modalPartno(\'' + row.idc_id + '\' , \'' + row.idc_running_no + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
+                                '<button type="button" onclick="modalPartno(\'' + row.idc_id + '\' , \'' + row.idc_running_no + '\', \'' + row.idc_refer_doc + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
                                 '</div>';
                         }
                         return disp;
@@ -2165,7 +2160,7 @@
                     className: 'text-center',
                     data: 'idc_id',
                     "render": function(data, type, row) {
-                        return showbtnAction(row.idc_status, row.idc_id);
+                        return showbtnAction(row.idc_status, row.idc_id, row.btn_nbc);
                     }
                 }
             ]
@@ -2186,9 +2181,6 @@
                 new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
-        setInterval(function() {
-            dataTable.ajax.reload(null, false);
-        }, 600000);
     }
 
     $(document).ready(function() {
@@ -2256,7 +2248,7 @@
                     "render": function(data, type, row) {
                         if (type === 'display') {
                             disp = '<div class="d-flex justify-content-around gap-1">' +
-                                '<button type="button" onclick="modalPartno(\'' + row.idc_id + '\' , \'' + row.idc_running_no + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
+                                '<button type="button" onclick="modalPartno(\'' + row.idc_id + '\' , \'' + row.idc_running_no + '\', \'' + row.idc_refer_doc + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
                                 '</div>';
                         }
                         return disp;
@@ -2302,7 +2294,7 @@
                     className: 'text-center',
                     data: 'idc_id',
                     "render": function(data, type, row) {
-                        return showbtnAction(row.idc_status, row.idc_id);
+                        return showbtnAction(row.idc_status, row.idc_id, row.btn_nbc);
                     }
                 }
             ]

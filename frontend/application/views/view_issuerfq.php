@@ -876,7 +876,7 @@
                     const rowCount = tbody.rows.length;
                     for (let i = 0; i < rowCount; i++) {
                         let volume = document.getElementById('inpVolume' + i);
-                        if (is_empty(volume.value)) {
+                        if (is_empty(volume.value) || volume.value < 1 || volume.value > 999999) {
                             form_errValid(volume, "*Please Enter Volume");
                             return false;
                         } else {

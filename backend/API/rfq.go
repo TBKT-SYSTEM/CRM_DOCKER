@@ -3,7 +3,6 @@ package API
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -22,26 +21,6 @@ func RfqLastid(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusOK, objLastId)
-}
-
-func CheckApproveRfq(c *gin.Context) {
-	var idc_id int
-	id := c.Param("id")
-
-	query := `SELECT idc.idc_id FROM info_document_control idc LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc.mdt_id WHERE mdt.mdt_name LIKE '%NBC%' AND idc.idc_refer_doc = ?`
-
-	err := db.QueryRow(query, id).Scan(&idc_id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			c.IndentedJSON(http.StatusOK, true)
-			return
-		}
-		log.Printf("Error querying database: %v", err)
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Database query failed"})
-		return
-	}
-
-	c.IndentedJSON(http.StatusOK, false)
 }
 
 func GetRFQ(c *gin.Context) {
@@ -537,28 +516,31 @@ func InsertRfq(c *gin.Context) {
 func ListRfqTable(c *gin.Context) {
 	var objRfqList []RfqTable
 	var mdtID int
+	docType := c.Param("id")
 
-	errMdt := db.QueryRow("SELECT mdt_id FROM mst_document_type WHERE mdt_position1 = ?", c.Param("id")).Scan(&mdtID)
-	if errMdt != nil {
-		if errMdt == sql.ErrNoRows {
+	query := "SELECT mdt_id FROM mst_document_type WHERE mdt_name LIKE ?"
+	err := db.QueryRow(query, "%"+docType+"%").Scan(&mdtID)
+	if err != nil {
+		if err == sql.ErrNoRows {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": "No matching document type found",
 			})
 			return
 		}
 		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": errMdt.Error(),
+			"Error": err.Error(),
 		})
 		return
 	}
 
-	objListRfq, err := db.Query("SELECT idc.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file FROM `info_document_control` AS idc LEFT JOIN sys_users AS su ON idc.idc_updated_by = su.su_username WHERE mdt_id = ? AND idc_created_date BETWEEN ? AND ? ORDER BY idc.idc_id", mdtID, c.Param("stratDate"), c.Param("endDate"))
+	objListRfq, err := db.Query("SELECT idc.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file, ( SELECT CASE WHEN COUNT(*) > 0 THEN 'true' ELSE 'false' END FROM info_document_control idc_sub LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc_sub.mdt_id WHERE mdt.mdt_name LIKE '%NBC%' AND idc_sub.idc_refer_doc = idc.idc_id ) AS btnNBC FROM `info_document_control` AS idc LEFT JOIN sys_users AS su ON idc.idc_updated_by = su.su_username WHERE idc.mdt_id = ? AND idc.idc_created_date BETWEEN ? AND ? ORDER BY idc.idc_id;", mdtID, c.Param("stratDate")+" 00:00:00", c.Param("endDate")+" 23:59:59")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
 		})
 		return
 	}
+
 	defer objListRfq.Close()
 	for objListRfq.Next() {
 		var objRfq RfqTable
@@ -577,7 +559,7 @@ func ListRfqTable(c *gin.Context) {
 		var strSignPath sql.NullString
 		var strSignFile sql.NullString
 
-		err := objListRfq.Scan(&objRfq.Idc_id, &objRfq.Mdt_id, &strReferDoc, &objRfq.Idc_running_no, &objRfq.Idc_issue_year, &objRfq.Idc_issue_month, &objRfq.Idc_issue_seq_no, &objRfq.Idc_customer_type, &objRfq.Idc_customer_name, &objRfq.Idc_plant_cd, &objRfq.Mds_id, &strSubjectNote, &objRfq.Mde_id, &strEnclosuresNote, &objRfq.Idc_project_life, &objRfq.Idc_project_start, &strIssueDate, &objRfq.Idc_closing_date, &strReplyDate, &objRfq.Idc_result_confirm, &objRfq.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objRfq.Idc_created_date, &objRfq.Idc_created_by, &objRfq.Idc_updated_date, &objRfq.Idc_updated_by, &strFirstName, &strLastName, &strSignPath, &strSignFile)
+		err := objListRfq.Scan(&objRfq.Idc_id, &objRfq.Mdt_id, &strReferDoc, &objRfq.Idc_running_no, &objRfq.Idc_issue_year, &objRfq.Idc_issue_month, &objRfq.Idc_issue_seq_no, &objRfq.Idc_customer_type, &objRfq.Idc_customer_name, &objRfq.Idc_plant_cd, &objRfq.Mds_id, &strSubjectNote, &objRfq.Mde_id, &strEnclosuresNote, &objRfq.Idc_project_life, &objRfq.Idc_project_start, &strIssueDate, &objRfq.Idc_closing_date, &strReplyDate, &objRfq.Idc_result_confirm, &objRfq.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objRfq.Idc_created_date, &objRfq.Idc_created_by, &objRfq.Idc_updated_date, &objRfq.Idc_updated_by, &strFirstName, &strLastName, &strSignPath, &strSignFile, &objRfq.Btn_nbc)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -770,7 +752,7 @@ func ListRfqTable(c *gin.Context) {
 // 	c.IndentedJSON(http.StatusOK, objRfq)
 // }
 
-func CancelRfq(c *gin.Context) {
+func CancelDocument(c *gin.Context) {
 	iId := c.Param("id")
 	iReason := c.Param("reason")
 	strUpdateBy := c.Param("userID")
@@ -787,7 +769,7 @@ func CancelRfq(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
 }
 
-func ReverseRfq(c *gin.Context) {
+func ReverseDocument(c *gin.Context) {
 	iId := c.Param("id")
 	strUpdateBy := c.Param("userID")
 	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
@@ -803,26 +785,10 @@ func ReverseRfq(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
 }
 
-func SubmitRfq(c *gin.Context) {
+func CreateNbc(c *gin.Context) {
 	iId := c.Param("id")
-	type InputData struct {
-		NBCCheck         bool   `json:"nbcCheck"`
-		FeasibilityCheck bool   `json:"feasibilityCheck"`
-		IntReplyDate     string `json:"intReplydate"`
-		CreateDate       string `json:"createDate"`
-		CreateBy         string `json:"createBy"`
-	}
-	type DocAppData struct {
-		Position1 string
-		SwgId     int
-		UserID    int
-		SatID     int
-	}
-	var objData InputData
-	if err := c.BindJSON(&objData); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	strUpdateBy := c.Param("userID")
+	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
 
 	var objReferRfq GetRfq
 
@@ -912,9 +878,235 @@ func SubmitRfq(c *gin.Context) {
 		return
 	}
 
-	query := ` SELECT mdt.mdt_position1, swd.swg_id, swd.su_id, swd.sat_id FROM mst_document_type mdt LEFT JOIN info_document_control idc ON idc.mdt_id = mdt.mdt_id LEFT JOIN mst_approve_pattern map ON map.map_id = mdt.map_id LEFT JOIN mst_approve_pattern_detail mapd ON map.map_id = mapd.map_id LEFT JOIN sys_approve_type sat ON sat.sat_id = mapd.sat_id LEFT JOIN sys_workflow_detail swd ON sat.sat_id = swd.sat_id LEFT JOIN sys_users su ON su.su_id = swd.su_id WHERE mdt.mdt_id = ( SELECT mdt_id FROM info_document_control WHERE idc_id = ? ) AND swd.swg_id = ( SELECT swg_id FROM sys_workflow_group swg LEFT JOIN sys_department sd ON sd.sd_id = swg.sd_id WHERE sd.sd_dept_name = 'Sales & Marketing PLANT1' ) GROUP BY swd.su_id ORDER BY mapd.mapd_seq_no `
+	var objDocNo GetDocNo
+	var runNo string
 
-	rows, err := db.Query(query, iId)
+	query := "SELECT mdt.mdt_id, CONCAT(mdt.mdt_position1, '-', mdt.mdt_position2) AS doc_mst, mdcn.mdcn_position1 AS doc_cur_no_p1, mdcn.mdcn_position2 AS doc_cur_no_p2, CONCAT( CONCAT(mdt.mdt_position1, '-', mdt.mdt_position2), '-', CONCAT(mdcn.mdcn_position1) ) AS doc_run_no FROM mst_document_type mdt LEFT JOIN mst_document_control_no mdcn ON mdcn.mdt_id = mdt.mdt_id WHERE mdt.mdt_name LIKE ? AND mdt.mdt_status = 1"
+	err = db.QueryRow(query, "%NBC%").Scan(&objDocNo.Mdt_id, &objDocNo.Doc_mst, &objDocNo.Doc_cur_no_po1, &objDocNo.Doc_cur_no_po2, &objDocNo.Doc_run_no)
+
+	if err == sql.ErrNoRows {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	runNo = objDocNo.Doc_run_no
+	objDocNo.Doc_cur_no_po2++
+	if objDocNo.Doc_cur_no_po2 < 10 {
+		if objDocNo.Doc_cur_no_po2 == 0 {
+			runNo += "-001"
+		} else {
+			runNo += fmt.Sprintf("-00%d", objDocNo.Doc_cur_no_po2)
+		}
+	} else if objDocNo.Doc_cur_no_po2 < 100 {
+		runNo += fmt.Sprintf("-0%d", objDocNo.Doc_cur_no_po2)
+	} else {
+		runNo += fmt.Sprintf("-%d", objDocNo.Doc_cur_no_po2)
+	}
+
+	objResult, err := db.Exec("INSERT INTO info_document_control (mdt_id, idc_refer_doc, idc_running_no, idc_issue_year, idc_issue_month, idc_issue_seq_no, idc_customer_type, idc_customer_name, idc_plant_cd, mds_id, idc_subject_note, mde_id, idc_enclosures_note, idc_project_life, idc_project_start, idc_issue_date, idc_closing_date, idc_reply_date, idc_result_confirm, idc_status, idc_note1, idc_note2, idc_file_path, idc_physical_path, idc_cancel_reason, idc_created_date, idc_created_by, idc_updated_date, idc_updated_by) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", objDocNo.Mdt_id, iId, runNo, objReferRfq.Idc_issue_year, objReferRfq.Idc_issue_month, objDocNo.Doc_cur_no_po2, objReferRfq.Idc_customer_type, objReferRfq.Idc_customer_name, objReferRfq.Idc_plant_cd, objReferRfq.Mds_id, objReferRfq.Idc_subject_note, objReferRfq.Mde_id, objReferRfq.Idc_enclosures_note, objReferRfq.Idc_project_life, objReferRfq.Idc_project_start, strIssueDate, objReferRfq.Idc_closing_date, strReplyDate, objReferRfq.Idc_result_confirm, 1, strNote1, strNote2, strFilePath, strPhysicalPath, strCancelReason, strUpdateDate, strUpdateBy, strUpdateDate, strUpdateBy)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	objLastId, err := objResult.LastInsertId()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	// 	// Insert Part No
+	var sql string = "INSERT INTO info_document_item (idc_id, idi_item_no, idi_item_name, idi_model, idi_order_no, idi_status, idi_remark, idi_created_date, idi_created_by, idi_updated_date, idi_updated_by) VALUES "
+	values := []string{}
+
+	for index, partCurrent := range objReferRfq.IrGroupPart {
+		partNo := partCurrent.Idi_item_no
+		partName := partCurrent.Idi_item_name
+		model := partCurrent.Idi_model
+		remark := partCurrent.Idi_remark
+		orderNo := index + 1
+
+		if partNo == "" {
+			partNo = "NULL"
+		} else {
+			partNo = fmt.Sprintf("'%s'", partNo)
+		}
+
+		if partName == "" {
+			partName = "NULL"
+		} else {
+			partName = fmt.Sprintf("'%s'", partName)
+		}
+
+		if model == "" {
+			model = "NULL"
+		} else {
+			model = fmt.Sprintf("'%s'", model)
+		}
+
+		if remark == "" {
+			remark = "NULL"
+		} else {
+			remark = fmt.Sprintf("'%s'", remark)
+		}
+
+		value := fmt.Sprintf("(%d, %s, %s, %s, %d, %d, %s, '%s', '%s', '%s', '%s')",
+			objLastId,
+			partNo,
+			partName,
+			model,
+			orderNo,
+			1,
+			remark,
+			strUpdateDate,
+			strUpdateBy,
+			strUpdateDate,
+			strUpdateBy)
+		values = append(values, value)
+	}
+
+	if len(values) == 0 {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+		return
+	}
+
+	sql += strings.Join(values, ",")
+	_, errPartItem := db.Exec(sql)
+
+	if errPartItem != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errPartItem.Error()})
+		return
+	}
+
+	_, errUpdateSeq := db.Exec("UPDATE mst_document_control_no SET mdcn_position2 = ? WHERE mdt_id = ?", objDocNo.Doc_cur_no_po2, objDocNo.Mdt_id)
+	if errUpdateSeq != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errUpdateSeq.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": objLastId})
+}
+func SubmitRfq(c *gin.Context) {
+	iId := c.Param("id")
+	type InputData struct {
+		NBCCheck         bool   `json:"nbcCheck"`
+		FeasibilityCheck bool   `json:"feasibilityCheck"`
+		IntReplyDate     string `json:"intReplydate"`
+		CreateDate       string `json:"createDate"`
+		CreateBy         string `json:"createBy"`
+	}
+	type DocAppData struct {
+		Position1 string
+		SwgId     int
+		UserID    int
+		SatID     int
+	}
+	var objData InputData
+	if err := c.BindJSON(&objData); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	type userEmail struct {
+		Su_id        int    `json:"su_id"`
+		Su_firstname string `json:"su_firstname"`
+		Su_email     string `json:"su_email"`
+	}
+
+	var objReferRfq GetRfq
+	var objEmail userEmail
+	var idaCurrent int
+
+	var strReferDoc sql.NullInt64
+	var strSubjectNote sql.NullString
+	var strEnclosuresNote sql.NullString
+	var strIssueDate sql.NullString
+	var strReplyDate sql.NullString
+	var strNote1 sql.NullString
+	var strNote2 sql.NullString
+	var strFilePath sql.NullString
+	var strPhysicalPath sql.NullString
+	var strCancelReason sql.NullString
+
+	queryGetRefer := "SELECT * FROM info_document_control WHERE idc_id = ?"
+	err := db.QueryRow(queryGetRefer, iId).Scan(&objReferRfq.Idc_id, &objReferRfq.Mdt_id, &strReferDoc, &objReferRfq.Idc_running_no, &objReferRfq.Idc_issue_year, &objReferRfq.Idc_issue_month, &objReferRfq.Idc_issue_seq_no, &objReferRfq.Idc_customer_type, &objReferRfq.Idc_customer_name, &objReferRfq.Idc_plant_cd, &objReferRfq.Mds_id, &strSubjectNote, &objReferRfq.Mde_id, &strEnclosuresNote, &objReferRfq.Idc_project_life, &objReferRfq.Idc_project_start, &strIssueDate, &objReferRfq.Idc_closing_date, &strReplyDate, &objReferRfq.Idc_result_confirm, &objReferRfq.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objReferRfq.Idc_created_date, &objReferRfq.Idc_created_by, &objReferRfq.Idc_updated_date, &objReferRfq.Idc_updated_by)
+	if err == sql.ErrNoRows {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	if strReferDoc.Valid {
+		objReferRfq.Idc_refer_doc = int(strReferDoc.Int64)
+	}
+	if strSubjectNote.Valid {
+		objReferRfq.Idc_subject_note = strSubjectNote.String
+	}
+	if strEnclosuresNote.Valid {
+		objReferRfq.Idc_enclosures_note = strEnclosuresNote.String
+	}
+	if strIssueDate.Valid {
+		objReferRfq.Idc_issue_date = strIssueDate.String
+	}
+	if strNote1.Valid {
+		objReferRfq.Idc_note1 = strNote1.String
+	}
+	if strNote2.Valid {
+		objReferRfq.Idc_note2 = strNote2.String
+	}
+	if strFilePath.Valid {
+		objReferRfq.Idc_file_path = strFilePath.String
+	}
+	if strPhysicalPath.Valid {
+		objReferRfq.Idc_physical_path = strPhysicalPath.String
+	}
+	if strCancelReason.Valid {
+		objReferRfq.Idc_cancel_reason = strCancelReason.String
+	}
+
+	rowsItem, err := db.Query("SELECT idi_id, idi_item_no, idi_item_name, idi_model, idi_remark FROM `info_document_item` WHERE idc_id = ? AND idi_status = 1 ORDER BY idi_id", c.Param("id"))
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+	defer rowsItem.Close()
+	for rowsItem.Next() {
+		var groupPart RfqGroupPart
+		var strModel sql.NullString
+		var strRemark sql.NullString
+		if err := rowsItem.Scan(
+			&groupPart.Idi_id,
+			&groupPart.Idi_item_no,
+			&groupPart.Idi_item_name,
+			&strModel,
+			&strRemark,
+		); err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+		if strModel.Valid {
+			groupPart.Idi_model = strModel.String
+		}
+		if strRemark.Valid {
+			groupPart.Idi_remark = strRemark.String
+		}
+		objReferRfq.IrGroupPart = append(objReferRfq.IrGroupPart, groupPart)
+	}
+
+	if err := rowsItem.Err(); err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	query := ` SELECT mdt.mdt_position1, swd.swg_id, swd.su_id, swd.sat_id FROM mst_document_type mdt LEFT JOIN info_document_control idc ON idc.mdt_id = mdt.mdt_id LEFT JOIN mst_approve_pattern map ON map.map_id = mdt.map_id LEFT JOIN mst_approve_pattern_detail mapd ON map.map_id = mapd.map_id LEFT JOIN sys_approve_type sat ON sat.sat_id = mapd.sat_id LEFT JOIN sys_workflow_detail swd ON sat.sat_id = swd.sat_id LEFT JOIN sys_users su ON su.su_id = swd.su_id WHERE mdt.mdt_id = ( SELECT mdt_id FROM info_document_control WHERE idc_id = ? ) AND swd.swg_id = ( SELECT swg_id FROM sys_workflow_group swg LEFT JOIN sys_department sd ON sd.sd_id = swg.sd_id LEFT JOIN sys_users su ON sd.sd_id = su.sd_id WHERE su.su_username = ? ) GROUP BY swd.su_id ORDER BY mapd.mapd_seq_no `
+
+	rows, err := db.Query(query, iId, objData.CreateBy)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query"})
 		return
@@ -974,26 +1166,39 @@ func SubmitRfq(c *gin.Context) {
 		}
 		type notiActive struct {
 			Ida_id    int    `json:"ida_id"`
+			Su_id     int    `json:"su_id"`
 			Ida_count string `json:"ida_count"`
 			Sat_id    int    `json:"sat_id"`
 		}
 		var objNotiActive notiActive
-		strShowUsers := "RFQ"
-		err = db.QueryRow("SELECT ida_id, COUNT(ida_id) AS ida_count, MIN(sat_id) AS sat_id FROM info_document_approval WHERE idc_id = ? AND ida_action = 0", iId).Scan(&objNotiActive.Ida_id, &objNotiActive.Ida_count, &objNotiActive.Sat_id)
+		strShowUsers := "You have a new document"
+		err = db.QueryRow("SELECT ida_id, su_id, COUNT(ida_id) AS ida_count, MIN(sat_id) AS sat_id FROM info_document_approval WHERE idc_id = ? AND ida_action = 0 AND ida_status = 1", iId).Scan(&objNotiActive.Ida_id, &objNotiActive.Su_id, &objNotiActive.Ida_count, &objNotiActive.Sat_id)
 		if err == sql.ErrNoRows {
 			c.IndentedJSON(http.StatusOK, false)
 			return
 		}
+		idaCurrent = objNotiActive.Ida_id
 		_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 1, objNotiActive.Ida_id, strShowUsers, 0, objData.CreateDate, objData.CreateDate)
 
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		}
+
+		getEmail := "SELECT su_id, su_firstname, su_email FROM sys_users WHERE su_id = ?"
+		err = db.QueryRow(getEmail, objNotiActive.Su_id).Scan(&objEmail.Su_id, &objEmail.Su_firstname, &objEmail.Su_email)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+				return
+			}
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+			return
+		}
 	}
 
 	if objData.NBCCheck {
 		var objDocNo GetDocNo
-		var runNo string
 		if objData.IntReplyDate == "" {
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Reply date is required"})
 			return
@@ -1007,107 +1212,23 @@ func SubmitRfq(c *gin.Context) {
 			return
 		}
 
-		runNo = objDocNo.Doc_run_no
-		objDocNo.Doc_cur_no_po2++
-		if objDocNo.Doc_cur_no_po2 < 10 {
-			if objDocNo.Doc_cur_no_po2 == 0 {
-				runNo += "-001"
-			} else {
-				runNo += fmt.Sprintf("-00%d", objDocNo.Doc_cur_no_po2)
-			}
-		} else if objDocNo.Doc_cur_no_po2 < 100 {
-			runNo += fmt.Sprintf("-0%d", objDocNo.Doc_cur_no_po2)
-		} else {
-			runNo += fmt.Sprintf("-%d", objDocNo.Doc_cur_no_po2)
-		}
-
-		objResult, err := db.Exec("INSERT INTO info_document_control (mdt_id, idc_refer_doc, idc_running_no, idc_issue_year, idc_issue_month, idc_issue_seq_no, idc_customer_type, idc_customer_name, idc_plant_cd, mds_id, idc_subject_note, mde_id, idc_enclosures_note, idc_project_life, idc_project_start, idc_issue_date, idc_closing_date, idc_reply_date, idc_result_confirm, idc_status, idc_note1, idc_note2, idc_file_path, idc_physical_path, idc_cancel_reason, idc_created_date, idc_created_by, idc_updated_date, idc_updated_by) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", objDocNo.Mdt_id, iId, runNo, objReferRfq.Idc_issue_year, objReferRfq.Idc_issue_month, objDocNo.Doc_cur_no_po2, objReferRfq.Idc_customer_type, objReferRfq.Idc_customer_name, objReferRfq.Idc_plant_cd, objReferRfq.Mds_id, objReferRfq.Idc_subject_note, objReferRfq.Mde_id, objReferRfq.Idc_enclosures_note, objReferRfq.Idc_project_life, objReferRfq.Idc_project_start, strIssueDate, objReferRfq.Idc_closing_date, objData.IntReplyDate, objReferRfq.Idc_result_confirm, 1, strNote1, strNote2, strFilePath, strPhysicalPath, strCancelReason, objData.CreateDate, objData.CreateBy, objData.CreateDate, objData.CreateBy)
+		_, err = db.Exec("INSERT INTO temp_refer_document (idc_id, mdt_id, trd_created_date, trd_updated_date) VALUES(?, ?, ?, ?)", iId, objDocNo.Mdt_id, objData.CreateDate, objData.CreateDate)
 
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 			return
 		}
 
-		objLastId, err := objResult.LastInsertId()
-		if err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		_, errUpdateReplyDate := db.Exec("UPDATE info_document_control SET idc_reply_date = ? WHERE idc_id = ?", objData.IntReplyDate, iId)
+		if errUpdateReplyDate != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errUpdateReplyDate.Error()})
 			return
 		}
 
-		// 	// Insert Part No
-		var sql string = "INSERT INTO info_document_item (idc_id, idi_item_no, idi_item_name, idi_model, idi_order_no, idi_status, idi_remark, idi_created_date, idi_created_by, idi_updated_date, idi_updated_by) VALUES "
-		values := []string{}
-
-		for index, partCurrent := range objReferRfq.IrGroupPart {
-			partNo := partCurrent.Idi_item_no
-			partName := partCurrent.Idi_item_name
-			model := partCurrent.Idi_model
-			remark := partCurrent.Idi_remark
-			orderNo := index + 1
-
-			if partNo == "" {
-				partNo = "NULL"
-			} else {
-				partNo = fmt.Sprintf("'%s'", partNo)
-			}
-
-			if partName == "" {
-				partName = "NULL"
-			} else {
-				partName = fmt.Sprintf("'%s'", partName)
-			}
-
-			if model == "" {
-				model = "NULL"
-			} else {
-				model = fmt.Sprintf("'%s'", model)
-			}
-
-			if remark == "" {
-				remark = "NULL"
-			} else {
-				remark = fmt.Sprintf("'%s'", remark)
-			}
-
-			value := fmt.Sprintf("(%d, %s, %s, %s, %d, %d, %s, '%s', '%s', '%s', '%s')",
-				objLastId,
-				partNo,
-				partName,
-				model,
-				orderNo,
-				1,
-				remark,
-				objData.CreateDate,
-				objData.CreateBy,
-				objData.CreateDate,
-				objData.CreateBy)
-			values = append(values, value)
-		}
-
-		if len(values) == 0 {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
-			return
-		}
-
-		sql += strings.Join(values, ",")
-		_, errPartItem := db.Exec(sql)
-
-		if errPartItem != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errPartItem.Error()})
-			return
-		}
-
-		_, errUpdateSeq := db.Exec("UPDATE mst_document_control_no SET mdcn_position2 = ? WHERE mdt_id = ?", objDocNo.Doc_cur_no_po2, objDocNo.Mdt_id)
-		if errUpdateSeq != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errUpdateSeq.Error()})
-			return
-		}
 	}
 
 	if objData.FeasibilityCheck {
 		var objDocNo GetDocNo
-		var replyDate sql.NullString
-		var runNo string
 
 		query := `SELECT mdt.mdt_id, CONCAT(mdt.mdt_position1, '-', mdt.mdt_position2) AS doc_mst, mdcn.mdcn_position1 AS doc_cur_no_p1, mdcn.mdcn_position2 AS doc_cur_no_p2, CONCAT( CONCAT(mdt.mdt_position1, '-', mdt.mdt_position2), '-', CONCAT(mdcn.mdcn_position1) ) AS doc_run_no FROM mst_document_type mdt LEFT JOIN mst_document_control_no mdcn ON mdcn.mdt_id = mdt.mdt_id WHERE mdt.mdt_name LIKE ? AND mdt.mdt_status = 1`
 		err := db.QueryRow(query, "%feasibility%").Scan(&objDocNo.Mdt_id, &objDocNo.Doc_mst, &objDocNo.Doc_cur_no_po1, &objDocNo.Doc_cur_no_po2, &objDocNo.Doc_run_no)
@@ -1117,108 +1238,15 @@ func SubmitRfq(c *gin.Context) {
 			return
 		}
 
-		runNo = objDocNo.Doc_run_no
-		objDocNo.Doc_cur_no_po2++
-		if objDocNo.Doc_cur_no_po2 < 10 {
-			if objDocNo.Doc_cur_no_po2 == 0 {
-				runNo += "-001"
-			} else {
-				runNo += fmt.Sprintf("-00%d", objDocNo.Doc_cur_no_po2)
-			}
-		} else if objDocNo.Doc_cur_no_po2 < 100 {
-			runNo += fmt.Sprintf("-0%d", objDocNo.Doc_cur_no_po2)
-		} else {
-			runNo += fmt.Sprintf("-%d", objDocNo.Doc_cur_no_po2)
-		}
-
-		if replyDate.Valid {
-			objData.IntReplyDate = replyDate.String
-		}
-
-		objResult, err := db.Exec("INSERT INTO info_document_control (mdt_id, idc_refer_doc, idc_running_no, idc_issue_year, idc_issue_month, idc_issue_seq_no, idc_customer_type, idc_customer_name, idc_plant_cd, mds_id, idc_subject_note, mde_id, idc_enclosures_note, idc_project_life, idc_project_start, idc_issue_date, idc_closing_date, idc_reply_date, idc_result_confirm, idc_status, idc_note1, idc_note2, idc_file_path, idc_physical_path, idc_cancel_reason, idc_created_date, idc_created_by, idc_updated_date, idc_updated_by) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", objDocNo.Mdt_id, iId, runNo, objReferRfq.Idc_issue_year, objReferRfq.Idc_issue_month, objDocNo.Doc_cur_no_po2, objReferRfq.Idc_customer_type, objReferRfq.Idc_customer_name, objReferRfq.Idc_plant_cd, objReferRfq.Mds_id, objReferRfq.Idc_subject_note, objReferRfq.Mde_id, objReferRfq.Idc_enclosures_note, objReferRfq.Idc_project_life, objReferRfq.Idc_project_start, strIssueDate, objReferRfq.Idc_closing_date, replyDate, objReferRfq.Idc_result_confirm, 1, strNote1, strNote2, strFilePath, strPhysicalPath, strCancelReason, objData.CreateDate, objData.CreateBy, objData.CreateDate, objData.CreateBy)
+		_, err = db.Exec("INSERT INTO temp_refer_document (idc_id, mdt_id, trd_created_date, trd_updated_date) VALUES(?, ?, ?, ?)", iId, objDocNo.Mdt_id, objData.CreateDate, objData.CreateDate)
 
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-			return
-		}
-
-		objLastId, err := objResult.LastInsertId()
-		if err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-			return
-		}
-
-		// 	// Insert Part No
-		var sql string = "INSERT INTO info_document_item (idc_id, idi_item_no, idi_item_name, idi_model, idi_order_no, idi_status, idi_remark, idi_created_date, idi_created_by, idi_updated_date, idi_updated_by) VALUES "
-		values := []string{}
-
-		for index, partCurrent := range objReferRfq.IrGroupPart {
-			partNo := partCurrent.Idi_item_no
-			partName := partCurrent.Idi_item_name
-			model := partCurrent.Idi_model
-			remark := partCurrent.Idi_remark
-			orderNo := index + 1
-
-			if partNo == "" {
-				partNo = "NULL"
-			} else {
-				partNo = fmt.Sprintf("'%s'", partNo)
-			}
-
-			if partName == "" {
-				partName = "NULL"
-			} else {
-				partName = fmt.Sprintf("'%s'", partName)
-			}
-
-			if model == "" {
-				model = "NULL"
-			} else {
-				model = fmt.Sprintf("'%s'", model)
-			}
-
-			if remark == "" {
-				remark = "NULL"
-			} else {
-				remark = fmt.Sprintf("'%s'", remark)
-			}
-
-			value := fmt.Sprintf("(%d, %s, %s, %s, %d, %d, %s, '%s', '%s', '%s', '%s')",
-				objLastId,
-				partNo,
-				partName,
-				model,
-				orderNo,
-				1,
-				remark,
-				objData.CreateDate,
-				objData.CreateBy,
-				objData.CreateDate,
-				objData.CreateBy)
-			values = append(values, value)
-		}
-
-		if len(values) == 0 {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
-			return
-		}
-
-		sql += strings.Join(values, ",")
-		_, errPartItem := db.Exec(sql)
-
-		if errPartItem != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errPartItem.Error()})
-			return
-		}
-
-		_, errUpdateSeq := db.Exec("UPDATE mst_document_control_no SET mdcn_position2 = ? WHERE mdt_id = ?", objDocNo.Doc_cur_no_po2, objDocNo.Mdt_id)
-		if errUpdateSeq != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errUpdateSeq.Error()})
 			return
 		}
 	}
 
-	_, err = db.Exec("UPDATE info_document_control SET idc_status = 2 WHERE idc_id = ?", iId)
+	_, err = db.Exec("UPDATE info_document_control SET idc_status = 2, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", objData.CreateDate, objData.CreateBy, iId)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"Error": err.Error(),
@@ -1226,13 +1254,12 @@ func SubmitRfq(c *gin.Context) {
 		return
 	}
 
-	_, err = db.Exec("UPDATE info_document_control SET idc_status = 2 WHERE idc_id = ?", iId)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"Error": err.Error(),
-		})
+	errMail := SendMail(c, objReferRfq.Idc_id, idaCurrent, objEmail.Su_firstname, objEmail.Su_email, "waiting")
+	if errMail != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errMail.Error()})
 		return
 	}
+
 	c.IndentedJSON(http.StatusOK, gin.H{"Update": objData})
 }
 

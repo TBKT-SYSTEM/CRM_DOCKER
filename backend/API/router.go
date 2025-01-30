@@ -10,7 +10,6 @@ func Routy() {
 	router.Use(cors.Default())
 
 	router.POST("/login/login", Login)
-	router.POST("/login/approve_email/:document", ApproveByEmail)
 	router.POST("/login/username_unique", UsernameIsUnique)
 	router.POST("/log/login", LogLogin)
 	router.POST("/log/logout", LogLogout)
@@ -100,10 +99,20 @@ func Routy() {
 	// router.GET("/rfq/getBtnRfq/:id", ListBtnRfq)
 	router.POST("/rfq/insert", InsertRfq)
 	router.PUT("/rfq/edit", EditRfq)
-	router.PUT("/rfq/cancel/:id/:reason/:userID", CancelRfq)
-	router.PUT("/rfq/reverse/:id/:userID", ReverseRfq)
+	router.PUT("/rfq/cancel/:id/:reason/:userID", CancelDocument)
+	router.PUT("/rfq/nbc/:id/:userID", CreateNbc)
+	router.PUT("/rfq/reverse/:id/:userID", ReverseDocument)
 	router.PUT("/rfq/submit/:id", SubmitRfq)
-	router.GET("/rfq/checkApprove/:id", CheckApproveRfq)
+
+	router.GET("/nbc/table/:id/:stratDate/:endDate", ListNbcTable)
+	router.PUT("/nbc/cancel/:id/:reason/:userID", CancelDocument)
+	router.PUT("/nbc/reverse/:id/:userID", ReverseDocument)
+	router.GET("/nbc/:id", GetNBC)
+	router.GET("/doc/runno/:id", GetDocByRunNo)
+	router.PUT("/nbc/edit", EditNbc)
+	router.PUT("/nbc/submit/:id", SubmitNbc)
+
+	router.GET("/remainTask/table/:id", GetRemainTask)
 
 	router.GET("/manage_feasibility/table/:id", ListManageFeasibilityTable)
 	router.GET("/manage_feasibility/table_consern/:if_id/:sd_id", ListConsiderationScoreByid)
@@ -160,7 +169,11 @@ func Routy() {
 	router.GET("/notify/alert/:id/:username", NotifyAlert)
 	router.PUT("/notify/update/:id", NotifyUpdate)
 	router.POST("/email/userdata", EmailUserData)
-	router.GET("/test/mail", TestSendMail)
+	// router.GET("/send/mail", SendMail)
+	// router.GET("/send/mail", TestSendMail)
+
+	router.PUT("/email/approve_email/:documentId/:idaId/:caseType", ApproveByEmail)
+	router.PUT("/email/reject_email/:documentId/:idaId/:reason/:caseType", RejectByEmail)
 
 	router.Run(":8080")
 	// router.Run("192.168.161.219:9002")

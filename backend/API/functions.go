@@ -1,12 +1,18 @@
 package API
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"html/template"
+	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	// "encoding/json"
 	// "github.com/go-resty/resty/v2"
@@ -1236,7 +1242,7 @@ func LineNotify(c *gin.Context) {
 	client := resty.New()
 	var objResult map[string]string
 	json.Unmarshal([]byte(`{
-		"message": "กินข้าวหรือยังครับ",
+		"message1": "กินข้าวหรือยังครับ",
 		"stickerId": "10882",
 		"stickerPackageId": "789"
 	}`), &objResult)
@@ -1266,7 +1272,7 @@ func NotifyAlert(c *gin.Context) {
 	}
 	var objNotifies []Notify
 
-	rows, err := db.Query(`SELECT ida.su_id, ida.ida_created_by, snc.snc_id, snc.snc_type, snc.ida_id, snc.snc_show_users, snc.snc_read_status, snc.snc_created_date, snc.snc_updated_date FROM sys_notification_ctrl snc LEFT JOIN info_document_approval ida ON ida.ida_id = snc.ida_id LEFT JOIN info_document_control idc ON idc.idc_id = ida.idc_id WHERE ida.ida_created_by = ? OR ida.su_id = ?`, username, id)
+	rows, err := db.Query(`SELECT ida.su_id, ida.ida_created_by, snc.snc_id, snc.snc_type, snc.ida_id, snc.snc_show_users, snc.snc_read_status, snc.snc_created_date, snc.snc_updated_date FROM sys_notification_ctrl snc LEFT JOIN info_document_approval ida ON ida.ida_id = snc.ida_id LEFT JOIN info_document_control idc ON idc.idc_id = ida.idc_id WHERE ida.ida_created_by = ? OR ida.su_id = ? ORDER BY snc.snc_id DESC`, username, id)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -1379,29 +1385,88 @@ func NotifyUpdate(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, "Success")
 }
 
-func TestSendMail(c *gin.Context) {
+func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail string, caseType string) error {
+	type EmailApprove struct {
+		DocId        int
+		Username     string
+		Detail       string
+		detailReject string
+		LinkApporve  string
+		LinkReject   string
+		LinkPreview  string
+	}
+	type Document struct {
+		Idc_id         int    `json:"idc_id"`
+		Idc_running_no string `json:"idc_running_no"`
+	}
+
+	var templateMail string
+	var detail string
+	var detailReject string
+
 	MAILER_HOST := "smtp.office365.com"
 	MAILER_PORT := 25
 	MAILER_USERNAME := "admin_pcsystem@tbkk.co.th"
 	MAILER_PASSWORD := "AvZZ$4"
 
-	run_no := "RFQ-SM-2025-001"
-	run_no_base64 := base64.StdEncoding.EncodeToString([]byte(run_no))
+	var objDocument Document
+	queryGetRefer := "SELECT idc_running_no FROM info_document_control WHERE idc_id = ?"
+	err := db.QueryRow(queryGetRefer, docId).Scan(&objDocument.Idc_running_no)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": "No data found"})
+		} else {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		}
+		return err
+	}
 
-	approveURL := "http://172.21.64.221:8081/Welcome/approveEmail/?document=" + run_no_base64
+	docIdStr := strconv.Itoa(docId)
+	encodedDocId := base64.StdEncoding.EncodeToString([]byte(docIdStr))
+
+	idaIdStr := strconv.Itoa(idaId)
+	encodedIdaId := base64.StdEncoding.EncodeToString([]byte(idaIdStr))
+
+	approveURL := "http://172.21.64.221:8081/Welcome/approveEmail/?documentId=" + encodedDocId + "&idaId=" + encodedIdaId + "&type=" + base64.StdEncoding.EncodeToString([]byte("waiting"))
+	rejectURL := "http://172.21.64.221:8081/Welcome/approveEmail/?documentId=" + encodedDocId + "&idaId=" + encodedIdaId + "&type=" + base64.StdEncoding.EncodeToString([]byte("reject"))
+	previewURL := "http://172.21.64.221:8081/Welcome/approveEmail/?documentId=" + encodedDocId + "&idaId=" + encodedIdaId + "&type=" + base64.StdEncoding.EncodeToString([]byte("preview"))
+
+	if caseType == "waiting" {
+		templateMail = "template/email_template2.html"
+		detail = `You have a new document "` + objDocument.Idc_running_no + `" that needs approval.`
+	} else if caseType == "approve" {
+		templateMail = "template/email_template3.html"
+		detail = `Your document "` + objDocument.Idc_running_no + `" has been approved`
+	} else if caseType == "reject" {
+		templateMail = "template/email_template3.html"
+		detail = `Your document "` + objDocument.Idc_running_no + `" has been rejected`
+	}
+
+	data := EmailApprove{
+		DocId:        docId,
+		Username:     userName,
+		Detail:       detail,
+		detailReject: detailReject,
+		LinkApporve:  approveURL,
+		LinkReject:   rejectURL,
+		LinkPreview:  previewURL,
+	}
+
+	tmpl, err := template.ParseFiles(templateMail)
+	if err != nil {
+		log.Fatalf("Failed to parse template: %v. Please check if the file exists at: %s", err, templateMail)
+	}
+
+	var body bytes.Buffer
+	if err := tmpl.Execute(&body, data); err != nil {
+		log.Fatalf("Failed to execute template: %v", err)
+	}
 
 	mailer := gomail.NewMessage()
 	mailer.SetHeader("From", MAILER_USERNAME)
-	mailer.SetHeader("To", "tanasid_p@tbkk.co.th")
+	mailer.SetHeader("To", userEmail)
 	mailer.SetHeader("Subject", "New Document From CRM System")
-	mailer.SetBody("text/html", `
-			<p>Dear, K.Tanasid</p>
-			<p style="margin-left: 40px;">You have a new document "`+run_no+`" that needs approval.</p>
-			<p style="padding: 10px;">
-        		<a href="`+approveURL+`" style="margin-left: 40px;">Click here</a>
-				to Approve Document.
-    		</p>
-	`)
+	mailer.SetBody("text/html", body.String())
 
 	// (Optional) แนบไฟล์
 	// mailer.Attach("path/to/file.pdf")
@@ -1410,15 +1475,316 @@ func TestSendMail(c *gin.Context) {
 	dialer := gomail.NewDialer(MAILER_HOST, MAILER_PORT, MAILER_USERNAME, MAILER_PASSWORD)
 
 	// ส่งอีเมล
-	if err := dialer.DialAndSend(mailer); err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"message": "Failed to send email",
-			"error":   err.Error(),
-		})
+	err = dialer.DialAndSend(mailer)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ApproveByEmail(c *gin.Context) {
+	type Document struct {
+		Idc_id         int    `json:"idc_id"`
+		Idc_running_no string `json:"idc_running_no"`
+	}
+	type notiActive struct {
+		Ida_id    int    `json:"ida_id"`
+		Su_id     int    `json:"su_id"`
+		Ida_count string `json:"ida_count"`
+		Sat_id    int    `json:"sat_id"`
+	}
+	type userEmail struct {
+		Su_id        int    `json:"su_id"`
+		Su_firstname string `json:"su_firstname"`
+		Su_email     string `json:"su_email"`
+		Su_username  string `json:"su_username"`
+	}
+	type userCreate struct {
+		Su_id        int    `json:"su_id"`
+		Su_firstname string `json:"su_firstname"`
+		Su_email     string `json:"su_email"`
+	}
+
+	docID := c.Param("documentId")
+	idaID := c.Param("idaId")
+	caseType := c.Param("caseType")
+	strCreateDate := time.Now().Format("2006-01-02 15:04:05")
+	strShowUsers := "You have a new document!"
+	strShowUsers2 := "Your document has been approved!"
+
+	var objUserCreate userCreate
+	getEmail := "SELECT su.su_id, su.su_firstname, su.su_email FROM sys_users su LEFT JOIN info_document_control idc ON idc.idc_created_by = su.su_username WHERE idc.idc_id = ?"
+	err := db.QueryRow(getEmail, docID).Scan(&objUserCreate.Su_id, &objUserCreate.Su_firstname, &objUserCreate.Su_email)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+			return
+		}
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{
-		"message": "Email sent successfully!",
-	})
+	var cheIda int
+	checkIda := "SELECT ida_id FROM info_document_approval WHERE ida_id = ? AND ida_action = 0"
+	err = db.QueryRow(checkIda, idaID).Scan(&cheIda)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, "This document has already been approved")
+			return
+		}
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		return
+	} else {
+		var objNotiActive notiActive
+		err = db.QueryRow("SELECT ida_id, su_id, COUNT(ida_id) AS ida_count, MIN(sat_id) AS sat_id FROM info_document_approval WHERE idc_id = ? AND ida_action = 0 AND ida_status = 1", docID).Scan(&objNotiActive.Ida_id, &objNotiActive.Su_id, &objNotiActive.Ida_count, &objNotiActive.Sat_id)
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, false)
+			return
+		}
+
+		var objEmail userEmail
+		getEmail := "SELECT su_id, su_firstname, su_email, su_username FROM sys_users WHERE su_id = ?"
+		err = db.QueryRow(getEmail, objNotiActive.Su_id).Scan(&objEmail.Su_id, &objEmail.Su_firstname, &objEmail.Su_email, &objEmail.Su_username)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+				return
+			}
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+			return
+		}
+
+		var updateIda string
+		if caseType == "email" {
+			updateIda = "UPDATE info_document_approval SET ida_action = 1, ida_status = 9, ida_route = 2, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND ida_id = ?"
+		} else {
+			updateIda = "UPDATE info_document_approval SET ida_action = 1, ida_status = 9, ida_route = 1, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND ida_id = ?"
+		}
+		_, err = db.Exec(updateIda, strCreateDate, objEmail.Su_username, docID, idaID)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		} else {
+			_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 2, idaID, strShowUsers2, 0, strCreateDate, strCreateDate)
+			if err != nil {
+				c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			}
+
+			var objNotiActive notiActive
+			err = db.QueryRow("SELECT ida_id, su_id, COUNT(ida_id) AS ida_count, MIN(sat_id) AS sat_id FROM info_document_approval WHERE idc_id = ? AND ida_action = 0 AND ida_status = 1", docID).Scan(&objNotiActive.Ida_id, &objNotiActive.Su_id, &objNotiActive.Ida_count, &objNotiActive.Sat_id)
+			if err == sql.ErrNoRows {
+				c.IndentedJSON(http.StatusOK, false)
+				return
+			} else {
+				idcId, err := strconv.Atoi(docID)
+				if err != nil {
+					fmt.Println("Error converting to int:", err)
+					return
+				}
+
+				if objNotiActive.Ida_count == "0" || objNotiActive.Ida_count == "" {
+					err = InsertReferDoc(c, idcId)
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					}
+
+					err = SendMail(c, idcId, objNotiActive.Ida_id, objUserCreate.Su_firstname, objUserCreate.Su_email, "approve")
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					}
+
+					var strUpdatedByEmp string
+					getUser := db.QueryRow("SELECT idc_created_by FROM info_document_control WHERE idc_id = ?", idcId).Scan(&strUpdatedByEmp)
+					if getUser != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error1": getUser.Error()})
+						return
+					}
+					_, err = db.Exec("UPDATE info_document_control SET idc_status = 9, idc_updated_date = ?, idc_updated_by = ? WHERE idc_Id = ?", strCreateDate, strUpdatedByEmp, idcId)
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					}
+
+				} else {
+					_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 1, objNotiActive.Ida_id, strShowUsers, 0, strCreateDate, strCreateDate)
+					if err != nil {
+						c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+					}
+
+					var objEmail userEmail
+					getEmail := "SELECT su_id, su_firstname, su_email, su_username FROM sys_users WHERE su_id = ?"
+					err = db.QueryRow(getEmail, objNotiActive.Su_id).Scan(&objEmail.Su_id, &objEmail.Su_firstname, &objEmail.Su_email, &objEmail.Su_username)
+
+					if err != nil {
+						if err == sql.ErrNoRows {
+							c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+							return
+						}
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					}
+
+					err = SendMail(c, idcId, objNotiActive.Ida_id, objUserCreate.Su_firstname, objUserCreate.Su_email, "approve")
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					}
+
+					err = SendMail(c, idcId, objNotiActive.Ida_id, objEmail.Su_firstname, objEmail.Su_email, "waiting")
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					}
+				}
+			}
+		}
+	}
+
+	c.IndentedJSON(http.StatusOK, true)
+}
+
+func RejectByEmail(c *gin.Context) {
+	type notiActive struct {
+		Ida_id    int    `json:"ida_id"`
+		Su_id     int    `json:"su_id"`
+		Ida_count string `json:"ida_count"`
+		Sat_id    int    `json:"sat_id"`
+	}
+	type userEmail struct {
+		Su_id        int    `json:"su_id"`
+		Su_firstname string `json:"su_firstname"`
+		Su_email     string `json:"su_email"`
+		Su_username  string `json:"su_username"`
+	}
+	type userCreate struct {
+		Su_id        int    `json:"su_id"`
+		Su_firstname string `json:"su_firstname"`
+		Su_email     string `json:"su_email"`
+	}
+
+	docID := c.Param("documentId")
+	idaID := c.Param("idaId")
+	reason := c.Param("reason")
+	caseType := c.Param("caseType")
+	strCreateDate := time.Now().Format("2006-01-02 15:04:05")
+	var objNotiActive notiActive
+	strShowUsers := "Your document has been rejected!"
+
+	var cheIda int
+	checkIda := "SELECT ida_id FROM info_document_approval WHERE ida_id = ? AND ida_action = 0"
+	err := db.QueryRow(checkIda, idaID).Scan(&cheIda)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, "This document has already been rejected")
+			return
+		}
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		return
+	} else {
+		err = db.QueryRow("SELECT ida_id, su_id, COUNT(ida_id) AS ida_count, MIN(sat_id) AS sat_id FROM info_document_approval WHERE idc_id = ? AND ida_action = 0 AND ida_status = 1", docID).Scan(&objNotiActive.Ida_id, &objNotiActive.Su_id, &objNotiActive.Ida_count, &objNotiActive.Sat_id)
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, false)
+			return
+		} else {
+			var objEmail userEmail
+			getEmail := "SELECT su_id, su_firstname, su_email, su_username FROM sys_users WHERE su_id = ?"
+			err := db.QueryRow(getEmail, objNotiActive.Su_id).Scan(&objEmail.Su_id, &objEmail.Su_firstname, &objEmail.Su_email, &objEmail.Su_username)
+
+			if err != nil {
+				if err == sql.ErrNoRows {
+					c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+					return
+				}
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+				return
+			} else {
+				updateIda := "UPDATE info_document_approval SET ida_status = 6 WHERE idc_id = ?"
+				_, err := db.Exec(updateIda, docID)
+				if err != nil {
+					c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+					return
+				} else {
+					var updateIdaBy string
+					if caseType == "email" {
+						updateIdaBy = "UPDATE info_document_approval SET ida_action = 1, ida_route = 2, ida_reject_reason = ?, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND ida_id = ? AND su_id = ?"
+					} else {
+						updateIdaBy = "UPDATE info_document_approval SET ida_action = 1, ida_route = 1, ida_reject_reason = ?, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND ida_id = ? AND su_id = ?"
+					}
+
+					_, err = db.Exec(updateIdaBy, reason, strCreateDate, objEmail.Su_username, docID, objNotiActive.Ida_id, objNotiActive.Su_id)
+					if err != nil {
+						c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+						return
+					} else {
+						_, err := db.Exec("UPDATE temp_refer_document SET trd_status = 5, trd_updated_date = ? WHERE idc_id = ?", strCreateDate, docID)
+						if err != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{
+								"Error": err.Error(),
+							})
+							return
+						} else {
+							_, err := db.Exec("UPDATE info_document_control SET idc_status = 6, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", strCreateDate, objEmail.Su_username, docID)
+							if err != nil {
+								c.IndentedJSON(http.StatusInternalServerError, gin.H{
+									"Error": err.Error(),
+								})
+								return
+							} else {
+								var objUserCreate userCreate
+								getEmail := "SELECT su.su_id, su.su_firstname, su.su_email FROM sys_users su LEFT JOIN info_document_control idc ON idc.idc_created_by = su.su_username WHERE idc.idc_id = ?"
+								err := db.QueryRow(getEmail, docID).Scan(&objUserCreate.Su_id, &objUserCreate.Su_firstname, &objUserCreate.Su_email)
+
+								if err != nil {
+									if err == sql.ErrNoRows {
+										c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+										return
+									}
+									c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+									return
+								}
+								idcId, err := strconv.Atoi(docID)
+								if err != nil {
+									fmt.Println("Error converting to int:", err)
+									return
+								}
+
+								_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 2, objNotiActive.Ida_id, strShowUsers, 0, strCreateDate, strCreateDate)
+								if err != nil {
+									c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+								}
+								var doc_no string
+								err = db.QueryRow("SELECT idc_running_no FROM info_document_control WHERE idc_id = ?", docID).Scan(&doc_no)
+								if err != nil {
+									c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error1.1": err.Error()})
+									return
+								}
+								substring := doc_no[:3]
+
+								if substring == "NBC" {
+									_, err = db.Exec("UPDATE info_document_control SET idc_result_confirm = 1 WHERE idc_Id = ?", docID)
+									if err != nil {
+										c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+										return
+									}
+								}
+
+								err = SendMail(c, idcId, objNotiActive.Ida_id, objUserCreate.Su_firstname, objUserCreate.Su_email, "reject")
+								if err != nil {
+									c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+									return
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	c.IndentedJSON(http.StatusOK, true)
 }

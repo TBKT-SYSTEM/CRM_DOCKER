@@ -58,12 +58,11 @@ async function alertNotification() {
                                         <img class="rounded-circle" width="35" height="35" alt="" src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/${str_username}.jpg" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png'">
                                     </span>
                                     <div class="w-100">
-                                        <h6 class="mb-1 fw-semibold lh-base">You have a new ${data[i].snc_show_users}!</h6>
+                                        <h6 class="mb-1 fw-semibold lh-base">${data[i].snc_show_users}</h6>
                                         <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
                                         <span class="fs-2 d-block text-body-secondary">${timeAgo}</span>
                                     </div>
                                 </button>`;
-                        newNoti++;
                     }
                 }
                 if (data[i].snc_type == 2) {
@@ -76,7 +75,7 @@ async function alertNotification() {
                                         <img class="rounded-circle" width="35" height="35" alt="" src="http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/${str_username}.jpg" onerror="this.onerror=null; this.src='http://192.168.161.219/ticketMaintenance//assets/img/avatars/no-avatar.png'">
                                     </span>
                                     <div class="w-100">
-                                        <h6 class="mb-1 fw-semibold lh-base">Your document has been ${data[i].snc_show_users}!</h6>
+                                        <h6 class="mb-1 fw-semibold lh-base">${data[i].snc_show_users}</h6>
                                         <span class="fs-2 d-block fw-semibold text-body-secondary">Please check the documents.</span>
                                         <span class="fs-2 d-block text-body-secondary">${timeAgo}</span>
                                     </div>
@@ -87,6 +86,8 @@ async function alertNotification() {
             }
             if (newNoti == 0) {
                 $('a .notification').removeClass('bg-primary');
+            } else {
+                $('a .notification').addClass('bg-primary');
             }
             html += '<div class="p-2"></div>';
             $('#notificationBody').html(html);
@@ -98,10 +99,10 @@ async function alertNotification() {
 $(document).ready(function () {
     function alertNotificationRecursive() {
         alertNotification().then(() => {
-            setTimeout(alertNotificationRecursive, 5000);
+            setTimeout(alertNotificationRecursive, 600000);
         }).catch(err => {
             console.error(err);
-            setTimeout(alertNotificationRecursive, 5000);
+            setTimeout(alertNotificationRecursive, 600000);
         });
     }
 

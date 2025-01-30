@@ -48,6 +48,132 @@ class ManageNbc extends CI_Controller
 		$this->render_view('view_mngNbc');
 	}
 
+	public function UploadFile()
+	{
+		$empId = $this->session->userdata('sessUsr');
+
+		if (!empty($_FILES['inaf_file']['name'])) {
+			$config['upload_path'] = 'assets/images/uploaded/NBC/' . $empId . '/';
+			$config['allowed_types'] = 'jpg|jpeg|png|pdf|docx|xlsx';
+			$fileName = preg_replace('/[^A-Za-z0-9.\-_]/', '', $_FILES['inaf_file']['name']);
+			$fileName = str_replace(' ', '', $fileName);
+
+			$config['file_name'] = date('Y-m-d') . '_' . $fileName;
+
+			if (empty($empId)) {
+				echo json_encode([
+					'status' => 'error',
+					'message' => 'empId is required',
+				]);
+				return;
+			}
+
+			if (!is_dir($config['upload_path'])) {
+				if (!mkdir($config['upload_path'], 0777, true)) {
+					echo json_encode([
+						'status' => 'error',
+						'message' => 'Failed to create directory: ' . $config['upload_path'],
+					]);
+					return;
+				}
+			}
+			$this->load->library('upload', $config);
+
+			if ($this->upload->do_upload('inaf_file')) {
+				$uploadData = $this->upload->data();
+				$fileName = $uploadData['file_name'];
+				$filePath =  $config['upload_path'] . $fileName;
+				$physicalPath =  FCPATH . $config['upload_path'] . $fileName;
+
+				$data = [
+					'idc_id' => $this->input->get('idc_id'),
+					'inaf_file_path' => $filePath,
+					'inaf_physical_path' => $physicalPath,
+					'inaf_created_date' => date('Y-m-d H:i:s'),
+					'inaf_created_by' => $empId,
+					'inaf_updated_date' => date('Y-m-d H:i:s'),
+					'inaf_updated_by' => $empId,
+				];
+
+				if ($this->db->insert('info_nbc_attach_file', $data)) {
+					echo json_encode([
+						'status' => 'success',
+						'message' => 'Data inserted successfully.',
+						'file_path' => $filePath,
+						'file_name' => $fileName,
+						'inaf_physical_path' => $physicalPath,
+						'insert_id' => $this->db->insert_id(),
+					]);
+				} else {
+					echo json_encode([
+						'status' => 'error',
+						'message' => 'Failed to insert data.',
+					]);
+				}
+			} else {
+				echo json_encode([
+					'status' => 'error',
+					'message' => $this->upload->display_errors(),
+				]);
+			}
+		}
+	}
+	public function RemoveFile()
+	{
+		$filePath = $this->input->post('filePath');
+		$inaf_id = $this->input->post('inaf_id');
+		$idc_id = $this->input->post('idc_id');
+		if (!empty($filePath)) {
+			$absolutePath = FCPATH . str_replace('/', DIRECTORY_SEPARATOR, $filePath);
+
+			if (file_exists($absolutePath)) {
+				if (unlink($absolutePath)) {
+					if (
+						$this->db->set('inaf_status', 0)
+						->where('idc_id', $idc_id)
+						->update('info_nbc_attach_file')
+						&&
+						$this->db->set('idc_file_path', NULL)
+						->set('idc_physical_path', NULL)
+						->set('idc_updated_date', date('Y-m-d H:i:s'))
+						->set('idc_updated_by', $this->session->userdata('sessUsr'))
+						->where('idc_id', $idc_id)
+						->update('info_document_control')
+					) {
+						echo json_encode([
+							'status' => 'success',
+							'message' => 'File removed and database updated successfully.',
+							'file_path' => $filePath,
+						]);
+					} else {
+						echo json_encode([
+							'status' => 'error',
+							'message' => 'Failed to update the database.',
+							'file_path' => $filePath,
+						]);
+					}
+				} else {
+					echo json_encode([
+						'status' => 'error',
+						'message' => 'Failed to delete the file.',
+						'file_path' => $filePath,
+					]);
+				}
+			} else {
+				echo json_encode([
+					'status' => 'error',
+					'message' => 'File does not exist.',
+					'file_path' => $filePath,
+				]);
+			}
+		} else {
+			echo json_encode([
+				'status' => 'error',
+				'message' => 'File path is empty.',
+			]);
+		}
+	}
+
 	public function createNbcPDF()
 	{
 		$pdf = new FPDF();
@@ -67,68 +193,106 @@ class ManageNbc extends CI_Controller
 
 		$pdf->SetX($pdf->GetX() + 60);
 		$issue_date = 'Doc. No. :';
-		$ir_created_date = $this->input->get('ir_created_date');
+		$run_no = $this->input->get('run_no');
 		$width_issue_date = $pdf->GetStringWidth($issue_date) + 2;
 		$pdf->SetX($pdf->GetX() + 5);
 		$pdf->Cell($width_issue_date, 5, $issue_date);
-		$pdf->Cell(35.5, 5, $ir_created_date, 'B', 0, 'C');
+		$pdf->Cell(35.5, 5, $run_no, 'B', 0, 'C');
 
 		$pdf->Ln(8);
 		$pdf->SetX($pdf->GetX() + 135);
 		$issue_date = 'Issue Date :';
-		$ir_created_date = $this->input->get('ir_created_date');
+		$idc_created_date = $this->input->get('idc_created_date');
 		$width_issue_date = $pdf->GetStringWidth($issue_date) + 2;
 		$pdf->SetX($pdf->GetX() + 5);
 		$pdf->Cell($width_issue_date, 5, $issue_date);
-		$pdf->Cell(33, 5, $ir_created_date, 'B', 0, 'C');
+		$pdf->Cell(33, 5, $idc_created_date, 'B', 0, 'C');
 
 		$pdf->Ln(8);
 		$pdf->SetX($pdf->GetX() - 5);
 		$attn = 'To :';
 		$width_attn = $pdf->GetStringWidth($attn) + 2;
 		$pdf->Cell($width_attn, 5, $attn);
-		$pdf->Cell(40, 5, $ir_created_date, 'B', 0, 'C');
+		$pdf->Cell(40, 5, 'R&D Department', 'B', 0, 'L');
 
 		$pdf->SetX($pdf->GetX() + 12);
 		$attn = 'From :';
 		$width_attn = $pdf->GetStringWidth($attn) + 2;
 		$pdf->Cell($width_attn, 5, $attn);
-		$pdf->Cell(60, 5, $ir_created_date, 'B', 0, 'C');
+		$pdf->Cell(60, 5, 'Sale and Marketing Department', 'B', 0, 'L');
 
 		$pdf->SetX($pdf->GetX() + 15);
 		$attn = 'Ref. No. :';
+		$idc_running_no = $this->input->get('idc_running_no');
 		$width_attn = $pdf->GetStringWidth($attn) + 2;
 		$pdf->Cell($width_attn, 5, $attn);
-		$pdf->Cell(36.5, 5, $ir_created_date, 'B', 0, 'C');
+		$pdf->Cell(36.5, 5, $idc_running_no, 'B', 0, 'C');
 
 		$pdf->Ln(8);
 		$pdf->SetX($pdf->GetX() - 5);
+		$attn_name = $this->db->select("CONCAT('Mr. ', su.su_firstname) AS su_firstname")
+			->from('sys_workflow_detail swd')
+			->join('sys_workflow_group swg', 'swg.swg_id = swd.swg_id', 'left')
+			->join('sys_department sd', 'sd.sd_id = swg.sd_id', 'left')
+			->join('sys_users su', 'su.su_id = swd.su_id', 'left')
+			->where('sd.sd_dept_aname LIKE', '%R&D%')
+			->where('swd.swd_level_no = (SELECT MAX(swd_level_no) FROM sys_workflow_detail swd_sub WHERE swd_sub.swg_id = swg.swg_id)', null, false)
+			->get()
+			->result();
+
 		$attn = 'Attn :';
 		$width_attn = $pdf->GetStringWidth($attn) + 2;
 		$pdf->Cell($width_attn, 5, $attn);
-		$pdf->Cell(37.5, 5, $ir_created_date, 'B', 0, 'C');
+		$pdf->Cell(37.5, 5, $attn_name[0]->su_firstname, 'B', 0, 'L');
 
+		// Enclosures
 		$pdf->Ln(10);
+		$count_mde = 0;
+		$get_mde = $this->input->get('mde_id');
+		$mde_all = $this->db->select('mde_id, mde_name')->from('mst_document_enclosures')->order_by('mde_id', 'asc')->get()->result();
+		$enclosures_note = '-';
+
 		$pdf->SetX($pdf->GetX() - 5);
 		$subj = 'Enclosures :';
 		$width_subj = $pdf->GetStringWidth($subj) + 2;
 		$pdf->Cell($width_subj, 0, $subj);
 
-		$pdf->SetFillColor(0, 0, 0);
-		$pdf->SetY($pdf->GetY() - 2.5);
-		$pdf->SetX($pdf->GetX() + 15);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$drawing = 'Drawing';
-		$width_drawing = $pdf->GetStringWidth($drawing) + 2;
-		$pdf->Cell($width_drawing, 5, $drawing);
+		for ($i = 0; $i < count($mde_all); $i++) {
+			$box_bg = '255, 255, 255';
 
-		$pdf->SetX($pdf->GetX() + 13);
-		$pdf->SetFillColor(255, 255, 255);
-		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-		$eOther = 'Other :';
-		$width_eOther = $pdf->GetStringWidth($eOther) + 2;
-		$pdf->Cell($width_eOther, 5, $eOther);
-		$pdf->Cell(55, 5, '', 'B', 0, 'L');
+			if ($get_mde == $mde_all[$i]->mde_id) {
+				$box_bg = '0, 0, 0';
+			}
+
+			if ($count_mde == 0) {
+				$pdf->SetFillColor((int)$box_bg);
+				$pdf->SetY($pdf->GetY() - 3);
+				$pdf->SetX($pdf->GetX() + 15);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$newp = $mde_all[$i]->mde_name;
+				$width_newp = $pdf->GetStringWidth($newp) + 2;
+				$pdf->Cell($width_newp, 5, $newp);
+			} else {
+				$pdf->SetX($pdf->GetX() + 7.6);
+				$pdf->SetFillColor((int)$box_bg);
+				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
+				$ecr = $mde_all[$i]->mde_name . ' :';
+				$width_ecr = $pdf->GetStringWidth($ecr) + 2;
+				$pdf->Cell($width_ecr, 5, $ecr);
+			}
+
+			if ($mde_all[$i]->mde_name == 'Other') {
+				if ($get_mde == $mde_all[$i]->mde_id) {
+					$enclosures_note = $this->input->get('idc_enclosures_note');
+					$pdf->Cell(55, 5, $enclosures_note, 'B', 0, 'L');
+				} else {
+					$pdf->Cell(55, 5, $enclosures_note, 'B', 0, 'C');
+				}
+			}
+
+			$pdf->SetX($pdf->GetX() + 5);
+			$count_mde++;
+		}
 
 		$pdf->Ln(10);
 		$ir_pro_life = $this->input->get('ir_pro_life');
@@ -140,7 +304,6 @@ class ManageNbc extends CI_Controller
 
 		// Table Part No.
 		$pdf->Ln(4);
-		// $pdf->SetLineWidth(1.3);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 12);
 		$pdf->SetFillColor(235, 235, 235);
@@ -150,23 +313,22 @@ class ManageNbc extends CI_Controller
 		$pdf->Cell(40, 4, 'MODEL', 1, 0, 'C', true);
 		$pdf->Cell(50, 4, 'Remark', 1, 1, 'C', true);
 
-		// $ir_id = $this->input->get('ir_id');
-		// 0 = $this->db->select('irpn.irpn_part_no, irpn.irpn_part_name, irpn.irpn_model, irpn.irpn_remark')
-		// 	->from('info_rfq_part_no irpn')
-		// 	->join('info_rfq ir', 'ir.ir_id = irpn.ir_id', 'left')
-		// 	->where('irpn.ir_id', $ir_id)
-		// 	->where('irpn.irpn_status', 1)
-		// 	->order_by('irpn.irpn_id', 'ASC')->get()->result();
+		$idc_id = $this->input->get('idc_id');
+		$consern = $this->db->select('idi_item_no, idi_item_name, idi_model, idi_remark')
+			->from('info_document_item')
+			->where('idc_id', $idc_id)
+			->where('idi_status', 1)
+			->order_by('idi_id', 'ASC')->get()->result();
 
 		for ($i = 0; $i < 20; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
 			$pdf->SetFont('THSarabunNew', 'B', 11);
 			$pdf->Cell(15, 4, $i + 1, 1, 0, "C");
 
-			$part_no = isset($consern[$i]->irpn_part_no) ? $consern[$i]->irpn_part_no : '';
-			$part_name = isset($consern[$i]->irpn_part_name) ? $consern[$i]->irpn_part_name : '';
-			$model = isset($consern[$i]->irpn_model) ? $consern[$i]->irpn_model : '';
-			$remark = isset($consern[$i]->irpn_remark) ? $consern[$i]->irpn_remark : '';
+			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
+			$part_name = isset($consern[$i]->idi_item_name) ? $consern[$i]->idi_item_name : '';
+			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
+			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
 			$pdf->Cell(35, 4, $part_no, 1, 0, 'C');
 			$pdf->Cell(55, 4, $part_name, 1, 0, 'C');
@@ -178,31 +340,22 @@ class ManageNbc extends CI_Controller
 		$pdf->Ln(1);
 		$pdf->SetX($pdf->GetX() - 5);
 		$pdf->SetFont('THSarabunNew', 'B', 11);
-
-		$ir_pro_life = $this->input->get('ir_pro_life');
 		$val = 'Volume Information :';
 		$width_val = $pdf->GetStringWidth($val);
 		$pdf->Cell($width_val, 5, $val);
 
 		$pdf->Ln(5);
-		$years = [];
-		$volumes = [];
-		$countYears = $ir_sop_tim;
-		for ($i = 0; $i <= $ir_pro_life; $i++) {
-			if ($i == 0) {
-				$years[$i] = $countYears;
-				$volumes[$i] = rand(10000, 99999);
-			} else {
-				$years[$i] = $countYears += 1;
-				$volumes[$i] = rand(10000, 99999);
-			}
-		}
+		$countYears = $this->db->select('idv_year, idv_qty')
+			->from('info_document_volume')
+			->where('idc_id', $idc_id)
+			->where('idv_status', 1)
+			->order_by('idv_id', 'ASC')->get()->result();
 
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFillColor(235, 235, 235);
 		$pdf->Cell(15, 5, 'Year', 1, 0, 'R', true);
 		for ($i = 0; $i < 11; $i++) {
-			$year = isset($years[$i]) ? $years[$i] : '';
+			$year = isset($countYears[$i]->idv_year) ? $countYears[$i]->idv_year : '';
 			$pdf->Cell(16.35, 5, $year, 1, 0, 'C');
 		}
 
@@ -211,7 +364,7 @@ class ManageNbc extends CI_Controller
 		$pdf->SetFillColor(235, 235, 235);
 		$pdf->Cell(15, 5, 'Volume', 1, 0, 'R', true);
 		for ($i = 0; $i < 11; $i++) {
-			$volume = isset($volumes[$i]) ? $volumes[$i] : '';
+			$volume = isset($countYears[$i]->idv_qty) ? $countYears[$i]->idv_qty : '';
 			$pdf->Cell(16.35, 5, $volume, 1, 0, 'C');
 		}
 
@@ -230,12 +383,14 @@ class ManageNbc extends CI_Controller
 		$pdf->SetFont('THSarabunNew', 'B', 10);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->Cell(195, 4, '2. Please mention point that need to change specification.', 'LR', 0, 'L',);
+		
 		$pdf->Ln();
 		$pdf->SetFont('THSarabunNew', 'B', 10);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->Cell(16, 4, '3. Reply on : ', 'L', 0, 'L',);
-		$pdf->Cell(60, 4, '', 'B', 0, 'L');
-		$pdf->Cell(119, 2, '', 'R', 0, 'L');
+		$idc_reply_date = $this->input->get('idc_reply_date');
+		$pdf->Cell(40, 4, $idc_reply_date, 'B', 0, 'C');
+		$pdf->Cell(139, 2, '', 'R', 0, 'L');
 
 		$pdf->Ln();
 		$pdf->SetFont('THSarabunNew', 'B', 10);
@@ -254,22 +409,55 @@ class ManageNbc extends CI_Controller
 
 		$pdf->Ln();
 		$pdf->SetX($pdf->GetX() - 4);
-		$image_sign = 'assets/images/uploaded/signature/51SST60_signature.png';
-		$image_sign2 = 'assets/images/uploaded/signature/51SST60_signature2.png';
-		$image_sign3 = 'assets/images/uploaded/signature/51SST60_signature3.png';
-		$pdf->Cell(48.75, 15, $pdf->Image($image_sign, $pdf->GetX(), $pdf->GetY(), 48.75, 17), 'LR', 0, 'C');
-		$pdf->Cell(48.75, 15, $pdf->Image($image_sign3, $pdf->GetX(), $pdf->GetY(), 48.75, 17), 'LR', 0, 'C');
-		$pdf->Cell(48.75, 15, $pdf->Image($image_sign2, $pdf->GetX(), $pdf->GetY(), 48.75, 17), 'LR', 0, 'C');
-		$pdf->Cell(48.75, 15, '', 'LR', 0, 'C');
+
+		$sign1 = $this->db->select("su.su_sign_path, CONCAT(su.su_firstname, ' ', su.su_lastname) AS fullname")
+			->from('sys_users su')
+			->join('info_document_control idc', 'idc.idc_created_by = su.su_username', 'left')
+			->where('idc.idc_running_no', $run_no)
+			->get()
+			->result();
+
+		$sign1[0]->su_sign_path = ($sign1[0]->su_sign_path == 'null' || !$sign1[0]->su_sign_path) ? 'assets/images/uploaded/signature/EmptySign.png' : $sign1[0]->su_sign_path;
+		$sign1[0]->fullname = $sign1[0]->fullname ?? '';
+
+		$sign_group = $this->db->select("CASE WHEN ida.ida_status = 9 THEN su.su_sign_path ELSE 'null' END AS su_sign_path,
+										COALESCE(CONCAT(su.su_firstname, ' ', su.su_lastname), 'null') AS fullname")
+									->from('info_document_control idc')
+									->join('info_document_approval ida', 'ida.idc_id = idc.idc_id', 'left')
+									->join('sys_users su', 'su.su_id = ida.su_id', 'left')
+									->where('idc.idc_id', $this->input->get('idc_refer_doc'))
+									->where_in('ida.ida_status', [1, 9])
+									->get()
+									->result();
+
+		if (count($sign_group) == 3) {
+			for ($i = 0; $i < count($sign_group); $i++) {
+				$sign_group[$i]->su_sign_path = ($sign_group[$i]->su_sign_path == 'null' || !$sign_group[$i]->su_sign_path) ? 'assets/images/uploaded/signature/EmptySign.png' : $sign_group[$i]->su_sign_path;
+				$sign_group[$i]->fullname = $sign_group[$i]->fullname ?? '';
+			}
+		} else {
+			for ($i = 0; $i < count($sign_group); $i++) {
+				$sign_group[$i]->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
+				$sign_group[$i]->fullname = 'Error signature';
+			}
+		}
+
+		$pdf->Cell(48.75, 15, $pdf->Image($sign1[0]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48, 16), 'LR', 0, 'C');
+		$pdf->Cell(48.75, 15, $pdf->Image($sign_group[0]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48, 16), 'LR', 0, 'C');
+		$pdf->Cell(48.75, 15, $pdf->Image($sign_group[1]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48, 16), 'LR', 0, 'C');
+		$pdf->Cell(48.75, 15, $pdf->Image($sign_group[2]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48, 16), 'LR', 0, 'C');
 
 		$pdf->Ln();
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(48.75, 5, 'Pimnapat Bualuang', 'LBR', 0, 'C');
-		$pdf->Cell(48.75, 5, 'Kyoko Saijo', 'LBR', 0, 'C');
-		$pdf->Cell(48.75, 5, 'Sirote Sukhiranwat', 'LBR', 0, 'C');
-		$pdf->Cell(48.75, 5, 'Horokoshi Yuji', 'LBR', 0, 'C');
+		$pdf->Cell(48.75, 5, $sign1[0]->fullname, 'LBR', 0, 'C');
+		$pdf->Cell(48.75, 5, $sign_group[0]->fullname, 'LBR', 0, 'C');
+		$pdf->Cell(48.75, 5, $sign_group[1]->fullname, 'LBR', 0, 'C');
+		$pdf->Cell(48.75, 5, $sign_group[2]->fullname, 'LBR', 0, 'C');
 
 		$pdf->Ln(7);
+		$bg_ok = '';
+		$bg_ng = '';
+		$idc_result_confirm = $this->input->get('idc_result_confirm');
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 10);
 		$replysheet = 'Reply Sheet :';
@@ -277,15 +465,26 @@ class ManageNbc extends CI_Controller
 		$replydept = 'R&D Dept. confirm project\'s possibility result :';
 		$pdf->Cell(5, 6, $replydept, 0, 0);
 
+		if ($idc_result_confirm == 0) {
+			$bg_ok = '255, 255, 255';
+			$bg_ng = '255, 255, 255';
+		} else if ($idc_result_confirm == 1) {
+			$bg_ok = '255, 255, 255';
+			$bg_ng = '0, 0, 0';
+		} else if ($idc_result_confirm == 9) {
+			$bg_ok = '0, 0, 0';
+			$bg_ng = '255, 255, 255';
+		}
+
 		$pdf->SetY($pdf->GetY() + 0.5);
 		$pdf->SetX($pdf->GetX() - 17);
-		$pdf->SetFillColor(0, 0, 0);
+		$pdf->SetFillColor((int)$bg_ok);
 		$pdf->SetX($pdf->GetX() - 115);
 		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
 		$drawing = 'OK';
 		$pdf->Cell(15, 5, $drawing);
 
-		$pdf->SetFillColor(255, 255, 255);
+		$pdf->SetFillColor((int)$bg_ng);
 		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
 		$eOther = 'NG';
 		$pdf->Cell(1, 5, $eOther);
@@ -298,7 +497,8 @@ class ManageNbc extends CI_Controller
 		$pdf->Cell(195, 5, 'Note / Comment :', 1, 0, 'L', true);
 		$pdf->Ln();
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(195, 20, '', 'LBR', 1, 'L',);
+		$idc_note2 = $this->input->get('idc_note2');
+		$pdf->Cell(195, 20, $idc_note2, 'LBR', 1, 'L',);
 
 		$pdf->Ln(3);
 		$arrow = 'assets/images/logos/arrow-right-removebg-preview.png';
@@ -339,19 +539,43 @@ class ManageNbc extends CI_Controller
 		$pdf->Cell(48.75, 5, '', 'LR', 0, 'L',);
 		$pdf->Cell(48.75, 5, '', 'R', 1, 'L',);
 
+		$sign_rnd = $this->db->select("
+				CASE WHEN ida.ida_status = 9 THEN su.su_sign_path ELSE 'null' END AS su_sign_path,
+				COALESCE(CONCAT(su.su_firstname, ' ', su.su_lastname), 'null') AS fullname")
+			->from('info_document_control idc')
+			->join('info_document_approval ida', 'ida.idc_id = idc.idc_id', 'left')
+			->join('sys_users su', 'su.su_id = ida.su_id', 'left')
+			->where('idc.idc_id', $idc_id)
+			->where_in('ida.ida_status', [1, 9, 6])
+			->get()
+			->result();
+
+		if (count($sign_rnd) == 2) {
+			for ($i = 0; $i < count($sign_rnd); $i++) {
+				$sign_rnd[$i]->su_sign_path = ($sign_rnd[$i]->su_sign_path == 'null' || !$sign_rnd[$i]->su_sign_path) ? 'assets/images/uploaded/signature/EmptySign.png' : $sign_rnd[$i]->su_sign_path;
+				$sign_rnd[$i]->fullname = $sign_rnd[$i]->fullname ?? '';
+			}
+		} else {
+			for ($i = 0; $i < count($sign_rnd); $i++) {
+				$sign_rnd[$i]->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
+				$sign_rnd[$i]->fullname = 'Error signature';
+			}
+		}
+
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->Cell(48.75, 5, "CE/GDC", 0, 0, 'C');
-		$pdf->Cell(48.75, 5, 'Praphan Chuesing', 'LB', 0, 'C',);
-		$pdf->Cell(48.75, 5, 'Chawalit Supotjanard', 'LBR', 0, 'C',);
-		$pdf->Cell(48.75, 5, 'Chawalit Supotjanard', 'BR', 1, 'C',);
+		$pdf->Cell(48.75, 5, $sign1[0]->fullname, 'LB', 0, 'C',);
+		$pdf->Cell(48.75, 5, $sign_rnd[0]->fullname, 'LBR', 0, 'C',);
+		$pdf->Cell(48.75, 5, $sign_rnd[1]->fullname, 'BR', 1, 'C',);
 
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->Sety($pdf->GetY() - 20);
 		$pdf->Cell(45, 5, "", 0, 0, 'C');
-		$pdf->Cell(48.75, 5, $pdf->Image($image_sign, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
-		$pdf->Cell(48.75, 5, $pdf->Image($image_sign2, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
-		$pdf->Cell(48.75, 5, $pdf->Image($image_sign3, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 1, 'L');
-		
+
+		$pdf->Cell(48.75, 5, $pdf->Image($sign1[0]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
+		$pdf->Cell(48.75, 5, $pdf->Image($sign_rnd[0]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
+		$pdf->Cell(48.75, 5, $pdf->Image($sign_rnd[1]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 1, 'L');
+
 		$pdf->Output();
 	}
 }
