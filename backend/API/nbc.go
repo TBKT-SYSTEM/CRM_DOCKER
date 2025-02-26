@@ -130,9 +130,7 @@ func GetNBC(c *gin.Context) {
 
 	objListNbc, err := db.Query("SELECT idc.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file, (SELECT CASE WHEN COUNT(*) > 0 THEN 'true' ELSE 'false' END FROM info_document_control idc_sub LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc_sub.mdt_id WHERE mdt.mdt_name LIKE '%NBC%' AND idc_sub.idc_refer_doc = idc.idc_id) AS btnNBC, (SELECT CASE WHEN run_no.mdt_id != 3 THEN 'null' ELSE COALESCE(run_no.idc_running_no, 'null') END FROM info_document_control run_no WHERE run_no.idc_id = idc.idc_refer_doc) AS run_no FROM info_document_control AS idc LEFT JOIN sys_users AS su ON idc.idc_updated_by = su.su_username WHERE idc.idc_id = ?", c.Param("id"))
 	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": err.Error(),
-		})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
 	}
 
@@ -140,6 +138,11 @@ func GetNBC(c *gin.Context) {
 	for objListNbc.Next() {
 		var objNbc NbcTable
 		var strReferDoc sql.NullInt64
+		var strPlant sql.NullInt64
+		var strMde sql.NullInt64
+		var strProlife sql.NullInt64
+		var strProstart sql.NullString
+		var strCloseingDate sql.NullString
 		var strSubjectNote sql.NullString
 		var strEnclosuresNote sql.NullString
 		var strIssueDate sql.NullString
@@ -155,16 +158,26 @@ func GetNBC(c *gin.Context) {
 		var strSignFile sql.NullString
 		var strRunNo sql.NullString
 
-		err := objListNbc.Scan(&objNbc.Idc_id, &objNbc.Mdt_id, &strReferDoc, &objNbc.Idc_running_no, &objNbc.Idc_issue_year, &objNbc.Idc_issue_month, &objNbc.Idc_issue_seq_no, &objNbc.Idc_customer_type, &objNbc.Idc_customer_name, &objNbc.Idc_plant_cd, &objNbc.Mds_id, &strSubjectNote, &objNbc.Mde_id, &strEnclosuresNote, &objNbc.Idc_project_life, &objNbc.Idc_project_start, &strIssueDate, &objNbc.Idc_closing_date, &strReplyDate, &objNbc.Idc_result_confirm, &objNbc.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objNbc.Idc_created_date, &objNbc.Idc_created_by, &objNbc.Idc_updated_date, &objNbc.Idc_updated_by, &strFirstName, &strLastName, &strSignPath, &strSignFile, &objNbc.Btn_nbc, &strRunNo)
+		err := objListNbc.Scan(&objNbc.Idc_id, &objNbc.Mdt_id, &strReferDoc, &objNbc.Idc_running_no, &objNbc.Idc_issue_year, &objNbc.Idc_issue_month, &objNbc.Idc_issue_seq_no, &objNbc.Idc_customer_type, &objNbc.Idc_customer_name, &strPlant, &objNbc.Mds_id, &strSubjectNote, &strMde, &strEnclosuresNote, &strProlife, &strProstart, &strIssueDate, &strCloseingDate, &strReplyDate, &objNbc.Idc_result_confirm, &objNbc.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objNbc.Idc_created_date, &objNbc.Idc_created_by, &objNbc.Idc_updated_date, &objNbc.Idc_updated_by, &strFirstName, &strLastName, &strSignPath, &strSignFile, &objNbc.Btn_nbc, &strRunNo)
 		if err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{
-				"Error": err.Error(),
-			})
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 			return
 		}
 
 		if strReferDoc.Valid {
 			objNbc.Idc_refer_doc = int(strReferDoc.Int64)
+		}
+		if strPlant.Valid {
+			objNbc.Idc_plant_cd = int(strPlant.Int64)
+		}
+		if strMde.Valid {
+			objNbc.Mde_id = int(strMde.Int64)
+		}
+		if strProlife.Valid {
+			objNbc.Idc_project_life = int(strProlife.Int64)
+		}
+		if strProstart.Valid {
+			objNbc.Idc_project_start = strProstart.String
 		}
 		if strSubjectNote.Valid {
 			objNbc.Idc_subject_note = strSubjectNote.String
@@ -174,6 +187,9 @@ func GetNBC(c *gin.Context) {
 		}
 		if strIssueDate.Valid {
 			objNbc.Idc_issue_date = strIssueDate.String
+		}
+		if strCloseingDate.Valid {
+			objNbc.Idc_closing_date = strCloseingDate.String
 		}
 		if strReplyDate.Valid {
 			objNbc.Idc_reply_date = strReplyDate.String
@@ -226,9 +242,14 @@ func GetNBC(c *gin.Context) {
 func GetDocByRunNo(c *gin.Context) {
 	var objDocNo GetRfq
 	var strReferDoc sql.NullInt64
+	var strPlant sql.NullInt64
+	var strMde sql.NullInt64
 	var strSubjectNote sql.NullString
 	var strEnclosuresNote sql.NullString
+	var strProLife sql.NullInt64
+	var strProstart sql.NullString
 	var strIssueDate sql.NullString
+	var strCloseDate sql.NullString
 	var strReplyDate sql.NullString
 	var strNote1 sql.NullString
 	var strNote2 sql.NullString
@@ -237,7 +258,7 @@ func GetDocByRunNo(c *gin.Context) {
 	var strCancelReason sql.NullString
 
 	query := "SELECT * FROM info_document_control WHERE idc_running_no = ?"
-	err := db.QueryRow(query, c.Param("id")).Scan(&objDocNo.Idc_id, &objDocNo.Mdt_id, &strReferDoc, &objDocNo.Idc_running_no, &objDocNo.Idc_issue_year, &objDocNo.Idc_issue_month, &objDocNo.Idc_issue_seq_no, &objDocNo.Idc_customer_type, &objDocNo.Idc_customer_name, &objDocNo.Idc_plant_cd, &objDocNo.Mds_id, &strSubjectNote, &objDocNo.Mde_id, &strEnclosuresNote, &objDocNo.Idc_project_life, &objDocNo.Idc_project_start, &strIssueDate, &objDocNo.Idc_closing_date, &strReplyDate, &objDocNo.Idc_result_confirm, &objDocNo.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objDocNo.Idc_created_date, &objDocNo.Idc_created_by, &objDocNo.Idc_updated_date, &objDocNo.Idc_updated_by)
+	err := db.QueryRow(query, c.Param("id")).Scan(&objDocNo.Idc_id, &objDocNo.Mdt_id, &strReferDoc, &objDocNo.Idc_running_no, &objDocNo.Idc_issue_year, &objDocNo.Idc_issue_month, &objDocNo.Idc_issue_seq_no, &objDocNo.Idc_customer_type, &objDocNo.Idc_customer_name, &strPlant, &objDocNo.Mds_id, &strSubjectNote, &strMde, &strEnclosuresNote, &strProLife, &strProstart, &strIssueDate, &strCloseDate, &strReplyDate, &objDocNo.Idc_result_confirm, &objDocNo.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objDocNo.Idc_created_date, &objDocNo.Idc_created_by, &objDocNo.Idc_updated_date, &objDocNo.Idc_updated_by)
 	if err == sql.ErrNoRows {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -248,14 +269,29 @@ func GetDocByRunNo(c *gin.Context) {
 	if strReferDoc.Valid {
 		objDocNo.Idc_refer_doc = int(strReferDoc.Int64)
 	}
+	if strPlant.Valid {
+		objDocNo.Idc_plant_cd = int(strPlant.Int64)
+	}
 	if strSubjectNote.Valid {
 		objDocNo.Idc_subject_note = strSubjectNote.String
+	}
+	if strMde.Valid {
+		objDocNo.Mde_id = int(strMde.Int64)
+	}
+	if strProLife.Valid {
+		objDocNo.Idc_project_life = int(strProLife.Int64)
+	}
+	if strProstart.Valid {
+		objDocNo.Idc_project_start = strProstart.String
 	}
 	if strEnclosuresNote.Valid {
 		objDocNo.Idc_enclosures_note = strEnclosuresNote.String
 	}
 	if strIssueDate.Valid {
 		objDocNo.Idc_issue_date = strIssueDate.String
+	}
+	if strCloseDate.Valid {
+		objDocNo.Idc_closing_date = strCloseDate.String
 	}
 	if strReplyDate.Valid {
 		objDocNo.Idc_reply_date = strReplyDate.String
@@ -541,7 +577,7 @@ func SubmitNbc(c *gin.Context) {
 		objReferRfq.Idc_cancel_reason = strCancelReason.String
 	}
 
-	query := ` SELECT mdt.mdt_position1, swd.swg_id, swd.su_id, swd.sat_id FROM mst_document_type mdt LEFT JOIN info_document_control idc ON idc.mdt_id = mdt.mdt_id LEFT JOIN mst_approve_pattern map ON map.map_id = mdt.map_id LEFT JOIN mst_approve_pattern_detail mapd ON map.map_id = mapd.map_id LEFT JOIN sys_approve_type sat ON sat.sat_id = mapd.sat_id LEFT JOIN sys_workflow_detail swd ON sat.sat_id = swd.sat_id LEFT JOIN sys_users su ON su.su_id = swd.su_id WHERE mdt.mdt_id = ( SELECT mdt_id FROM info_document_control WHERE idc_id = ? ) AND swd.swg_id = ( SELECT swg_id FROM sys_workflow_group swg LEFT JOIN sys_department sd ON sd.sd_id = swg.sd_id WHERE swg.sd_id = 19 ) GROUP BY swd.su_id ORDER BY mapd.mapd_seq_no `
+	query := ` SELECT mdt.mdt_position1, swd.swg_id, swd.su_id, swd.sat_id FROM mst_document_type mdt LEFT JOIN info_document_control idc ON idc.mdt_id = mdt.mdt_id LEFT JOIN mst_approve_pattern map ON map.map_id = mdt.map_id LEFT JOIN mst_approve_pattern_detail mapd ON map.map_id = mapd.map_id LEFT JOIN sys_approve_type sat ON sat.sat_id = mapd.sat_id LEFT JOIN sys_workflow_detail swd ON sat.sat_id = swd.sat_id LEFT JOIN sys_users su ON su.su_id = swd.su_id WHERE mdt.mdt_id = ( SELECT mdt_id FROM info_document_control WHERE idc_id = ? ) AND swd.swg_id = ( SELECT swg_id FROM sys_workflow_group swg LEFT JOIN sys_department sd ON sd.sd_id = swg.sd_id WHERE swg.sd_id = 19 ) AND swd.swd_status = 1 GROUP BY swd.su_id ORDER BY mapd.mapd_seq_no `
 
 	rows, err := db.Query(query, iId)
 	if err != nil {

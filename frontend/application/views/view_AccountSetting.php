@@ -178,7 +178,7 @@
                                 <div class="image-preview form-control mt-3 mx-auto" id="imagePreview">
                                     <span id="imagePreviewText">No picture has been selected.</span>
                                     <?php $sessUsr = $this->session->userdata('sessUsr'); ?>
-                                    <img src="assets/images/uploaded/signature/<?php echo $sessUsr ?>_signature.png" id="imagePreviewImg" class="" onload="document.getElementById('imagePreviewText').style.display='none';" onerror="this.style.display='none';">
+                                    <img src="assets/images/uploaded/signature/<?php echo $sessUsr ?>/<?php echo $sessUsr ?>_signature.png" id="imagePreviewImg" class="" onload="document.getElementById('imagePreviewText').style.display='none';" onerror="this.style.display='none';">
                                 </div>
 
                         </div>
@@ -220,7 +220,6 @@
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
 
-                    // การตัดพื้นหลัง (เบื้องต้น)
                     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     const data = imageData.data;
 
@@ -229,9 +228,8 @@
                         const g = data[i + 1];
                         const b = data[i + 2];
 
-                        // หากเป็นสีขาว (หรือใกล้เคียง) ทำให้โปร่งใส
                         if (r > 200 && g > 200 && b > 200) {
-                            data[i + 3] = 0; // ตั้งค่า alpha เป็น 0 (โปร่งใส)
+                            data[i + 3] = 0;
                         }
                     }
 
@@ -274,6 +272,7 @@
                     data: JSON.stringify(data),
                     contentType: 'application/json',
                     success: async function(resData) {
+                        console.log(resData);
                         var newData = JSON.parse(resData);
                         $.ajax({
                             type: 'POST',

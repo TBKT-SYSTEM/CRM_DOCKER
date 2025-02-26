@@ -60,20 +60,23 @@ class AccountSetting extends CI_Controller
 		$imageData = base64_decode($imageData);
 
 		$fileName = $update_by . '_signature.png';
-		$filePath = 'assets/images/uploaded/signature/' . $update_by . '_signature.png';
+		$filePath = 'assets/images/uploaded/signature/' . $update_by;
 
-		$newData = array(
-			'su_id' => (int)$su_id,
-			'su_sign_file' => $fileName,
-			'su_sign_path' => $filePath,
-			'su_updated_date' => $update_date,
-			'su_updated_by' => $update_by,
-		);
+		if (!is_dir($filePath)) {
+			mkdir($filePath, 0777, true);
+		}
 
-		if (file_put_contents($filePath, $imageData)) {
+		if (file_put_contents($filePath . '/' . $fileName, $imageData)) {
+			$newData = array(
+				'su_id' => (int)$su_id,
+				'su_sign_file' => $fileName,
+				'su_sign_path' => $filePath . '/' . $fileName,
+				'su_updated_date' => $update_date,
+				'su_updated_by' => $update_by,
+			);
 			echo json_encode($newData);
 		} else {
-			echo 'Failed to upload file.';
+			echo json_encode(["error" => "Failed to upload file."]);
 		}
 	}
 }

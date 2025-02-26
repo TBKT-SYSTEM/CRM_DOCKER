@@ -87,4 +87,4 @@ defined('EXIT__AUTO_MAX')      or define('EXIT__AUTO_MAX', 125); // highest auto
 // defined('API_BASE_URL_CONTAINER')        or define('API_BASE_URL_CONTAINER', 'http://backend:8080/');
 // defined('API_BASE_URL')        or define('API_BASE_URL', 'http://localhost:8080/');
 defined('API_BASE_URL')        or define('API_BASE_URL', 'http://172.21.64.221:8080/');
-// defined('API_BASE_URL')        OR define('API_BASE_URL', 'http://192.168.161.219:9002/');
+// defined('API_BASE_URL')        OR define('API_BASE_URL', 'http://192.168.161.79:9000/');

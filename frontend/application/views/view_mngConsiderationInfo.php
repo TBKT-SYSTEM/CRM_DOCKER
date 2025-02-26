@@ -798,7 +798,7 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'sd_dept_name'
+                    data: 'sd_adept_aname'
                 },
                 {
                     className: 'text-center',

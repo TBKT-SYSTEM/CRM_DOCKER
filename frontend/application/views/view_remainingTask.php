@@ -206,7 +206,6 @@
             }
         })
     }
-
     async function reject() {
         let idc_id = $('#inpIdc').val();
         let ida_id = $('#inpIda').val();
@@ -290,7 +289,6 @@
         }
     }
 
-
     function formatDate(inputDate) {
         let dateParts = inputDate.split('-');
         let year = dateParts[0];
@@ -341,6 +339,28 @@
                     param.idc_closing_date = formatDate(Duedate);
 
                     let pdfUrl = '<?php echo base_url(); ?>ManageNbc/createNbcPDF?' + $.param(param);
+                    window.open(pdfUrl, '_blank');
+                    return;
+                }
+            });
+        } else if (doc_type == 'FS') {
+            $.ajax({
+                type: 'get',
+                url: API_URL + 'doc/runno/' + run_no,
+                success: async function(result) {
+                    console.log(result);
+                    
+                    let param = {
+                        ...result
+                    };
+
+                    let IssueDate = param.idc_created_date.split(" ")[0];
+                    param.idc_created_date = formatDate(IssueDate);
+                    
+                    let Duedate = param.idc_closing_date.split(" ")[0];
+                    param.idc_closing_date = formatDate(Duedate);
+
+                    let pdfUrl = '<?php echo base_url(); ?>ManageFeasibility/createFeasibilityPDF?' + $.param(param);
                     window.open(pdfUrl, '_blank');
                     return;
                 }
@@ -410,9 +430,13 @@
         var run_no = doc_no;
         if (doc_type == 'RFQ') {
             url_pdf = 'RfqForm/createPDF?';
+            $('#chkNBC').addClass('d-none').find('input').prop('disabled', true);
         } else if (doc_type == 'NBC') {
             url_pdf = 'ManageNbc/createNbcPDF?';
             $('#chkNBC').removeClass('d-none').find('input').prop('disabled', false);
+        } else if (doc_type == 'FS') {
+            url_pdf = 'ManageFeasibility/createFeasibilityPDF?';
+            $('#chkNBC').addClass('d-none').find('input').prop('disabled', true);
         } else {
             Swal.fire('Error', 'Document type not found.', 'error');
             return;
@@ -477,6 +501,12 @@
             ajax: {
                 url: API_URL + 'remainTask/table/' + '<?php echo $this->session->userdata('sessUsrId'); ?>',
                 dataSrc: function(json) {
+                    let data = (json.data || []).filter(item => {
+                        if (item.doc_type == "FS") {
+                            return true;
+                        }
+                        return item.ida_prev_action !== 0;
+                    });
                     let html = '';
                     if (json.data == null || json.data.length === 0) {
                         html += `<div class="alert alert-light-success bg-success-subtle text-success" role="alert">
@@ -494,11 +524,11 @@
                                         <label class="alert-heading fw-semibold" style="font-size: 1.5rem !important;"> Alert!</label>
                                     </div>
                                     <hr>
-                                    <p>You have ${json.data.length} tasks left waiting to be approved.</p>
+                                    <p>You have ${data.length} tasks left waiting to be approved.</p>
                                 </div>`;
                     }
                     $('#box_alert').html(html);
-                    return json.data || [];
+                    return data || [];
                 }
 
             },
@@ -545,10 +575,15 @@
                     className: 'text-center',
                     data: 'idc_status',
                     "render": function(data, type, row) {
-                        let work_flow = row.work_flow;
-                        let steps = work_flow.split(',');
-                        let result = steps.join('<i class="ti ti-chevrons-right text-success fw-semibold" style="font-size: 1.5rem !important;"></i>');
-                        return `<div class="d-flex justify-content-evenly gap-1">${result}</div>`;
+                        if (row.doc_type == "FS") {
+                            return '-';
+                        } else {
+                            let work_flow = row.work_flow;
+                            let steps = work_flow.split(',');
+                            let result = steps.join('<i class="ti ti-chevrons-right text-success fw-semibold" style="font-size: 1.5rem !important;"></i>');
+                            return `<div class="d-flex justify-content-evenly gap-1">${result}</div>`;
+
+                        }
                     }
                 },
                 {

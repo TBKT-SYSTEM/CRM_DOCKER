@@ -1071,7 +1071,7 @@ func ListDocRfq(c *gin.Context) {
 		Idc_running_no string `json:"idc_running_no"`
 	}
 	var objRfqNoGroupList []RfqNo
-	objListRfqNo, err := db.Query("SELECT idc_id, idc_running_no FROM `info_document_control` ORDER BY idc_id")
+	objListRfqNo, err := db.Query("SELECT idc_id, idc_running_no FROM `info_document_control` WHERE mdt_id = 3 ORDER BY idc_id")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -1358,6 +1358,58 @@ func InsertReferDoc(c *gin.Context, docId int) error {
 					if err != nil {
 						c.IndentedJSON(http.StatusOK, gin.H{"Error21": err.Error()})
 						return err
+					}
+
+					if objRefer.MdtID == 1 {
+						var mcipID []int
+						rows, err := db.Query("SELECT mcip_id FROM mst_consideration_item_pic WHERE mcip_status = 1")
+						if err != nil {
+							c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+							return err
+						}
+						defer rows.Close()
+
+						for rows.Next() {
+							var mcip_id int
+							if err := rows.Scan(&mcip_id); err != nil {
+								c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+								return err
+							}
+							mcipID = append(mcipID, mcip_id)
+						}
+
+						if err := rows.Err(); err != nil {
+							c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+							return err
+						}
+
+						var sql string = "INSERT INTO info_feasibility_score (idc_id, mcip_id, ifs_created_date, ifs_created_by, ifs_updated_date, ifs_updated_by) VALUES "
+						values := []string{}
+
+						for _, id := range mcipID {
+
+							value := fmt.Sprintf("(%d, %d, '%s', '%s', '%s', '%s')",
+								iLastID,
+								id,
+								strCreateDate,
+								objReferRfq.Idc_created_by,
+								strCreateDate,
+								objReferRfq.Idc_created_by)
+							values = append(values, value)
+						}
+
+						if len(values) == 0 {
+							c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+							return err
+						}
+
+						sql += strings.Join(values, ",")
+						_, errPartItem := db.Exec(sql)
+
+						if errPartItem != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errPartItem.Error()})
+							return err
+						}
 					}
 
 					/////////////////////  Insert Refer Item  ///////////////////////

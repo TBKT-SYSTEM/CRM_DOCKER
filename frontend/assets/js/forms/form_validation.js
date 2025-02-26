@@ -206,14 +206,20 @@ async function login_validate() {
         $('#btnSignIn').text('Sign In');
         return false;
     } else {
-        form_ok(name);
-        if (is_empty(password.value)) {
-            form_err(password, "*Please Enter password");
+        if (name.value.includes(" ")) {
+            form_err(name, "*Please Enter valid username");
             $('#btnSignIn').text('Sign In');
             return false;
         } else {
-            form_ok(password);
-            return true;
+            form_ok(name);
+            if (is_empty(password.value)) {
+                form_err(password, "*Please Enter password");
+                $('#btnSignIn').text('Sign In');
+                return false;
+            } else {
+                form_ok(password);
+                return true;
+            }
         }
     }
 }
@@ -1460,7 +1466,88 @@ async function Rfq_valid(formType) {
                     // console.log(id);
                     if (!id) {
                         return false;
-                    } 
+                    }
+                    return true, id;
+                }
+            }
+        }
+    }
+}
+
+async function Fs_valid(formType) {
+    var id, urlDocNo, ir_doc, ir_doc_no, idc_customer_type, idc_customer_name, mds_id, idc_subject_note;
+
+    urlDocNo = API_URL + "rfq/doc_no/Feasibility";
+    ir_doc_no = await getDocNo(urlDocNo);
+    ir_doc = "";
+
+    if (formType == "add") {
+        idc_customer_type = document.add_form.idc_customer_type;
+        idc_customer_name = document.add_form.idc_customer_name;
+        mds_id = document.add_form.mds_id;
+        idc_subject_note = document.add_form.idc_subject_note;
+        id = 0;
+    } else {
+        let getid = document.edit_form.idc_id;
+        idc_customer_type = document.edit_form.idc_customer_type;
+        idc_customer_name = document.edit_form.idc_customer_name;
+        mds_id = document.edit_form.mds_id;
+        idc_subject_note = document.edit_form.idc_subject_note;
+        id = parseInt(getid.value);
+    }
+
+    if (is_empty(idc_customer_type.value)) {
+        form_errValid(idc_customer_type, "*Please Select Customer Type");
+        return false;
+    } else {
+        form_okValid(idc_customer_type);
+        if (is_empty(idc_customer_name.value)) {
+            form_errValid(idc_customer_name, "*Please Select Customer Name");
+            return false;
+        } else {
+            form_okValid(idc_customer_name);
+            if (is_empty(mds_id.value)) {
+                form_errValid(mds_id, "*Please Select Subject");
+                return false;
+            } else {
+                form_okValid(mds_id);
+                if (idc_subject_note.disabled) {
+                    form_okValid(idc_subject_note);
+                } else {
+                    if (is_empty(idc_subject_note.value)) {
+                        form_errValid(idc_subject_note, "*Please Enter Other Subject");
+                        return false;
+                    } else {
+                        form_okValid(idc_subject_note);
+                    }
+                }
+
+                if (formType == "add") {
+                    try {
+                        if (typeof ir_doc_no['doc_cur_no_po2'] != "number") {
+                            return false;
+                        } else {
+                            if (++ir_doc_no['doc_cur_no_po2'] < 10) {
+                                if (ir_doc_no['doc_cur_no_po2'] == 0) {
+                                    ir_doc += "001";
+                                } else {
+                                    ir_doc += "00" + ir_doc_no['doc_cur_no_po2'];
+                                }
+                            } else if (ir_doc_no['doc_cur_no_po2'] < 100) {
+                                ir_doc += "0" + ir_doc_no['doc_cur_no_po2'];
+                            } else {
+                                ir_doc += ir_doc_no['doc_cur_no_po2'];
+                            }
+                            return true, ir_doc_no['doc_run_no'] + '-' + ir_doc;
+                        }
+                    } catch (err) {
+                        console.log(err); // Handle error
+                    }
+                } else {
+                    // console.log(id);
+                    if (!id) {
+                        return false;
+                    }
                     return true, id;
                 }
             }

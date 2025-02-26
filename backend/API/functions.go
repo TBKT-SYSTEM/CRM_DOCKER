@@ -700,7 +700,7 @@ func InsertSd(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("INSERT INTO sys_department(sd_plant_cd, sd_dept_cd, sd_dept_name, sd_dept_aname, sd_status, sd_created_date, sd_created_by, sd_updated_date, sd_updated_by) VALUES(?,?,?,?,?,?,?,?,?)", objDepartmentData.Sd_plant_cd, objDepartmentData.Sd_name_cd, objDepartmentData.Sd_Aname, objDepartmentData.Sd_name, 1, objDepartmentData.Create_date, objDepartmentData.Create_by, objDepartmentData.Create_date, objDepartmentData.Create_by)
+	objResult, err := db.Exec("INSERT INTO sys_department(sd_plant_cd, sd_dept_cd, sd_dept_name, sd_dept_aname, sd_status, sd_created_date, sd_created_by, sd_updated_date, sd_updated_by) VALUES(?,?,?,?,?,?,?,?,?)", objDepartmentData.Sd_plant_cd, objDepartmentData.Sd_name_cd, objDepartmentData.Sd_name, objDepartmentData.Sd_Aname, 1, objDepartmentData.Create_date, objDepartmentData.Create_by, objDepartmentData.Create_date, objDepartmentData.Create_by)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
@@ -861,7 +861,7 @@ func ChangeConsiderationStatus(c *gin.Context) {
 // Consider Incharge ------------------------
 func ListInchargeTable(c *gin.Context) {
 	var objConsiderInchargeList []ConsiderInchargeTable
-	objListIncharge, err := db.Query("SELECT mcip.*, mci.mci_name, sd_dept_name, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file FROM `mst_consideration_item_pic` AS mcip LEFT JOIN sys_users AS su ON mcip.mcip_updated_by = su.su_username LEFT JOIN mst_consideration_item AS mci ON mci.mci_id = mcip.mci_id LEFT JOIN sys_department AS sd ON mcip.sd_id = sd.sd_id ORDER BY mcip.mcip_id")
+	objListIncharge, err := db.Query("SELECT mcip.*, mci.mci_name, sd_dept_aname, sd_dept_name, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file FROM `mst_consideration_item_pic` AS mcip LEFT JOIN sys_users AS su ON mcip.mcip_updated_by = su.su_username LEFT JOIN mst_consideration_item AS mci ON mci.mci_id = mcip.mci_id LEFT JOIN sys_department AS sd ON mcip.sd_id = sd.sd_id ORDER BY mcip.mcip_id")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -880,7 +880,7 @@ func ListInchargeTable(c *gin.Context) {
 		var strUpdateDate sql.NullString
 		var strCreateBy sql.NullString
 		var strUpdateBy sql.NullString
-		err := objListIncharge.Scan(&objIncharge.Mcip_id, &objIncharge.Mci_id, &objIncharge.Mcip_weight, &objIncharge.Sd_id, &objIncharge.Mcip_status, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &objIncharge.Mci_name, &objIncharge.Sd_dept_name, &strUserFname, &strUserLname, &strUserSignPath, &strUserSignFile)
+		err := objListIncharge.Scan(&objIncharge.Mcip_id, &objIncharge.Mci_id, &objIncharge.Mcip_weight, &objIncharge.Sd_id, &objIncharge.Mcip_status, &strCreateDate, &strCreateBy, &strUpdateDate, &strUpdateBy, &objIncharge.Mci_name, &objIncharge.Sd_dept_aname, &objIncharge.Sd_dept_name, &strUserFname, &strUserLname, &strUserSignPath, &strUserSignFile)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -1272,7 +1272,7 @@ func NotifyAlert(c *gin.Context) {
 	}
 	var objNotifies []Notify
 
-	rows, err := db.Query(`SELECT ida.su_id, ida.ida_created_by, snc.snc_id, snc.snc_type, snc.ida_id, snc.snc_show_users, snc.snc_read_status, snc.snc_created_date, snc.snc_updated_date FROM sys_notification_ctrl snc LEFT JOIN info_document_approval ida ON ida.ida_id = snc.ida_id LEFT JOIN info_document_control idc ON idc.idc_id = ida.idc_id WHERE ida.ida_created_by = ? OR ida.su_id = ? ORDER BY snc.snc_id DESC`, username, id)
+	rows, err := db.Query(`SELECT ida.su_id, ida.ida_created_by, snc.snc_id, snc.snc_type, snc.ida_id, snc.snc_show_users, snc.snc_read_status, snc.snc_created_date, snc.snc_updated_date FROM sys_notification_ctrl snc LEFT JOIN info_document_approval ida ON ida.ida_id = snc.ida_id LEFT JOIN info_document_control idc ON idc.idc_id = ida.idc_id WHERE (ida.ida_created_by = ? OR ida.su_id = ?) AND YEAR(snc.snc_created_date) = YEAR(CURDATE()) AND MONTH(snc.snc_created_date) = MONTH(CURDATE()) ORDER BY snc.snc_id DESC`, username, id)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -1526,17 +1526,124 @@ func ApproveByEmail(c *gin.Context) {
 		return
 	}
 
-	var cheIda int
-	checkIda := "SELECT ida_id FROM info_document_approval WHERE ida_id = ? AND ida_action = 0"
-	err = db.QueryRow(checkIda, idaID).Scan(&cheIda)
+	var cheIdc int
+	checkIda := "SELECT idc_status FROM info_document_control WHERE idc_id = ?"
+	err = db.QueryRow(checkIda, docID).Scan(&cheIdc)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			c.IndentedJSON(http.StatusOK, "This document has already been approved")
+			c.IndentedJSON(http.StatusOK, "This document not found!")
 			return
 		}
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
 		return
 	} else {
+		if cheIdc == 6 || cheIdc == 5 || cheIdc == 9 || cheIdc == 1 {
+			statuses := map[int]string{
+				6: "rejected",
+				5: "cancelled",
+				9: "approved",
+				1: "not submitted",
+			}
+			c.IndentedJSON(http.StatusOK, fmt.Sprintf("This document has been %s!", statuses[cheIdc]))
+			return
+		}
+
+		var chkMdt int
+		sqlMdt := "SELECT mdt_id FROM info_document_control WHERE idc_id = ?"
+		err := db.QueryRow(sqlMdt, docID).Scan(&chkMdt)
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, "This document not found!")
+			return
+		} else {
+			if chkMdt == 1 {
+				var objEmailFS userEmail
+				var idcSendMail int
+				getEmail := "SELECT su.su_id, su.su_firstname, su.su_email, su.su_username FROM sys_users su LEFT JOIN info_document_approval ida ON ida.su_id = su.su_id WHERE ida.ida_id = ? GROUP BY ida.su_id"
+				err := db.QueryRow(getEmail, idaID).Scan(&objEmailFS.Su_id, &objEmailFS.Su_firstname, &objEmailFS.Su_email, &objEmailFS.Su_username)
+
+				if err == sql.ErrNoRows {
+					c.IndentedJSON(http.StatusOK, "No user found")
+					return
+				}
+
+				var updateIda string
+				if caseType == "email" {
+					updateIda = "UPDATE info_document_approval SET ida_action = 1, ida_status = 9, ida_route = 2, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND su_id = ?"
+				} else {
+					updateIda = "UPDATE info_document_approval SET ida_action = 1, ida_status = 9, ida_route = 1, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND su_id = ?"
+				}
+				_, err = db.Exec(updateIda, strCreateDate, objEmailFS.Su_username, docID, objEmailFS.Su_id)
+				if err != nil {
+					c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+					return
+				} else {
+					getSendIda := "SELECT MIN(ida_id) AS ida_id FROM info_document_approval WHERE su_id = ?"
+					err = db.QueryRow(getSendIda, objEmailFS.Su_id).Scan(&idcSendMail)
+					if err != nil {
+						c.IndentedJSON(http.StatusOK, fmt.Sprintf("Error get send ida: %s", err))
+						return
+					}
+
+					var chkAllApprove string
+					sqlChkAllApprove := "SELECT IF( COUNT(DISTINCT ida_status) = 1 AND MAX(ida_status) = 9, 9, 0 ) AS ida_status_check FROM info_document_approval WHERE idc_id = ?"
+					err = db.QueryRow(sqlChkAllApprove, docID).Scan(&chkAllApprove)
+					if err == sql.ErrNoRows {
+						c.IndentedJSON(http.StatusOK, "Error check all approve")
+						return
+					}
+					// 0 = Not approval all, 9 = has all approval
+					if chkAllApprove == "9" {
+						_, err := db.Exec("UPDATE info_feasibility_score SET ifs_status = 9, ifs_updated_date = ?, ifs_updated_by = ? WHERE idc_id = ?", strCreateDate, objEmailFS.Su_username, docID)
+						if err != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{
+								"Error": err.Error(),
+							})
+							return
+						}
+						_, err = db.Exec("UPDATE info_document_control SET idc_status = 9, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", strCreateDate, objEmailFS.Su_username, docID)
+						if err != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{
+								"Error": err.Error(),
+							})
+							return
+						}
+					}
+
+					var objUserCreate userCreate
+					getEmail := "SELECT su.su_id, su.su_firstname, su.su_email FROM sys_users su LEFT JOIN info_document_control idc ON idc.idc_created_by = su.su_username WHERE idc.idc_id = ?"
+					err := db.QueryRow(getEmail, docID).Scan(&objUserCreate.Su_id, &objUserCreate.Su_firstname, &objUserCreate.Su_email)
+
+					if err != nil {
+						if err == sql.ErrNoRows {
+							c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+							return
+						}
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					}
+					idcId, err := strconv.Atoi(docID)
+					if err != nil {
+						fmt.Println("Error converting to int:", err)
+						return
+					}
+
+					_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 2, idcSendMail, strShowUsers2, 0, strCreateDate, strCreateDate)
+					if err != nil {
+						c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+					}
+
+					err = SendMail(c, idcId, idcSendMail, objUserCreate.Su_firstname, objUserCreate.Su_email, "approve")
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					}
+				}
+
+				c.IndentedJSON(http.StatusOK, true)
+				return
+			}
+		}
+
 		var objNotiActive notiActive
 		err = db.QueryRow("SELECT ida_id, su_id, COUNT(ida_id) AS ida_count, MIN(sat_id) AS sat_id FROM info_document_approval WHERE idc_id = ? AND ida_action = 0 AND ida_status = 1", docID).Scan(&objNotiActive.Ida_id, &objNotiActive.Su_id, &objNotiActive.Ida_count, &objNotiActive.Sat_id)
 		if err == sql.ErrNoRows {
@@ -1675,17 +1782,145 @@ func RejectByEmail(c *gin.Context) {
 	var objNotiActive notiActive
 	strShowUsers := "Your document has been rejected!"
 
-	var cheIda int
-	checkIda := "SELECT ida_id FROM info_document_approval WHERE ida_id = ? AND ida_action = 0"
-	err := db.QueryRow(checkIda, idaID).Scan(&cheIda)
+	var cheIdc int
+	checkIda := "SELECT idc_status FROM info_document_control WHERE idc_id = ?"
+	err := db.QueryRow(checkIda, docID).Scan(&cheIdc)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			c.IndentedJSON(http.StatusOK, "This document has already been rejected")
+			c.IndentedJSON(http.StatusOK, "This document not found!")
 			return
 		}
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
 		return
 	} else {
+		if cheIdc == 6 || cheIdc == 5 || cheIdc == 9 || cheIdc == 1 {
+			statuses := map[int]string{
+				6: "rejected",
+				5: "cancelled",
+				9: "approved",
+				1: "not submitted",
+			}
+			c.IndentedJSON(http.StatusOK, fmt.Sprintf("This document has been %s!", statuses[cheIdc]))
+			return
+		}
+
+		var chkMdt int
+		sqlMdt := "SELECT mdt_id FROM info_document_control WHERE idc_id = ?"
+		err := db.QueryRow(sqlMdt, docID).Scan(&chkMdt)
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, "This document not found!")
+			return
+		} else {
+			if chkMdt == 1 {
+				var objEmailFS userEmail
+				getEmail := "SELECT su.su_id, su.su_firstname, su.su_email, su.su_username FROM sys_users su LEFT JOIN info_document_approval ida ON ida.su_id = su.su_id WHERE ida.ida_id = ? GROUP BY ida.su_id"
+				err := db.QueryRow(getEmail, idaID).Scan(&objEmailFS.Su_id, &objEmailFS.Su_firstname, &objEmailFS.Su_email, &objEmailFS.Su_username)
+
+				if err == sql.ErrNoRows {
+					c.IndentedJSON(http.StatusOK, "No user found")
+					return
+				}
+
+				updateIda := "UPDATE info_document_approval SET ida_status = 6 WHERE idc_id = ?"
+				_, err = db.Exec(updateIda, docID)
+				if err != nil {
+					c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+					return
+				} else {
+					var updateIdaBy string
+					if caseType == "email" {
+						updateIdaBy = "UPDATE info_document_approval SET ida_action = 1, ida_route = 2, ida_reject_reason = ?, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND su_id = ?"
+					} else {
+						updateIdaBy = "UPDATE info_document_approval SET ida_action = 1, ida_route = 1, ida_reject_reason = ?, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND su_id = ?"
+					}
+
+					_, err = db.Exec(updateIdaBy, reason, strCreateDate, objEmailFS.Su_username, docID, objEmailFS.Su_id)
+					if err != nil {
+						c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+						return
+					} else {
+						_, err := db.Exec("UPDATE temp_refer_document SET trd_status = 5, trd_updated_date = ? WHERE idc_id = ?", strCreateDate, docID)
+						if err != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{
+								"Error": err.Error(),
+							})
+							return
+						} else {
+							_, err := db.Exec("UPDATE info_document_control SET idc_status = 6, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", strCreateDate, objEmailFS.Su_username, docID)
+							if err != nil {
+								c.IndentedJSON(http.StatusInternalServerError, gin.H{
+									"Error": err.Error(),
+								})
+								return
+							} else {
+								var objUserCreate userCreate
+								var idcSendMail int
+								getEmail := "SELECT su.su_id, su.su_firstname, su.su_email FROM sys_users su LEFT JOIN info_document_control idc ON idc.idc_created_by = su.su_username WHERE idc.idc_id = ?"
+								err := db.QueryRow(getEmail, docID).Scan(&objUserCreate.Su_id, &objUserCreate.Su_firstname, &objUserCreate.Su_email)
+
+								if err != nil {
+									if err == sql.ErrNoRows {
+										c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+										return
+									}
+									c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+									return
+								}
+								idcId, err := strconv.Atoi(docID)
+								if err != nil {
+									fmt.Println("Error converting to int:", err)
+									return
+								}
+
+								getSendIda := "SELECT MIN(ida_id) AS ida_id FROM info_document_approval WHERE su_id = ?"
+								err = db.QueryRow(getSendIda, objEmailFS.Su_id).Scan(&idcSendMail)
+								if err != nil {
+									c.IndentedJSON(http.StatusOK, fmt.Sprintf("Error get send ida: %s", err))
+									return
+								}
+
+								_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 2, idcSendMail, strShowUsers, 0, strCreateDate, strCreateDate)
+								if err != nil {
+									c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+								}
+								var doc_no string
+								err = db.QueryRow("SELECT idc_running_no FROM info_document_control WHERE idc_id = ?", docID).Scan(&doc_no)
+								if err != nil {
+									c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error1.1": err.Error()})
+									return
+								}
+								substring := doc_no[:3]
+
+								if substring == "NBC" {
+									_, err = db.Exec("UPDATE info_document_control SET idc_result_confirm = 1 WHERE idc_Id = ?", docID)
+									if err != nil {
+										c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+										return
+									}
+								}
+
+								_, err = db.Exec("UPDATE info_feasibility_score SET ifs_status = 1, ifs_updated_date = ?, ifs_updated_by = ? WHERE idc_id = ?", strCreateDate, objEmailFS.Su_username, docID)
+								if err != nil {
+									c.IndentedJSON(http.StatusInternalServerError, gin.H{
+										"Error": err.Error(),
+									})
+									return
+								}
+
+								err = SendMail(c, idcId, idcSendMail, objUserCreate.Su_firstname, objUserCreate.Su_email, "reject")
+								if err != nil {
+									c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+									return
+								}
+							}
+						}
+					}
+				}
+				c.IndentedJSON(http.StatusOK, true)
+				return
+			}
+		}
+
 		err = db.QueryRow("SELECT ida_id, su_id, COUNT(ida_id) AS ida_count, MIN(sat_id) AS sat_id FROM info_document_approval WHERE idc_id = ? AND ida_action = 0 AND ida_status = 1", docID).Scan(&objNotiActive.Ida_id, &objNotiActive.Su_id, &objNotiActive.Ida_count, &objNotiActive.Sat_id)
 		if err == sql.ErrNoRows {
 			c.IndentedJSON(http.StatusOK, false)
@@ -1787,4 +2022,159 @@ func RejectByEmail(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, true)
+}
+func GetDataRFQ(DocId int) (GetRfq, error) {
+	var objDocNo GetRfq
+	var strReferDoc sql.NullInt64
+	var strSubjectNote sql.NullString
+	var strEnclosuresNote sql.NullString
+	var strIssueDate sql.NullString
+	var strReplyDate sql.NullString
+	var strNote1 sql.NullString
+	var strNote2 sql.NullString
+	var strFilePath sql.NullString
+	var strPhysicalPath sql.NullString
+	var strCancelReason sql.NullString
+
+	query := "SELECT * FROM info_document_control WHERE idc_id = ?"
+	err := db.QueryRow(query, DocId).Scan(&objDocNo.Idc_id, &objDocNo.Mdt_id, &strReferDoc, &objDocNo.Idc_running_no, &objDocNo.Idc_issue_year, &objDocNo.Idc_issue_month, &objDocNo.Idc_issue_seq_no, &objDocNo.Idc_customer_type, &objDocNo.Idc_customer_name, &objDocNo.Idc_plant_cd, &objDocNo.Mds_id, &strSubjectNote, &objDocNo.Mde_id, &strEnclosuresNote, &objDocNo.Idc_project_life, &objDocNo.Idc_project_start, &strIssueDate, &objDocNo.Idc_closing_date, &strReplyDate, &objDocNo.Idc_result_confirm, &objDocNo.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objDocNo.Idc_created_date, &objDocNo.Idc_created_by, &objDocNo.Idc_updated_date, &objDocNo.Idc_updated_by)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return objDocNo, nil
+		}
+		return objDocNo, err
+	}
+
+	if strReferDoc.Valid {
+		objDocNo.Idc_refer_doc = int(strReferDoc.Int64)
+	}
+	if strSubjectNote.Valid {
+		objDocNo.Idc_subject_note = strSubjectNote.String
+	}
+	if strEnclosuresNote.Valid {
+		objDocNo.Idc_enclosures_note = strEnclosuresNote.String
+	}
+	if strIssueDate.Valid {
+		objDocNo.Idc_issue_date = strIssueDate.String
+	}
+	if strReplyDate.Valid {
+		objDocNo.Idc_reply_date = strReplyDate.String
+	}
+	if strNote1.Valid {
+		objDocNo.Idc_note1 = strNote1.String
+	}
+	if strNote2.Valid {
+		objDocNo.Idc_note2 = strNote2.String
+	}
+	if strFilePath.Valid {
+		objDocNo.Idc_file_path = strFilePath.String
+	}
+	if strPhysicalPath.Valid {
+		objDocNo.Idc_physical_path = strPhysicalPath.String
+	}
+	if strCancelReason.Valid {
+		objDocNo.Idc_cancel_reason = strCancelReason.String
+	}
+
+	rowsAttn, err := db.Query("SELECT mda_id FROM `info_document_attn` WHERE idc_id = ? AND idat_status = 1 ORDER BY idat_id", DocId)
+	if err != nil {
+		return objDocNo, err
+	}
+	defer rowsAttn.Close()
+	for rowsAttn.Next() {
+		var idatID string
+		if err := rowsAttn.Scan(&idatID); err != nil {
+			return objDocNo, err
+		}
+		objDocNo.Idat_item = append(objDocNo.Idat_item, idatID)
+	}
+	if err := rowsAttn.Err(); err != nil {
+		return objDocNo, err
+	}
+
+	rowsIdpu, err := db.Query("SELECT mdpu_id FROM `info_document_purchase_cost` WHERE idc_id = ? AND idpu_status = 1 ORDER BY idpu_id", DocId)
+	if err != nil {
+		return objDocNo, err
+	}
+	defer rowsIdpu.Close()
+	for rowsIdpu.Next() {
+		var idpuID string
+		if err := rowsIdpu.Scan(&idpuID); err != nil {
+			return objDocNo, err
+		}
+		objDocNo.Idpu_item = append(objDocNo.Idpu_item, idpuID)
+	}
+	if err := rowsIdpu.Err(); err != nil {
+		return objDocNo, err
+	}
+
+	rowsIdpc, err := db.Query("SELECT mdpc_id FROM `info_document_process_cost` WHERE idc_id = ? AND idpc_status = 1 ORDER BY idpc_id", DocId)
+	if err != nil {
+		return objDocNo, err
+	}
+	defer rowsIdpc.Close()
+	for rowsIdpc.Next() {
+		var idpcID string
+		if err := rowsIdpc.Scan(&idpcID); err != nil {
+			return objDocNo, err
+		}
+		objDocNo.Idpc_item = append(objDocNo.Idpc_item, idpcID)
+	}
+	if err := rowsIdpc.Err(); err != nil {
+		return objDocNo, err
+	}
+
+	rowsItem, err := db.Query("SELECT idi_id, idi_item_no, idi_item_name, idi_model, idi_remark FROM `info_document_item` WHERE idc_id = ? AND idi_status = 1 ORDER BY idi_id", DocId)
+	if err != nil {
+		return objDocNo, err
+	}
+	defer rowsItem.Close()
+	for rowsItem.Next() {
+		var groupPart RfqGroupPart
+		var strModel sql.NullString
+		var strRemark sql.NullString
+		if err := rowsItem.Scan(
+			&groupPart.Idi_id,
+			&groupPart.Idi_item_no,
+			&groupPart.Idi_item_name,
+			&strModel,
+			&strRemark,
+		); err != nil {
+			return objDocNo, err
+		}
+		if strModel.Valid {
+			groupPart.Idi_model = strModel.String
+		}
+		if strRemark.Valid {
+			groupPart.Idi_remark = strRemark.String
+		}
+		objDocNo.IrGroupPart = append(objDocNo.IrGroupPart, groupPart)
+	}
+
+	if err := rowsItem.Err(); err != nil {
+		return objDocNo, err
+	}
+
+	rowsVolume, err := db.Query("SELECT idv_id, idv_year, idv_qty FROM `info_document_volume` WHERE idc_id = ? AND idv_status = 1 ORDER BY idv_id", DocId)
+	if err != nil {
+		return objDocNo, err
+	}
+	defer rowsVolume.Close()
+	for rowsVolume.Next() {
+		var groupVolume RfqGroupVolumeDetail
+		if err := rowsVolume.Scan(
+			&groupVolume.Idv_id,
+			&groupVolume.Idv_year,
+			&groupVolume.Idv_qty,
+		); err != nil {
+			return objDocNo, err
+		}
+		objDocNo.IrGroupVolume = append(objDocNo.IrGroupVolume, groupVolume)
+	}
+
+	if err := rowsVolume.Err(); err != nil {
+		return objDocNo, err
+	}
+
+	return objDocNo, nil
 }

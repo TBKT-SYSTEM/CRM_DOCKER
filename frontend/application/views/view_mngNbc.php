@@ -32,6 +32,7 @@
                                     <div class="d-flex align-items-center flex-nowrap">
                                         <label class="col-auto fs-3 text-dark fw-semibold me-2" style="width: 120px;" for="inpImportFrom">Customer Type :</label>
                                         <select type="text" class="form-select form-select-sm shadow-sm" id="inpImportFrom" name="ir_import_tran" onchange="filterData()">
+                                            <option value="">All</option>
                                             <option value="1">Domestic</option>
                                             <option value="2">Overseas</option>
                                         </select>
@@ -116,39 +117,28 @@
 
 </div>
 
-<!-- Modal for View RFQ Group Part No-->
-<div class="modal fade" id="mdlPartNo" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+<!-- Modal for View RFQ No-->
+<div class="modal fade" id="mdlReferRfq" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+    <div class="modal-dialog modal-xxl modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-header d-flex flex-wrap gap-3">
                 <div class="d-flex align-items-center flex-grow-1 me-2">
-                    <label class="col-auto fs-5 text-dark fw-semibold me-2" id="myLargeModalLabel">RFQ Document No.</label>
-                    <input type="text" class="form-control flex-grow-1 shadow-sm" id="inpDocNo" name="ir_doc_no" value="" placeholder="RFQ Document No." disabled>
+                    <label class="col-auto fs-5 text-dark fw-semibold me-2" id="myLargeModalLabel">Document No.</label>
+                    <input type="text" class="form-control flex-grow-1 shadow-sm" id="inpDocNo" name="ir_doc_no" value="" placeholder="Document No." disabled>
                 </div>
                 <div class="d-flex align-items-center flex-grow-1">
-                    <label class="col-auto fs-5 text-dark fw-semibold me-2" id="myLargeModalLabel">Refer RFQ Document No.</label>
-                    <input type="text" class="form-control flex-grow-1 shadow-sm" id="inpDocNoRef" name="ir_doc_no_ref" value="" placeholder="Ref RFQ Document No." disabled>
+                    <label class="col-auto fs-5 text-dark fw-semibold me-2" id="myLargeModalLabel">Refer Document No.</label>
+                    <input type="text" class="form-control flex-grow-1 shadow-sm" id="inpDocNoRef" name="ir_doc_no_ref" value="" placeholder="RFQ Document No." disabled>
                 </div>
             </div>
             <div class="modal-body">
-                <h5 class="mb-4" id="myLargeModalLabel">Item Information</h5>
-                <table class="dataTable table table-bordered text-wrap align-middle" style="width: 100%;" id="tblPartNo">
-                    <thead class="fw-semibold">
-                        <tr>
-                            <th>No.</th>
-                            <th>Part No.</th>
-                            <th>Part Name</th>
-                            <th>Model</th>
-                            <th>Part Remark</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodyPartNo">
-
-                    </tbody>
-                </table>
+                <h5 class="mb-4" id="">Item Information</h5>
+                <div class="p-5 border shadow-sm" style="height: 80vh;">
+                    <iframe class="w-100 h-100" src="" id="filePreview" frameborder="0"></iframe>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="reset" class="btn bg-danger-subtle text-danger waves-effect text-start" data-bs-dismiss="modal">
@@ -455,8 +445,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- end Zero Configuration -->
                             </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -863,32 +853,30 @@
         var customerName = $('#inpCustomer').val();
         var docNo = $('#inpSearchDocNo').val();
 
-        if (elementId === "inpCustomer") {
-            if (customerName == 'Other') {
-                const {
-                    value: text
-                } = await Swal.fire({
-                    title: "Input Customer Name",
-                    input: "text",
-                    inputPlaceholder: "Enter your customer name"
+        if (customerName == 'Other') {
+            const {
+                value: text
+            } = await Swal.fire({
+                title: "Input Customer Name",
+                input: "text",
+                inputPlaceholder: "Enter your customer name"
+            });
+
+            if (text) {
+                let optionExists = false;
+                $('select#inpCustomer option').each(function() {
+                    if ($(this).val() == text) {
+                        optionExists = true;
+                    }
                 });
 
-                if (text) {
-                    let optionExists = false;
-                    $('select#inpCustomer option').each(function() {
-                        if ($(this).val() == text) {
-                            optionExists = true;
-                        }
-                    });
-
-                    if (!optionExists) {
-                        $('select#inpCustomer').append(new Option(text, text));
-                    }
-                    $('select#inpCustomer').val(text);
+                if (!optionExists) {
+                    $('select#inpCustomer').append(new Option(text, text));
                 }
-
-                customerName = text;
+                $('select#inpCustomer').val(text);
             }
+
+            customerName = text;
         }
 
         if (is_empty(customerType)) {
@@ -1098,7 +1086,15 @@
             type: 'get',
             url: API_URL + 'doc/runno/' + run_no,
             success: async function(result) {
-                // console.log(result);
+
+                $.ajax({
+                    url: API_URL + 'rfq/refer_doc/' + result.idc_refer_doc,
+                    method: 'GET',
+                    success: function(response) {
+                        $('#inpDocNo').val(run_no);
+                        $('#inpDocNoRef').val(response.Running_no);
+                    }
+                });
 
                 let param = {
                     ...result
@@ -1111,8 +1107,28 @@
                 param.idc_closing_date = formatDate(Duedate);
 
                 let pdfUrl = '<?php echo base_url(); ?>RfqForm/createPDF?' + $.param(param);
-                window.open(pdfUrl, '_blank');
+
+                Swal.fire({
+                    title: 'Loading...',
+                    text: 'Please wait while we load the data.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                let iframe = document.getElementById('filePreview');
+
+                iframe.onload = function() {
+                    Swal.close();
+                };
+
+                iframe.src = pdfUrl;
             }
+        });
+
+        $('#mdlReferRfq').on('hidden.bs.modal', function() {
+            $('#filePreview').attr('src', '');
         });
     }
 
@@ -1182,9 +1198,9 @@
                     data: 'run_no',
                     "render": function(data, type, row) {
                         if (row.run_no == "null" || row.run_no == "") {
-                            disp = '';
+                            disp = '-';
                         } else {
-                            disp = `<span class="badge bg-danger-subtle text-white fw-semibold fs-3 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #a345efe6 !important;" onclick="viewRfqPDF('${row.run_no}')">${row.run_no}</span>`;
+                            disp = `<span class="badge bg-danger-subtle text-white fw-semibold fs-3 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #a345efe6 !important;" onclick="viewRfqPDF('${row.run_no}')" data-bs-toggle="modal" data-bs-target="#mdlReferRfq">${row.run_no}</span>`;
                         }
                         return disp;
                     }
@@ -1560,7 +1576,6 @@
 
 
     $(document).ready(function() {
-
         listCustomer();
         listSubject();
         listEnclosures();
@@ -1619,9 +1634,9 @@
                     data: 'run_no',
                     "render": function(data, type, row) {
                         if (row.run_no == "null" || row.run_no == "") {
-                            disp = '';
+                            disp = '-';
                         } else {
-                            disp = `<span class="badge bg-danger-subtle text-white fw-semibold fs-3 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #a345efe6 !important;" onclick="viewRfqPDF('${row.run_no}')">${row.run_no}</span>`;
+                            disp = `<span class="badge bg-danger-subtle text-white fw-semibold fs-3 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #a345efe6 !important;" onclick="viewRfqPDF('${row.run_no}')" data-bs-toggle="modal" data-bs-target="#mdlReferRfq">${row.run_no}</span>`;
                         }
                         return disp;
                     }

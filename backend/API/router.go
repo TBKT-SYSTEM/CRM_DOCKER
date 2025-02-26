@@ -9,7 +9,7 @@ func Routy() {
 	router := gin.Default()
 	router.Use(cors.Default())
 
-	router.POST("/login/login", Login)
+	router.POST("/login/login", LoginNew)
 	router.POST("/login/username_unique", UsernameIsUnique)
 	router.POST("/log/login", LogLogin)
 	router.POST("/log/logout", LogLogout)
@@ -79,12 +79,17 @@ func Routy() {
 	router.PUT("/workflow_detail/change_status", ChangeSwdStatus)
 
 	router.GET("/feasibility/:id", ListFeasibility)
-	router.GET("/feasibility/table", ListFeasibilityTable)
+	router.GET("/feasibilityItem/:id", ListFeasibilityItem)
+	router.GET("/feasibility/table/:id/:stratDate/:endDate", ListFeasibilityTable)
 	router.GET("/feasibility/last_id", FeasibilityLastid)
+	router.GET("/feasibility/totalScore/:id", FeasibilityTotalScore)
 	router.POST("/feasibility/insert", InsertFeasibility)
 	router.PUT("/feasibility/update", UpdateFeasibility)
-	router.PUT("/feasibility/update_partno", UpdatePartNoFeasibility)
 	router.PUT("/feasibility/change_status", ChangeFeasibilityStatus)
+	router.PUT("/feasibility/saveScore", SaveScore)
+	router.PUT("/feasibility/cancel/:id/:reason/:userID", CancelDocument)
+	router.PUT("/feasibility/reverse/:id/:userID", ReverseDocument)
+	router.PUT("/feasibility/submit/:id", SubmitFeasibility)
 
 	router.GET("/feasibilityHistory/table", ListFeasibilityTableHistory)
 	router.GET("/feasibilityHistory/tableDate/:date", ListFeasibilityTableHistoryDate)
@@ -176,5 +181,5 @@ func Routy() {
 	router.PUT("/email/reject_email/:documentId/:idaId/:reason/:caseType", RejectByEmail)
 
 	router.Run(":8080")
-	// router.Run("192.168.161.219:9002")
+	// router.Run("192.168.161.79:9000")
 }

@@ -902,6 +902,14 @@
                         confirmButtonText: 'Yes, register it.!'
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Loading...',
+                                text: 'Please wait while we submit the data...',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            })
                             var add_form = {};
                             let groupCheckBoxAttn = [];
                             $('#add_form').serializeArray().forEach(function(item) {
@@ -963,7 +971,8 @@
                                 url: API_URL + 'rfq/insert',
                                 data: JSON.stringify(add_form),
                                 success: function(data) {
-                                    if (data.Error != "null" || data.Error != "") {
+                                    Swal.close();
+                                    if (data.Error) {
                                         Swal.fire({
                                             html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add RFQ success!</p>",
                                             icon: 'success',
@@ -977,7 +986,7 @@
                                         clearForm();
                                     } else {
                                         Swal.fire({
-                                            html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add RFQ!</p>",
+                                            html: "<h4>เกิดข้อผิดพลาดในระบบ !</h4>\n<p>" + data.False + "</p>",
                                             icon: 'error',
                                             showClass: {
                                                 popup: 'animate__animated animate__fadeInDown'

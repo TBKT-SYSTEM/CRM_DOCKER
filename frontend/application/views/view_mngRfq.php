@@ -32,6 +32,7 @@
                                     <div class="d-flex align-items-center flex-nowrap">
                                         <label class="col-auto fs-3 text-dark fw-semibold me-2" style="width: 120px;" for="inpImportFrom">Customer Type :</label>
                                         <select type="text" class="form-select form-select-sm shadow-sm" id="inpImportFrom" name="ir_import_tran" onchange="filterData()">
+                                            <option value="">All</option>
                                             <option value="1">Domestic</option>
                                             <option value="2">Overseas</option>
                                         </select>
@@ -714,6 +715,7 @@
         }
         return true;
     }
+
     async function saveChange(groupPart, groupVolume, mdt_id) {
         if (isProcessing) return;
         isProcessing = true;
@@ -1141,32 +1143,30 @@
         var customerName = $('#inpCustomer').val();
         var docNo = $('#inpSearchDocNo').val();
 
-        if (elementId === "inpCustomer") {
-            if (customerName == 'Other') {
-                const {
-                    value: text
-                } = await Swal.fire({
-                    title: "Input Customer Name",
-                    input: "text",
-                    inputPlaceholder: "Enter your customer name"
+        if (customerName == 'Other') {
+            const {
+                value: text
+            } = await Swal.fire({
+                title: "Input Customer Name",
+                input: "text",
+                inputPlaceholder: "Enter your customer name"
+            });
+
+            if (text) {
+                let optionExists = false;
+                $('select#inpCustomer option').each(function() {
+                    if ($(this).val() == text) {
+                        optionExists = true;
+                    }
                 });
 
-                if (text) {
-                    let optionExists = false;
-                    $('select#inpCustomer option').each(function() {
-                        if ($(this).val() == text) {
-                            optionExists = true;
-                        }
-                    });
-
-                    if (!optionExists) {
-                        $('select#inpCustomer').append(new Option(text, text));
-                    }
-                    $('select#inpCustomer').val(text);
+                if (!optionExists) {
+                    $('select#inpCustomer').append(new Option(text, text));
                 }
-
-                customerName = text;
+                $('select#inpCustomer').val(text);
             }
+
+            customerName = text;
         }
 
         if (is_empty(customerType)) {
@@ -1232,6 +1232,24 @@
         const model = currentRow.querySelector('input[id="inpModel"]');
         const remark = currentRow.querySelector('input[id="inpRemark"]');
 
+        if ($('#tblEditBodyPartNo tr').length > 20) {
+            Swal.fire({
+                html: "<h4>Cannot add more than 20 items.</h4>",
+                icon: 'warning',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            })
+            partNo.value = "";
+            partName.value = "";
+            model.value = "";
+            remark.value = "";
+            return;
+        }
+
         if (is_empty(partNo.value.trim())) {
             form_errValid(partNo, '*Plase Enter Part No.');
             return;
@@ -1267,8 +1285,7 @@
             <button type="button" onclick="deletePartNoByItem(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm">
                 <i class="ti ti-trash-x fs-6"></i>
             </button>
-        </td>
-    `;
+        </td>`;
         tbody.insertBefore(newRow, currentRow);
 
         currentRow.querySelector('input[placeholder="Part No"]').value = '';
@@ -1779,7 +1796,7 @@
 
                         if (data != false) {
                             Swal.fire({
-                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Cancel RFQ Success!</p>",
+                                html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Genarate NBC Success!</p>",
                                 icon: 'success',
                                 showClass: {
                                     popup: 'animate__animated animate__fadeInDown'
@@ -1792,7 +1809,7 @@
                             dataTable.ajax.reload(null, false);
                         } else {
                             Swal.fire({
-                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Cancel RFQ!</p>",
+                                html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Genarate NBC!</p>",
                                 icon: 'error',
                                 showClass: {
                                     popup: 'animate__animated animate__fadeInDown'
@@ -1938,6 +1955,14 @@
                     createDate: createDate,
                     createBy: userID
                 }
+                Swal.fire({
+                    title: 'Loading...',
+                    text: 'Please wait while we submit the data...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                })
                 // console.log(data);
                 $.ajax({
                     method: 'PUT',
@@ -1945,6 +1970,7 @@
                     data: JSON.stringify(data),
                     dataType: 'json',
                     success: function(data) {
+                        Swal.close();
                         if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Submit RFQ Success!</p>",

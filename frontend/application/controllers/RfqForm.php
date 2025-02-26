@@ -539,9 +539,7 @@ class RfqForm extends CI_Controller
 		$sign1[0]->su_sign_path = ($sign1[0]->su_sign_path == 'null' || !$sign1[0]->su_sign_path) ? 'assets/images/uploaded/signature/EmptySign.png' : $sign1[0]->su_sign_path;
 		$sign1[0]->fullname = $sign1[0]->fullname ?? '';
 
-		$sign_group = $this->db->select("
-				CASE WHEN ida.ida_status = 9 THEN su.su_sign_path ELSE 'null' END AS su_sign_path,
-				COALESCE(CONCAT(su.su_firstname, ' ', su.su_lastname), 'null') AS fullname")
+		$sign_group = $this->db->select("CASE WHEN ida.ida_status = 9 THEN su.su_sign_path ELSE 'null' END AS su_sign_path, COALESCE(CONCAT(su.su_firstname, ' ', su.su_lastname), 'null') AS fullname")
 			->from('info_document_control idc')
 			->join('info_document_approval ida', 'ida.idc_id = idc.idc_id', 'left')
 			->join('sys_users su', 'su.su_id = ida.su_id', 'left')
@@ -549,17 +547,25 @@ class RfqForm extends CI_Controller
 			->where_in('ida.ida_status', [1, 9])
 			->get()
 			->result();
+		$default_sign = (object) [
+			"su_sign_path" => 'assets/images/uploaded/signature/EmptySign.png',
+			"fullname" => "Error signature"
+		];
 
-		if (count($sign_group) == 3) {
-			for ($i = 0; $i < count($sign_group); $i++) {
-				$sign_group[$i]->su_sign_path = ($sign_group[$i]->su_sign_path == 'null' || !$sign_group[$i]->su_sign_path) ? 'assets/images/uploaded/signature/EmptySign.png' : $sign_group[$i]->su_sign_path;
-				$sign_group[$i]->fullname = $sign_group[$i]->fullname ?? '';
+		foreach ($sign_group as $sign) {
+			if (empty($sign->su_sign_path) || !file_exists($sign->su_sign_path)) {
+				$sign->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
 			}
-		} else {
-			for ($i = 0; $i < count($sign_group); $i++) {
-				$sign_group[$i]->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
-				$sign_group[$i]->fullname = 'Error signature';
-			}
+
+			$sign->fullname = !empty($sign->fullname) ? $sign->fullname : "Error signature";
+		}
+
+		while (count($sign_group) < 3) {
+			$sign_group[] = clone $default_sign;
+		}
+
+		if (empty($sign_group)) {
+			$sign_group = [clone $default_sign, clone $default_sign, clone $default_sign];
 		}
 
 		$pdf->Cell(48.75, 20, $pdf->Image($sign1[0]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
@@ -579,8 +585,6 @@ class RfqForm extends CI_Controller
 		$pdf->Cell(48.75, 5, 'Supervisor', 'LBR', 0, 'C');
 		$pdf->Cell(48.75, 5, 'Department Manager', 'LBR', 0, 'C');
 		$pdf->Cell(48.75, 5, 'General Manager', 'LBR', 0, 'C');
-
-
 
 		$pdf->Output();
 	}

@@ -16,7 +16,7 @@ func UsernameIsUnique(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := db.QueryRow("SELECT * FROM sys_user WHERE su_emp_code= ?", objUser.Su_emp_code).Scan(&objUser.Su_id, &objUser.Su_fname, &objUser.Su_lname, &objUser.Su_email,
+	err := db.QueryRow("SELECT * FROM sys_users WHERE su_emp_code= ?", objUser.Su_emp_code).Scan(&objUser.Su_id, &objUser.Su_fname, &objUser.Su_lname, &objUser.Su_email,
 		&objUser.Su_emp_code, &objUser.Su_password, &objUser.Su_tel, &objUser.Su_img_path, &objUser.Su_img_name, &objUser.Spg_id, &objUser.Sd_id, &objUser.Spc_id, &objUser.Su_status, &objUser.Create_date,
 		&objUser.Update_date, &objUser.Create_by, &objUser.Update_by)
 	if err == sql.ErrNoRows {
@@ -199,7 +199,7 @@ func UpdateUser(c *gin.Context) {
 	TextTrim(&objUser.Su_username, " ")
 	TextTrim(&objUser.Su_firstname, " ")
 	TextTrim(&objUser.Su_lastname, " ")
-	objResult, err := db.Exec("Update sys_users SET su_firstname = ?,su_lastname = ?,su_email = ?,su_username = ?, spg_id = ?,sd_id = ?, su_updated_date = ?, su_updated_by = ? WHERE su_id = ?", objUser.Su_firstname, objUser.Su_lastname, objUser.Su_email, objUser.Su_username, objUser.Spg_id, objUser.Sd_id, objUser.Update_date, objUser.Update_by, objUser.Su_id)
+	objResult, err := db.Exec("Update sys_users SET su_firstname = ?,su_lastname = ?,su_email = ?, spg_id = ?,sd_id = ?, su_updated_date = ?, su_updated_by = ? WHERE su_id = ?", objUser.Su_firstname, objUser.Su_lastname, objUser.Su_email, objUser.Spg_id, objUser.Sd_id, objUser.Update_date, objUser.Update_by, objUser.Su_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -214,7 +214,7 @@ func ChangeUserStatus(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update sys_user SET su_status = ? WHERE su_id = ?", objUser.Su_status, objUser.Su_id)
+	objResult, err := db.Exec("Update sys_users SET su_status = ?, su_updated_date = ?, su_updated_by = ? WHERE su_id = ?", objUser.Su_status, objUser.Update_date, objUser.Update_by, objUser.Su_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),

@@ -133,7 +133,7 @@
         if (chk) {
             var login_data = {};
             $('#form_login').serializeArray().map(function(x) {
-                login_data[x.name] = x.value;
+                login_data[x.name] = x.value.replace(/\s/g, "");
             });
             $.ajax({
                 type: 'post',

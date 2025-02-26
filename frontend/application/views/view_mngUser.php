@@ -173,7 +173,7 @@
                         <div class="mb-3 row align-items-center">
                             <label for="edtEmployeeCode" class="form-label fw-semibold col-sm-3 col-form-label">Code</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="edtEmployeeCode" name="su_username" placeholder="Employee code">
+                                <input type="text" class="form-control" id="edtEmployeeCode" name="su_username" placeholder="Employee code" disabled>
                                 <span class="form_error"></span>
                             </div>
                         </div>
@@ -394,6 +394,8 @@
                 var status_form = {};
                 status_form["su_id"] = id;
                 status_form["su_status"] = status;
+                status_form["update_date"] = getTimeNow();
+                status_form["update_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                 $.ajax({
                     type: 'PUT',
                     dataType: 'json',
@@ -413,6 +415,8 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
+                            var dataTable = $('#tblUsers').DataTable();
+                            dataTable.ajax.reload(null, false);
                         } else {
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Update status user!</p>",
@@ -424,6 +428,8 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
+                            var dataTable = $('#tblUsers').DataTable();
+                            dataTable.ajax.reload(null, false);
                         }
                     },
                     error: function(err) {
@@ -571,7 +577,7 @@
             }
         })
     }
-    
+
     $(document).ready(function() {
         var sessUsrId = "<?php echo $this->session->userdata('sessUsrId'); ?>";
         if ($.fn.DataTable.isDataTable('#tblUsers')) {

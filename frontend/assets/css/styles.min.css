@@ -24855,7 +24855,7 @@ a:hover .h1 {
 
 /* width */
 ::-webkit-scrollbar {
-    width: 1px;
+    width: 6px;
 }
 
 /* Track */

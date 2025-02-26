@@ -383,7 +383,7 @@ class ManageNbc extends CI_Controller
 		$pdf->SetFont('THSarabunNew', 'B', 10);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->Cell(195, 4, '2. Please mention point that need to change specification.', 'LR', 0, 'L',);
-		
+
 		$pdf->Ln();
 		$pdf->SetFont('THSarabunNew', 'B', 10);
 		$pdf->SetX($pdf->GetX() - 4);
@@ -422,13 +422,13 @@ class ManageNbc extends CI_Controller
 
 		$sign_group = $this->db->select("CASE WHEN ida.ida_status = 9 THEN su.su_sign_path ELSE 'null' END AS su_sign_path,
 										COALESCE(CONCAT(su.su_firstname, ' ', su.su_lastname), 'null') AS fullname")
-									->from('info_document_control idc')
-									->join('info_document_approval ida', 'ida.idc_id = idc.idc_id', 'left')
-									->join('sys_users su', 'su.su_id = ida.su_id', 'left')
-									->where('idc.idc_id', $this->input->get('idc_refer_doc'))
-									->where_in('ida.ida_status', [1, 9])
-									->get()
-									->result();
+			->from('info_document_control idc')
+			->join('info_document_approval ida', 'ida.idc_id = idc.idc_id', 'left')
+			->join('sys_users su', 'su.su_id = ida.su_id', 'left')
+			->where('idc.idc_id', $this->input->get('idc_refer_doc'))
+			->where_in('ida.ida_status', [1, 9])
+			->get()
+			->result();
 
 		if (count($sign_group) == 3) {
 			for ($i = 0; $i < count($sign_group); $i++) {
@@ -539,7 +539,7 @@ class ManageNbc extends CI_Controller
 		$pdf->Cell(48.75, 5, '', 'LR', 0, 'L',);
 		$pdf->Cell(48.75, 5, '', 'R', 1, 'L',);
 
-		$sign_rnd = $this->db->select("
+		$sign_group = $this->db->select("
 				CASE WHEN ida.ida_status = 9 THEN su.su_sign_path ELSE 'null' END AS su_sign_path,
 				COALESCE(CONCAT(su.su_firstname, ' ', su.su_lastname), 'null') AS fullname")
 			->from('info_document_control idc')
@@ -550,31 +550,46 @@ class ManageNbc extends CI_Controller
 			->get()
 			->result();
 
-		if (count($sign_rnd) == 2) {
-			for ($i = 0; $i < count($sign_rnd); $i++) {
-				$sign_rnd[$i]->su_sign_path = ($sign_rnd[$i]->su_sign_path == 'null' || !$sign_rnd[$i]->su_sign_path) ? 'assets/images/uploaded/signature/EmptySign.png' : $sign_rnd[$i]->su_sign_path;
-				$sign_rnd[$i]->fullname = $sign_rnd[$i]->fullname ?? '';
+		$default_sign = (object) [
+			"su_sign_path" => 'assets/images/uploaded/signature/EmptySign.png',
+			"fullname" => "Error signature"
+		];
+
+		foreach ($sign_group as $sign) {
+			if (empty($sign->su_sign_path) || !file_exists($sign->su_sign_path)) {
+				$sign->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
 			}
-		} else {
-			for ($i = 0; $i < count($sign_rnd); $i++) {
-				$sign_rnd[$i]->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
-				$sign_rnd[$i]->fullname = 'Error signature';
-			}
+
+			$sign->fullname = !empty($sign->fullname) ? $sign->fullname : "Error signature";
 		}
+
+		while (count($sign_group) < 2) {
+			$sign_group[] = clone $default_sign;
+		}
+
+		if (empty($sign_group)) {
+			$sign_group = [clone $default_sign, clone $default_sign, clone $default_sign];
+		}
+
+		$pdf->SetX($pdf->GetX() - 4);
+		$pdf->Cell(48.75, 5, '', 0, 0, 'L');
+		$pdf->Cell(48.75, 5, '', 'L', 0, 'L',);
+		$pdf->Cell(48.75, 5, '', 'LR', 0, 'L',);
+		$pdf->Cell(48.75, 5, '', 'R', 1, 'L',);
 
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->Cell(48.75, 5, "CE/GDC", 0, 0, 'C');
 		$pdf->Cell(48.75, 5, $sign1[0]->fullname, 'LB', 0, 'C',);
-		$pdf->Cell(48.75, 5, $sign_rnd[0]->fullname, 'LBR', 0, 'C',);
-		$pdf->Cell(48.75, 5, $sign_rnd[1]->fullname, 'BR', 1, 'C',);
+		$pdf->Cell(48.75, 5, $sign_group[0]->fullname, 'LBR', 0, 'C',);
+		$pdf->Cell(48.75, 5, $sign_group[1]->fullname, 'BR', 1, 'C',);
 
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Sety($pdf->GetY() - 20);
+		$pdf->Sety($pdf->GetY() - 23);
 		$pdf->Cell(45, 5, "", 0, 0, 'C');
 
 		$pdf->Cell(48.75, 5, $pdf->Image($sign1[0]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
-		$pdf->Cell(48.75, 5, $pdf->Image($sign_rnd[0]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
-		$pdf->Cell(48.75, 5, $pdf->Image($sign_rnd[1]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 1, 'L');
+		$pdf->Cell(48.75, 5, $pdf->Image($sign_group[0]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
+		$pdf->Cell(48.75, 5, $pdf->Image($sign_group[1]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 1, 'L');
 
 		$pdf->Output();
 	}

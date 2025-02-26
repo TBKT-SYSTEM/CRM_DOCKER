@@ -30,60 +30,7 @@
                                    <span class="badge text-bg-primary rounded-4 px-3 py-1 lh-sm" id="notificationCount"></span>
                                </div>
                                <div class="message-body px-1" data-simplebar style="max-height: 360px; overflow-y: auto;" id="notificationBody">
-                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item bg-info-subtle mb-1">
-                                       <span class="me-3">
-                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
-                                       </span>
-                                       <div class="w-100">
-                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
-                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
-                                       </div>
-                                   </a>
-                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item bg-info-subtle mb-1">
-                                       <span class="me-3">
-                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
-                                       </span>
-                                       <div class="w-100">
-                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
-                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
-                                       </div>
-                                   </a>
-                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item mb-1">
-                                       <span class="me-3">
-                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
-                                       </span>
-                                       <div class="w-100">
-                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
-                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
-                                       </div>
-                                   </a>
-                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item mb-1">
-                                       <span class="me-3">
-                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
-                                       </span>
-                                       <div class="w-100">
-                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
-                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
-                                       </div>
-                                   </a>
-                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item mb-1">
-                                       <span class="me-3">
-                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
-                                       </span>
-                                       <div class="w-100">
-                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
-                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
-                                       </div>
-                                   </a>
-                                   <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item mb-1">
-                                       <span class="me-3">
-                                           <img src="https://bootstrapdemos.adminmart.com/modernize/dist/assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48" height="48">
-                                       </span>
-                                       <div class="w-100">
-                                           <h6 class="mb-1 fw-semibold lh-base">You have a new RFQ!</h6>
-                                           <span class="fs-2 d-block text-body-secondary">Please check the documents.</span>
-                                       </div>
-                                   </a>
+                                   
                                </div>
                            </div>
                        </div>

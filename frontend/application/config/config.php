@@ -25,7 +25,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 // $config['base_url'] = 'http://localhost:8081/';
 $config['base_url'] = 'http://172.21.64.221:8081/';
-// $config['base_url'] = 'http://192.168.161.219/CRM/';
+// $config['base_url'] = 'http://192.168.161.79/CRM_DOCKER/frontend/';
 
 /*
 |--------------------------------------------------------------------------

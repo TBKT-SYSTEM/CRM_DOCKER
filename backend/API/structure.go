@@ -911,21 +911,22 @@ type ConsiderInchargeData struct {
 	Data []ConsiderInchargeTable `json:"data"`
 }
 type ConsiderInchargeTable struct {
-	Mcip_id      int    `json:"mcip_id"`
-	Mci_id       int    `json:"mci_id"`
-	Mcip_weight  string `json:"mcip_weight"`
-	Sd_id        int    `json:"sd_id"`
-	Mcip_status  int    `json:"mcip_status"`
-	Create_date  string `json:"mcip_created_date"`
-	Create_by    string `json:"mcip_created_by"`
-	Update_date  string `json:"mcip_updated_date"`
-	Update_by    string `json:"mcip_updated_by"`
-	Mci_name     string `json:"mci_name"`
-	Sd_dept_name string `json:"sd_dept_name"`
-	Su_firstname string `json:"su_firstname"`
-	Su_lastname  string `json:"su_lastname"`
-	Su_sign_path string `json:"su_sign_path"`
-	Su_sign_file string `json:"su_sign_file"`
+	Mcip_id       int    `json:"mcip_id"`
+	Mci_id        int    `json:"mci_id"`
+	Mcip_weight   string `json:"mcip_weight"`
+	Sd_id         int    `json:"sd_id"`
+	Mcip_status   int    `json:"mcip_status"`
+	Create_date   string `json:"mcip_created_date"`
+	Create_by     string `json:"mcip_created_by"`
+	Update_date   string `json:"mcip_updated_date"`
+	Update_by     string `json:"mcip_updated_by"`
+	Mci_name      string `json:"mci_name"`
+	Sd_dept_aname string `json:"sd_adept_aname"`
+	Sd_dept_name  string `json:"sd_dept_name"`
+	Su_firstname  string `json:"su_firstname"`
+	Su_lastname   string `json:"su_lastname"`
+	Su_sign_path  string `json:"su_sign_path"`
+	Su_sign_file  string `json:"su_sign_file"`
 }
 type ConsiderIncharge struct {
 	Mcip_id     int    `json:"mcip_id"`
@@ -995,4 +996,36 @@ type RemainTask struct {
 	Idc_created_date string `json:"idc_created_date"`
 	Idc_created_by   string `json:"idc_created_by"`
 	Su_firstname     string `json:"su_firstname"`
+}
+type FeasibilityInsert struct {
+	Idc_id             int            `json:"idc_id"`
+	Mdt_id             int            `json:"mdt_id"`
+	Idc_refer_doc      int            `json:"idc_refer_doc"`
+	Idc_running_no     string         `json:"idc_running_no"`
+	Idc_issue_year     string         `json:"idc_issue_year"`
+	Idc_issue_month    string         `json:"idc_issue_month"`
+	Idc_issue_seq_no   string         `json:"idc_issue_seq_no"`
+	Idc_customer_type  int            `json:"idc_customer_type"`
+	Idc_customer_name  string         `json:"idc_customer_name"`
+	Mds_id             int            `json:"mds_id"`
+	Idc_subject_note   string         `json:"idc_subject_note"`
+	Idc_result_confirm int            `json:"idc_result_confirm"`
+	Idc_status         int            `json:"idc_status"`
+	Idc_created_date   string         `json:"idc_created_date"`
+	Idc_created_by     string         `json:"idc_created_by"`
+	Idc_updated_date   string         `json:"idc_updated_date"`
+	Idc_updated_by     string         `json:"idc_updated_by"`
+	IrGroupPart        []RfqGroupPart `json:"ir_group_part"`
+}
+type FeasibilityItem struct {
+	Ifs_id        int    `json:"ifs_id"`
+	Mcip_id       int    `json:"mcip_id"`
+	Mci_name      string `json:"mci_name"`
+	Mcip_weight   string `json:"mcip_weight"`
+	Ifs_score     string `json:"ifs_score"`
+	Ifs_total     string `json:"ifs_total"`
+	Ifs_comment   string `json:"ifs_comment"`
+	Sd_dept_aname string `json:"sd_dept_aname"`
+	Ifs_status    int    `json:"ifs_status"`
+	Sd_id         int    `json:"sd_id"`
 }

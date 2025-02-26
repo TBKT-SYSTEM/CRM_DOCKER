@@ -77,7 +77,7 @@
                                             </div>
                                             <div class="col-lg">
                                                 <div class="mb-3 row align-items-center">
-                                                    <label for="inpMenuController" class="form-label fw-semibold col-sm-3 col-form-label"> Controller</label>
+                                                    <label for="inpMenuController" class="form-label fw-semibold col-sm-3 col-form-label">Controller</label>
                                                     <div class="col-sm-8">
                                                         <input type="text" class="form-control" id="inpMenuController" placeholder="Enter menu controller" disabled>
                                                         <span class="form_error"></span>
@@ -151,7 +151,7 @@
                                                         <div class=" row align-items-center">
                                                             <label for="inpMenuIcon" class="form-label fw-semibold col-sm-3 col-form-label">Menu Icon</label>
                                                             <div class="col-sm-8">
-                                                                <input type="text" class="form-control" name="inpMenuIcon" id="inpMenuIcon" placeholder="Enter menu icon">
+                                                                <input type="text" class="form-control" name="inpMenuIcon" id="inpMenuIcon" placeholder="Click for select icon" readonly onclick="openIconModal()">
                                                                 <span class="form_error"></span>
                                                             </div>
                                                         </div>
@@ -302,7 +302,69 @@
     </div>
 </div>
 
+<div class="modal fade" id="iconModal" tabindex="-1" aria-labelledby="iconModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="iconModalLabel">Select Icon</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="iconList">
+                    <!-- Icons will be dynamically inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="clearIcon()" >Reset</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    function openIconModal() {
+        const modal = new bootstrap.Modal(document.getElementById('iconModal'));
+        modal.show();
+    }
+
+    async function populateIcons() {
+        const iconList = document.getElementById('iconList');
+        const response = await fetch('assets/json/icons.json');
+        const icons = await response.json();
+
+        icons.forEach(icon => {
+            const col = document.createElement('div');
+            col.className = 'col-1 text-center mb-3';
+
+            const iconElement = document.createElement('i');
+            iconElement.className = `ti ${icon} fs-5 btn btn-secondary-subtle text-secondary shadow-sm card-hover`;
+            iconElement.style.cursor = 'pointer';
+            iconElement.onclick = () => selectIcon(icon);
+
+            col.appendChild(iconElement);
+            iconList.appendChild(col);
+        });
+    }
+
+    function selectIcon(icon) {
+        const inpMenuIcon = document.getElementById('inpMenuIcon');
+        inpMenuIcon.value = `ti ${icon}`;
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('iconModal'));
+        modal.hide();
+    }
+
+    function clearIcon() {
+        const inpMenuIcon = document.getElementById('inpMenuIcon');
+        inpMenuIcon.value = ``;
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('iconModal'));
+        modal.hide();
+    }
+
+    document.addEventListener('DOMContentLoaded', populateIcons);
+
     async function addMainMenu() {
         event.preventDefault();
         let chk = await smg_validate("add");
@@ -345,6 +407,7 @@
                                 })
                                 var table = $('#tblMainMenu').DataTable();
                                 table.ajax.reload(null, false);
+                                window.location.reload();
                             } else {
                                 Swal.fire({
                                     html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error add main menu!</p>",

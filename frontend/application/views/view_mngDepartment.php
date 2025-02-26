@@ -155,7 +155,7 @@
                                 <input type="text" class="form-control" id="edtDepartmentCd" name="sd_dept_cd" placeholder="Department Code">
                                 <span class="form_error"></span>
                             </div>
-                            <label for="edtPlantCd" class="form-label fw-semibold col-sm-4 col-form-label">Department Code</label>
+                            <label for="edtPlantCd" class="form-label fw-semibold col-sm-4 col-form-label">Plant</label>
                             <div class="col-sm-8">
                                 <select type="text" class="form-select" id="edtPlantCd" name="sd_plant_cd">
                                 </select>

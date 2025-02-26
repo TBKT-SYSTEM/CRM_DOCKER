@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CRM | E-Mail / Approve</title>
+    <title>CRM | E-Mail | Confirm</title>
     <link rel="shortcut icon" type="image/png" href="<?php echo base_url() ?>assets/images/logos/crm_icon_short.png" />
     <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/styles.min.css" />
 </head>
@@ -43,7 +43,7 @@
         const documentParam = urlParams.get('documentId');
         const idaParam = urlParams.get('idaId');
         const typeParam = urlParams.get('type');
-    
+
         let dataType = window.atob(typeParam);
         let url_api = '';
 
@@ -85,7 +85,7 @@
                         success: function(result) {
                             if (typeof result == "string") {
                                 Swal.fire({
-                                    html: '<h5>' + result + '</h5>\n <p>It cannot be re-rejected.</p>',
+                                    html: '<h4>' + result + '</h4>',
                                     icon: 'error',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
@@ -152,7 +152,6 @@
                             console.error('Invalid response data from API');
                         }
                     } else if (result.idc_running_no.substring(0, 3) == 'NBC') {
-                        console.log('test');
                         $.ajax({
                             type: 'get',
                             url: API_URL + 'nbc/' + atob(documentParam),
@@ -168,6 +167,26 @@
                                 param.idc_closing_date = formatDate(Duedate);
 
                                 let pdfUrl = '<?php echo base_url(); ?>ViewPDF/createNbcPDF?' + $.param(param);
+                                window.open(pdfUrl, '_blank');
+                                window.close();
+                            }
+                        });
+                    } else if (result.idc_running_no.substring(0, 2) == 'FS') {
+                        $.ajax({
+                            type: 'get',
+                            url: API_URL + 'nbc/' + atob(documentParam),
+                            success: async function(result) {
+                                let param = {
+                                    ...result.data[0]
+                                };
+
+                                let IssueDate = param.idc_created_date.split(" ")[0];
+                                param.idc_created_date = formatDate(IssueDate);
+
+                                let Duedate = param.idc_closing_date.split(" ")[0];
+                                param.idc_closing_date = formatDate(Duedate);
+
+                                let pdfUrl = '<?php echo base_url(); ?>ViewPDF/createFeasibilityPDF?' + $.param(param);
                                 window.open(pdfUrl, '_blank');
                                 window.close();
                             }
@@ -189,7 +208,7 @@
             success: function(result) {
                 if (typeof result == "string") {
                     Swal.fire({
-                        html: '<h5>' + result + '</h5>\n <p>It cannot be re-approved.</p>',
+                        html: '<h4>' + result + '</h4>',
                         icon: 'error',
                         showClass: {
                             popup: 'animate__animated animate__fadeInDown'
