@@ -493,11 +493,12 @@ type GetPartNoByIdData struct {
 	Data []RfqGroupPart `json:"data"`
 }
 type RfqGroupPart struct {
-	Idi_id        int    `json:"idi_id"`
-	Idi_item_no   string `json:"idi_item_no"`
-	Idi_item_name string `json:"idi_item_name"`
-	Idi_model     string `json:"idi_model"`
-	Idi_remark    string `json:"idi_remark"`
+	Idi_id        int                    `json:"idi_id"`
+	Idi_item_no   string                 `json:"idi_item_no"`
+	Idi_item_name string                 `json:"idi_item_name"`
+	Idi_model     string                 `json:"idi_model"`
+	Idi_remark    string                 `json:"idi_remark"`
+	IrGroupVolume []RfqGroupVolumeDetail `json:"ir_group_volume"`
 }
 
 type RfqGroupVolume struct {
@@ -505,6 +506,7 @@ type RfqGroupVolume struct {
 	Volume string `json:"volume"`
 }
 type RfqGroupVolumeDetail struct {
+	Idi_id   int    `json:"idi_id"`
 	Idv_id   int    `json:"idv_id"`
 	Idv_year string `json:"idv_year"`
 	Idv_qty  string `json:"idv_qty"`
@@ -546,6 +548,40 @@ type GetRfq struct {
 	IrGroupPart         []RfqGroupPart         `json:"ir_group_part"`
 	IrGroupVolume       []RfqGroupVolumeDetail `json:"ir_group_volume"`
 }
+type GetRfqNew struct {
+	Idc_id              int            `json:"idc_id"`
+	Mdt_id              int            `json:"mdt_id"`
+	Idc_refer_doc       int            `json:"idc_refer_doc"`
+	Idc_running_no      string         `json:"idc_running_no"`
+	Idc_issue_year      string         `json:"idc_issue_year"`
+	Idc_issue_month     string         `json:"idc_issue_month"`
+	Idc_issue_seq_no    string         `json:"idc_issue_seq_no"`
+	Idc_customer_type   int            `json:"idc_customer_type"`
+	Idc_customer_name   string         `json:"idc_customer_name"`
+	Idc_plant_cd        int            `json:"idc_plant_cd"`
+	Mds_id              int            `json:"mds_id"`
+	Idc_subject_note    string         `json:"idc_subject_note"`
+	Mde_id              int            `json:"mde_id"`
+	Idc_enclosures_note string         `json:"idc_enclosures_note"`
+	Idc_project_life    int            `json:"idc_project_life"`
+	Idc_project_start   string         `json:"idc_project_start"`
+	Idc_issue_date      string         `json:"idc_issue_date"`
+	Idc_closing_date    string         `json:"idc_closing_date"`
+	Idc_reply_date      string         `json:"idc_reply_date"`
+	Idc_result_confirm  int            `json:"idc_result_confirm"`
+	Idc_status          int            `json:"idc_status"`
+	Idc_note1           string         `json:"idc_note1"`
+	Idc_note2           string         `json:"idc_note2"`
+	Idc_file_path       string         `json:"idc_file_path"`
+	Idc_physical_path   string         `json:"idc_physical_path"`
+	Idc_cancel_reason   string         `json:"idc_cancel_reason"`
+	Idc_created_date    string         `json:"idc_created_date"`
+	Idc_created_by      string         `json:"idc_created_by"`
+	Idc_updated_date    string         `json:"idc_updated_date"`
+	Idc_updated_by      string         `json:"idc_updated_by"`
+	Idat_item           []string       `json:"idat_item"`
+	IrGroupPart         []RfqGroupPart `json:"ir_group_part"`
+}
 type Rfq struct {
 	Idc_id              int              `json:"idc_id"`
 	Mdt_id              int              `json:"mdt_id"`
@@ -582,6 +618,41 @@ type Rfq struct {
 	Idpc_item           []string         `json:"idpc_item"`
 	IrGroupPart         []RfqGroupPart   `json:"ir_group_part"`
 	IrGroupVolume       []RfqGroupVolume `json:"ir_group_volume"`
+}
+
+type RfqNew struct {
+	Idc_id              int            `json:"idc_id"`
+	Mdt_id              int            `json:"mdt_id"`
+	Idc_refer_doc       int            `json:"idc_refer_doc"`
+	Idc_running_no      string         `json:"idc_running_no"`
+	Idc_issue_year      string         `json:"idc_issue_year"`
+	Idc_issue_month     string         `json:"idc_issue_month"`
+	Idc_issue_seq_no    string         `json:"idc_issue_seq_no"`
+	Idc_customer_type   int            `json:"idc_customer_type"`
+	Idc_customer_name   string         `json:"idc_customer_name"`
+	Idc_plant_cd        int            `json:"idc_plant_cd"`
+	Mds_id              int            `json:"mds_id"`
+	Idc_subject_note    string         `json:"idc_subject_note"`
+	Mde_id              int            `json:"mde_id"`
+	Idc_enclosures_note string         `json:"idc_enclosures_note"`
+	Idc_project_life    int            `json:"idc_project_life"`
+	Idc_project_start   string         `json:"idc_project_start"`
+	Idc_issue_date      string         `json:"idc_issue_date"`
+	Idc_closing_date    string         `json:"idc_closing_date"`
+	Idc_reply_date      string         `json:"idc_reply_date"`
+	Idc_result_confirm  int            `json:"idc_result_confirm"`
+	Idc_status          int            `json:"idc_status"`
+	Idc_note1           string         `json:"idc_note1"`
+	Idc_note2           string         `json:"idc_note2"`
+	Idc_file_path       string         `json:"idc_file_path"`
+	Idc_physical_path   string         `json:"idc_physical_path"`
+	Idc_cancel_reason   string         `json:"idc_cancel_reason"`
+	Idc_created_date    string         `json:"idc_created_date"`
+	Idc_created_by      string         `json:"idc_created_by"`
+	Idc_updated_date    string         `json:"idc_updated_date"`
+	Idc_updated_by      string         `json:"idc_updated_by"`
+	Idat_item           []string       `json:"idat_item"`
+	IrGroupPart         []RfqGroupPart `json:"ir_group_part"`
 }
 
 type RfqData struct {
@@ -624,6 +695,7 @@ type RfqTable struct {
 	Su_sign_path        string `json:"su_sign_path"`
 	Su_sign_file        string `json:"su_sign_file"`
 	Btn_nbc             string `json:"btn_nbc"`
+	Reject_message      string `json:"reject_message"`
 }
 
 type NbcData struct {
@@ -667,6 +739,7 @@ type NbcTable struct {
 	Su_sign_file        string `json:"su_sign_file"`
 	Btn_nbc             string `json:"btn_nbc"`
 	Run_no              string `json:"run_no"`
+	Reject_message      string `json:"reject_message"`
 }
 
 type GetRfqFileByIdData struct {
@@ -1028,4 +1101,104 @@ type FeasibilityItem struct {
 	Sd_dept_aname string `json:"sd_dept_aname"`
 	Ifs_status    int    `json:"ifs_status"`
 	Sd_id         int    `json:"sd_id"`
+}
+type MeetingGroupMember struct {
+	Imm_id           int    `json:"imm_id"`
+	Imc_id           int    `json:"imc_id"`
+	Sd_id            int    `json:"sd_id"`
+	Imm_name         string `json:"imm_name"`
+	Imm_status       int    `json:"imm_status"`
+	Imm_created_date string `json:"imm_created_date"`
+	Imm_created_by   string `json:"imm_created_by"`
+	Imm_updated_date string `json:"imm_updated_date"`
+	Imm_updated_by   string `json:"imm_updated_by"`
+}
+type MeetingGroupAction struct {
+	Imnc_id           int    `json:"imnc_id"`
+	Imc_id            int    `json:"imc_id"`
+	Imnc_topic_no     int    `json:"imnc_topic_no"`
+	Imnc_topic_detail string `json:"imnc_topic_detail"`
+	Sd_id             int    `json:"sd_id"`
+	Imnc_date         string `json:"imnc_date"`
+	Imnc_status       int    `json:"imnc_status"`
+	Imnc_created_date string `json:"imnc_created_date"`
+	Imnc_created_by   string `json:"imnc_created_by"`
+	Imnc_updated_date string `json:"imnc_updated_date"`
+	Imnc_updated_by   string `json:"imnc_updated_by"`
+}
+type MeetingControl struct {
+	Imc_id            int                  `json:"imc_id"`
+	Mdt_id            int                  `json:"mdt_id"`
+	Idc_id            int                  `json:"idc_id"`
+	Imc_date          string               `json:"imc_date"`
+	Imc_detail        string               `json:"imc_detail"`
+	Imc_status        int                  `json:"imc_status"`
+	Idc_cancel_reason string               `json:"idc_cancel_reason"`
+	Imc_created_date  string               `json:"imc_created_date"`
+	Imc_created_by    string               `json:"imc_created_by"`
+	Imc_updated_date  string               `json:"imc_updated_date"`
+	Imc_updated_by    string               `json:"imc_updated_by"`
+	Imc_group_member  []MeetingGroupMember `json:"imc_group_member"`
+	Imc_group_action  []MeetingGroupAction `json:"imc_group_action"`
+}
+type MeetingTableData struct {
+	Data []MeetingTable `json:"data"`
+}
+type MeetingGroupMemberDetail struct {
+	Imm_id           int    `json:"imm_id"`
+	Imc_id           int    `json:"imc_id"`
+	Sd_id            int    `json:"sd_id"`
+	Imm_name         string `json:"imm_name"`
+	Imm_status       int    `json:"imm_status"`
+	Imm_created_date string `json:"imm_created_date"`
+	Imm_created_by   string `json:"imm_created_by"`
+	Imm_updated_date string `json:"imm_updated_date"`
+	Imm_updated_by   string `json:"imm_updated_by"`
+	Sd_dept_name     string `json:"sd_dept_name"`
+}
+type MeetingGroupActionDetail struct {
+	Imnc_id           int    `json:"imnc_id"`
+	Imc_id            int    `json:"imc_id"`
+	Imnc_topic_no     int    `json:"imnc_topic_no"`
+	Imnc_topic_detail string `json:"imnc_topic_detail"`
+	Sd_id             int    `json:"sd_id"`
+	Imnc_date         string `json:"imnc_date"`
+	Imnc_status       int    `json:"imnc_status"`
+	Imnc_created_date string `json:"imnc_created_date"`
+	Imnc_created_by   string `json:"imnc_created_by"`
+	Imnc_updated_date string `json:"imnc_updated_date"`
+	Imnc_updated_by   string `json:"imnc_updated_by"`
+	Sd_dept_name      string `json:"sd_dept_name"`
+}
+type MeetingTable struct {
+	Imc_id            int                        `json:"imc_id"`
+	Idc_id            int                        `json:"idc_id"`
+	Idc_customer_type int                        `json:"idc_customer_type"`
+	Mdt_id            int                        `json:"mdt_id"`
+	Mdt_position1     string                     `json:"mdt_position1"`
+	Idc_running_no    string                     `json:"idc_running_no"`
+	Idc_customer_name string                     `json:"idc_customer_name"`
+	Imc_status        int                        `json:"imc_status"`
+	Imc_date          string                     `json:"imc_date"`
+	Imc_detail        string                     `json:"imc_detail"`
+	Imc_created_by    string                     `json:"imc_created_by"`
+	Su_firstname      string                     `json:"su_firstname"`
+	Su_lastname       string                     `json:"su_lastname"`
+	Imc_group_member  []MeetingGroupMemberDetail `json:"imc_group_member"`
+	Imc_group_action  []MeetingGroupActionDetail `json:"imc_group_action"`
+}
+type ManageTaskData struct {
+	Data []ManageTask `json:"data"`
+}
+type ManageTask struct {
+	Idc_id            int    `json:"idc_id"`
+	Idc_customer_type string `json:"idc_customer_type"`
+	Mdt_position1     string `json:"mdt_position1"`
+	Idc_running_no    string `json:"idc_running_no"`
+	Refer_doc         string `json:"refer_doc"`
+	Idc_customer_name string `json:"idc_customer_name"`
+	Idc_status        int    `json:"idc_status"`
+	Idc_created_date  string `json:"idc_created_date"`
+	Idc_created_by    string `json:"idc_created_by"`
+	Su_firstname      string `json:"su_firstname"`
 }

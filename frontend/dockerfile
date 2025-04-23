@@ -26,3 +26,4 @@ RUN chown -R www-data:www-data /var/www/html
 RUN echo "upload_max_filesize = 100M" > /usr/local/etc/php/conf.d/uploads.ini
 RUN echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/uploads.ini
 RUN echo "memory_limit = 128M" >> /usr/local/etc/php/conf.d/uploads.ini
+RUN echo "date.timezone = Asia/Bangkok" >> /usr/local/etc/php/conf.d/uploads.ini

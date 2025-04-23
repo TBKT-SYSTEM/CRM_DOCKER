@@ -1484,10 +1484,6 @@ func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail s
 }
 
 func ApproveByEmail(c *gin.Context) {
-	type Document struct {
-		Idc_id         int    `json:"idc_id"`
-		Idc_running_no string `json:"idc_running_no"`
-	}
 	type notiActive struct {
 		Ida_id    int    `json:"ida_id"`
 		Su_id     int    `json:"su_id"`
@@ -1499,6 +1495,7 @@ func ApproveByEmail(c *gin.Context) {
 		Su_firstname string `json:"su_firstname"`
 		Su_email     string `json:"su_email"`
 		Su_username  string `json:"su_username"`
+		Sd_id        int    `json:"sd_id"`
 	}
 	type userCreate struct {
 		Su_id        int    `json:"su_id"`
@@ -1548,6 +1545,29 @@ func ApproveByEmail(c *gin.Context) {
 			return
 		}
 
+		var cheIdaStatus int
+		checkIdaStatus := "SELECT ida_status FROM info_document_approval WHERE ida_id = ?"
+		err = db.QueryRow(checkIdaStatus, idaID).Scan(&cheIdaStatus)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.IndentedJSON(http.StatusOK, "This document not found!")
+				return
+			}
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+			return
+		}
+		// log.Println("IDA_ID => ", idaID)
+		// log.Println("IDA_STATUS => ", cheIdaStatus)
+		if cheIdaStatus == 6 || cheIdaStatus == 5 || cheIdaStatus == 9 {
+			statuses := map[int]string{
+				6: "rejected",
+				5: "cancelled",
+				9: "approved",
+			}
+			c.IndentedJSON(http.StatusOK, fmt.Sprintf("This document has been %s!", statuses[cheIdaStatus]))
+			return
+		}
+
 		var chkMdt int
 		sqlMdt := "SELECT mdt_id FROM info_document_control WHERE idc_id = ?"
 		err := db.QueryRow(sqlMdt, docID).Scan(&chkMdt)
@@ -1557,9 +1577,9 @@ func ApproveByEmail(c *gin.Context) {
 		} else {
 			if chkMdt == 1 {
 				var objEmailFS userEmail
-				var idcSendMail int
-				getEmail := "SELECT su.su_id, su.su_firstname, su.su_email, su.su_username FROM sys_users su LEFT JOIN info_document_approval ida ON ida.su_id = su.su_id WHERE ida.ida_id = ? GROUP BY ida.su_id"
-				err := db.QueryRow(getEmail, idaID).Scan(&objEmailFS.Su_id, &objEmailFS.Su_firstname, &objEmailFS.Su_email, &objEmailFS.Su_username)
+				var idaSendMail int
+				getEmail := "SELECT su.su_id, su.su_firstname, su.su_email, su.su_username, su.sd_id FROM sys_users su LEFT JOIN info_document_approval ida ON ida.su_id = su.su_id WHERE ida.ida_id = ? GROUP BY ida.su_id"
+				err := db.QueryRow(getEmail, idaID).Scan(&objEmailFS.Su_id, &objEmailFS.Su_firstname, &objEmailFS.Su_email, &objEmailFS.Su_username, &objEmailFS.Sd_id)
 
 				if err == sql.ErrNoRows {
 					c.IndentedJSON(http.StatusOK, "No user found")
@@ -1577,36 +1597,11 @@ func ApproveByEmail(c *gin.Context) {
 					c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 					return
 				} else {
-					getSendIda := "SELECT MIN(ida_id) AS ida_id FROM info_document_approval WHERE su_id = ?"
-					err = db.QueryRow(getSendIda, objEmailFS.Su_id).Scan(&idcSendMail)
+					getSendIda := "SELECT MIN(ida_id) AS ida_id FROM info_document_approval WHERE su_id = ? AND idc_id = ?"
+					err = db.QueryRow(getSendIda, objEmailFS.Su_id, docID).Scan(&idaSendMail)
 					if err != nil {
 						c.IndentedJSON(http.StatusOK, fmt.Sprintf("Error get send ida: %s", err))
 						return
-					}
-
-					var chkAllApprove string
-					sqlChkAllApprove := "SELECT IF( COUNT(DISTINCT ida_status) = 1 AND MAX(ida_status) = 9, 9, 0 ) AS ida_status_check FROM info_document_approval WHERE idc_id = ?"
-					err = db.QueryRow(sqlChkAllApprove, docID).Scan(&chkAllApprove)
-					if err == sql.ErrNoRows {
-						c.IndentedJSON(http.StatusOK, "Error check all approve")
-						return
-					}
-					// 0 = Not approval all, 9 = has all approval
-					if chkAllApprove == "9" {
-						_, err := db.Exec("UPDATE info_feasibility_score SET ifs_status = 9, ifs_updated_date = ?, ifs_updated_by = ? WHERE idc_id = ?", strCreateDate, objEmailFS.Su_username, docID)
-						if err != nil {
-							c.IndentedJSON(http.StatusInternalServerError, gin.H{
-								"Error": err.Error(),
-							})
-							return
-						}
-						_, err = db.Exec("UPDATE info_document_control SET idc_status = 9, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", strCreateDate, objEmailFS.Su_username, docID)
-						if err != nil {
-							c.IndentedJSON(http.StatusInternalServerError, gin.H{
-								"Error": err.Error(),
-							})
-							return
-						}
 					}
 
 					var objUserCreate userCreate
@@ -1621,20 +1616,210 @@ func ApproveByEmail(c *gin.Context) {
 						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
 						return
 					}
+
+					_, err = db.Exec("UPDATE info_feasibility_score AS ifs JOIN mst_consideration_item_pic AS mcip ON mcip.mcip_id = ifs.mcip_id JOIN sys_department AS sd ON sd.sd_id = mcip.sd_id SET ifs.ifs_status = 9, ifs.ifs_updated_date = ?, ifs.ifs_updated_by = ? WHERE ifs.idc_id = ? AND mcip.sd_id = ?", strCreateDate, objEmailFS.Su_username, docID, objEmailFS.Sd_id)
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{
+							"Error": err.Error(),
+						})
+						return
+					}
+
 					idcId, err := strconv.Atoi(docID)
 					if err != nil {
 						fmt.Println("Error converting to int:", err)
 						return
 					}
 
-					_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 2, idcSendMail, strShowUsers2, 0, strCreateDate, strCreateDate)
+					_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 2, idaSendMail, strShowUsers2, 0, strCreateDate, strCreateDate)
 					if err != nil {
 						c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 					}
 
-					err = SendMail(c, idcId, idcSendMail, objUserCreate.Su_firstname, objUserCreate.Su_email, "approve")
+					err = SendMail(c, idcId, idaSendMail, objUserCreate.Su_firstname, objUserCreate.Su_email, "approve")
 					if err != nil {
 						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					}
+				}
+
+				var chkStatusAll int
+				err = db.QueryRow(`SELECT CASE WHEN COUNT(*) = SUM(ifs_status = 9) THEN 1 ELSE 0 END AS all_done FROM info_feasibility_score WHERE idc_id = ?`, docID).Scan(&chkStatusAll)
+				if err != nil {
+					c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query"})
+					return
+				}
+
+				if chkStatusAll == 1 {
+					var chkOterDept int
+					var userCreateDoc string
+					err = db.QueryRow(`SELECT COUNT(DISTINCT su.su_id) AS dept FROM info_document_approval ida LEFT JOIN sys_users su ON su.su_id = ida.su_id WHERE idc_id = ?`, docID).Scan(&chkOterDept)
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query"})
+						return
+					}
+
+					err = db.QueryRow(`SELECT idc_created_by FROM info_document_control WHERE idc_id = ?`, docID).Scan(&userCreateDoc)
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query"})
+						return
+					}
+
+					if chkOterDept == 5 {
+						type DocAppData struct {
+							Sd_id    int
+							Deptname string
+							SwgId    int
+							UserID   int
+							SatID    int
+						}
+
+						type notiActive struct {
+							Ida_id       int    `json:"ida_id"`
+							Su_id        int    `json:"su_id"`
+							Su_firstname string `json:"su_firstname"`
+							Su_email     string `json:"su_email"`
+						}
+
+						query := `SELECT sd.sd_id, sd.sd_dept_aname, swd.swg_id, swd.su_id, swd.sat_id FROM sys_workflow_detail swd LEFT JOIN sys_workflow_group swg ON swd.swg_id = swg.swg_id LEFT JOIN sys_department sd ON sd.sd_id = swg.sd_id WHERE swg.sd_id IN (41, 20, 47) AND swd.sat_id = (SELECT MAX(swd_inner.sat_id) FROM sys_workflow_detail swd_inner LEFT JOIN sys_workflow_group swg_inner ON swd_inner.swg_id = swg_inner.swg_id LEFT JOIN sys_department sd_inner ON sd_inner.sd_id = swg_inner.sd_id WHERE sd_inner.sd_dept_aname = sd.sd_dept_aname) AND swd.swd_status = 1 ORDER BY swd.swg_id`
+
+						rows, err := db.Query(query)
+						if err != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query"})
+							return
+						}
+						defer rows.Close()
+
+						var otherDept []DocAppData
+						for rows.Next() {
+							var data DocAppData
+							if err := rows.Scan(&data.Sd_id, &data.Deptname, &data.SwgId, &data.UserID, &data.SatID); err != nil {
+								c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan row data"})
+								return
+							}
+							otherDept = append(otherDept, data)
+						}
+						if err := rows.Err(); err != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while reading rows"})
+							return
+						}
+
+						idcId, err := strconv.Atoi(docID)
+						if err != nil {
+							fmt.Println("Error converting to int:", err)
+							return
+						}
+
+						var countSeqNo int
+						err = db.QueryRow(`SELECT IFNULL(MAX(ida_seq_no), 0) + 1 AS count FROM info_document_approval WHERE idc_id = ?`, idcId).Scan(&countSeqNo)
+						if err != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query"})
+							return
+						}
+
+						// Insert Approval
+						var sqlIda string = "INSERT INTO info_document_approval (swg_id, su_id, sat_id, ida_seq_no, idc_id, ida_created_date, ida_created_by, ida_updated_date, ida_updated_by) VALUES "
+						objListIda := []string{}
+						for _, consItem := range otherDept {
+							objIda := fmt.Sprintf("(%d, %d, %d, %d, %d, '%s', '%s', '%s', '%s')",
+								consItem.SwgId,
+								consItem.UserID,
+								consItem.SatID,
+								countSeqNo,
+								idcId,
+								strCreateDate,
+								userCreateDoc,
+								strCreateDate,
+								userCreateDoc,
+							)
+							objListIda = append(objListIda, objIda)
+							countSeqNo++
+						}
+
+						if len(objListIda) == 0 {
+							c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+							return
+						}
+
+						sqlIda += strings.Join(objListIda, ",")
+
+						_, errIda := db.Exec(sqlIda)
+						if errIda != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error3": errIda.Error()})
+							return
+						}
+
+						query = `SELECT ida.ida_id, ida.su_id, CONCAT(su.su_firstname, ' ', su.su_lastname) AS su_firstname, su.su_email FROM info_document_approval ida LEFT JOIN sys_users su ON su.su_id = ida.su_id WHERE ida.idc_id = ? AND ida.ida_action = 0 GROUP BY su_id`
+
+						rowsUserApp, err := db.Query(query, idcId)
+						if err != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query"})
+							return
+						}
+						defer rowsUserApp.Close()
+
+						var results []notiActive
+						for rowsUserApp.Next() {
+							var data notiActive
+							if err := rowsUserApp.Scan(&data.Ida_id, &data.Su_id, &data.Su_firstname, &data.Su_email); err != nil {
+								c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan row data"})
+								return
+							}
+							results = append(results, data)
+						}
+						if err := rowsUserApp.Err(); err != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while reading rows"})
+							return
+						}
+
+						objListNoti := []string{}
+						sqlNoti := "INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES "
+						for _, itemNoti := range results {
+							objIda := fmt.Sprintf("(%d, %d, '%s', %d, '%s', '%s')",
+								1,
+								itemNoti.Ida_id,
+								strShowUsers,
+								0,
+								strCreateDate,
+								strCreateDate,
+							)
+							objListNoti = append(objListNoti, objIda)
+
+							errMail := SendMail(c, idcId, itemNoti.Ida_id, itemNoti.Su_firstname, itemNoti.Su_email, "waiting")
+							if errMail != nil {
+								c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errMail.Error()})
+								return
+							}
+						}
+
+						if len(objListNoti) == 0 {
+							c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+							return
+						}
+
+						sqlNoti += strings.Join(objListNoti, ",")
+						_, errNoti := db.Exec(sqlNoti)
+						if errNoti != nil {
+							c.IndentedJSON(http.StatusInternalServerError, gin.H{"errNoti": errNoti.Error()})
+							return
+						}
+					}
+				}
+
+				var chkAllApprove string
+				sqlChkAllApprove := "SELECT IF( COUNT(DISTINCT ida_status) = 1 AND MAX(ida_status) = 9, 9, 0 ) AS ida_status_check FROM info_document_approval WHERE idc_id = ?"
+				err = db.QueryRow(sqlChkAllApprove, docID).Scan(&chkAllApprove)
+				if err == sql.ErrNoRows {
+					c.IndentedJSON(http.StatusOK, "Error check all approve")
+					return
+				}
+				// 0 = Not approval all, 9 = has all approval
+				if chkAllApprove == "9" {
+					_, err = db.Exec("UPDATE info_document_control SET idc_status = 9, idc_issue_date = ?, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", strCreateDate, strCreateDate, objEmailFS.Su_username, docID)
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{
+							"Error": err.Error(),
+						})
 						return
 					}
 				}
@@ -1657,7 +1842,7 @@ func ApproveByEmail(c *gin.Context) {
 
 		if err != nil {
 			if err == sql.ErrNoRows {
-				c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+				c.IndentedJSON(http.StatusOK, gin.H{"Error1": "No user found"})
 				return
 			}
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
@@ -1672,12 +1857,12 @@ func ApproveByEmail(c *gin.Context) {
 		}
 		_, err = db.Exec(updateIda, strCreateDate, objEmail.Su_username, docID, idaID)
 		if err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			c.IndentedJSON(http.StatusOK, gin.H{"Error1e": err.Error()})
 			return
 		} else {
 			_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 2, idaID, strShowUsers2, 0, strCreateDate, strCreateDate)
 			if err != nil {
-				c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+				c.IndentedJSON(http.StatusOK, gin.H{"Error2e": err.Error()})
 			}
 
 			var objNotiActive notiActive
@@ -1688,20 +1873,20 @@ func ApproveByEmail(c *gin.Context) {
 			} else {
 				idcId, err := strconv.Atoi(docID)
 				if err != nil {
-					fmt.Println("Error converting to int:", err)
+					fmt.Println("Error3e converting to int:", err)
 					return
 				}
 
 				if objNotiActive.Ida_count == "0" || objNotiActive.Ida_count == "" {
 					err = InsertReferDoc(c, idcId)
 					if err != nil {
-						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error4e": err.Error()})
 						return
 					}
 
 					err = SendMail(c, idcId, objNotiActive.Ida_id, objUserCreate.Su_firstname, objUserCreate.Su_email, "approve")
 					if err != nil {
-						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error5e": err.Error()})
 						return
 					}
 
@@ -1711,16 +1896,16 @@ func ApproveByEmail(c *gin.Context) {
 						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error1": getUser.Error()})
 						return
 					}
-					_, err = db.Exec("UPDATE info_document_control SET idc_status = 9, idc_updated_date = ?, idc_updated_by = ? WHERE idc_Id = ?", strCreateDate, strUpdatedByEmp, idcId)
+					_, err = db.Exec("UPDATE info_document_control SET idc_status = 9, idc_issue_date= ?, idc_updated_date = ?, idc_updated_by = ? WHERE idc_Id = ?", strCreateDate, strCreateDate, strUpdatedByEmp, idcId)
 					if err != nil {
-						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error6e": err.Error()})
 						return
 					}
 
 				} else {
 					_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 1, objNotiActive.Ida_id, strShowUsers, 0, strCreateDate, strCreateDate)
 					if err != nil {
-						c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+						c.IndentedJSON(http.StatusOK, gin.H{"Error7e": err.Error()})
 					}
 
 					var objEmail userEmail
@@ -1729,7 +1914,7 @@ func ApproveByEmail(c *gin.Context) {
 
 					if err != nil {
 						if err == sql.ErrNoRows {
-							c.IndentedJSON(http.StatusOK, gin.H{"Error": "No user found"})
+							c.IndentedJSON(http.StatusOK, gin.H{"Error2": "No user found"})
 							return
 						}
 						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
@@ -2177,4 +2362,111 @@ func GetDataRFQ(DocId int) (GetRfq, error) {
 	}
 
 	return objDocNo, nil
+}
+func CancelDocument(c *gin.Context) {
+	iId := c.Param("id")
+	iReason := c.Param("reason")
+	strUpdateBy := c.Param("userID")
+	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
+
+	objResult, err := db.Exec("UPDATE info_document_control SET idc_status = 5, idc_cancel_reason = ?, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", iReason, strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+}
+func ReverseDocument(c *gin.Context) {
+	iId := c.Param("id")
+	strUpdateBy := c.Param("userID")
+	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
+
+	objResult, err := db.Exec("UPDATE info_document_control SET idc_status = 1, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+}
+func CancelMeeting(c *gin.Context) {
+	iId := c.Param("id")
+	iReason := c.Param("reason")
+	strUpdateBy := c.Param("userID")
+	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
+
+	objResult, err := db.Exec("UPDATE info_meeting_control SET imc_status = 5, idc_cancel_reason = ?, imc_updated_date = ?, imc_updated_by = ? WHERE imc_id = ?", iReason, strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"ErrorImc": err.Error()})
+		return
+	}
+
+	_, err = db.Exec("UPDATE info_meeting_member SET imm_status = 5, imm_updated_date = ?, imm_updated_by = ? WHERE imc_id = ?", strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"ErrorImm": err.Error()})
+		return
+	}
+
+	_, err = db.Exec("UPDATE info_meeting_next_action SET imnc_status = 5, imnc_updated_date = ?, imnc_updated_by = ? WHERE imc_id = ?", strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"ErrorImm": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+}
+func ReverseMeeting(c *gin.Context) {
+	iId := c.Param("id")
+	strUpdateBy := c.Param("userID")
+	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
+
+	objResult, err := db.Exec("UPDATE info_meeting_control SET imc_status = 1, idc_cancel_reason = '', imc_updated_date = ?, imc_updated_by = ? WHERE imc_id = ?", strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"ErrorImc": err.Error()})
+		return
+	}
+
+	_, err = db.Exec("UPDATE info_meeting_member SET imm_status = 1, imm_updated_date = ?, imm_updated_by = ? WHERE imc_id = ?", strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"ErrorImm": err.Error()})
+		return
+	}
+
+	_, err = db.Exec("UPDATE info_meeting_next_action SET imnc_status = 1, imnc_updated_date = ?, imnc_updated_by = ? WHERE imc_id = ?", strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"ErrorImm": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+}
+func CloseMeeting(c *gin.Context) {
+	iId := c.Param("id")
+	strUpdateBy := c.Param("userID")
+	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
+
+	objResult, err := db.Exec("UPDATE info_meeting_control SET imc_status = 9, imc_updated_date = ?, imc_updated_by = ? WHERE imc_id = ?", strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"ErrorImc": err.Error()})
+		return
+	}
+
+	_, err = db.Exec("UPDATE info_meeting_member SET imm_status = 9, imm_updated_date = ?, imm_updated_by = ? WHERE imc_id = ?", strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"ErrorImm": err.Error()})
+		return
+	}
+
+	_, err = db.Exec("UPDATE info_meeting_next_action SET imnc_status = 9, imnc_updated_date = ?, imnc_updated_by = ? WHERE imc_id = ?", strUpdateDate, strUpdateBy, iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"ErrorImm": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
 }

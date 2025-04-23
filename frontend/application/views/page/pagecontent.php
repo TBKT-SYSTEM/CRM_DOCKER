@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/png" href="<?php echo base_url() ?>assets/images/logos/crm_icon_short.png" />
+    <link rel="shortcut icon" type="image/png" href="<?php echo base_url() ?>assets/images/logos/icon.png" />
     <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/styles.min.css" />
     <link rel="stylesheet" href="<?php echo base_url() ?>assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
@@ -116,6 +116,7 @@
 
     <script src="<?php echo base_url() ?>assets/js/vendor.min.js"></script>
     <script src="<?php echo base_url() ?>assets/js/theme.js"></script>
+    <script src="<?php echo base_url() ?>assets/js/dayjs.min.js"></script>
     <script src="<?php echo base_url() ?>assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="<?php echo base_url() ?>assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo base_url() ?>assets/js/sidebarmenu.js"></script>

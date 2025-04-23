@@ -7,6 +7,7 @@ import (
 
 	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -49,6 +50,166 @@ func GetRemainTask(c *gin.Context) {
 	}
 
 	var objData RemainTaskData
+	objData.Data = objList
+	c.IndentedJSON(http.StatusOK, objData)
+}
+
+func GetManageTask(c *gin.Context) {
+	var objList []ManageTask
+	now := time.Now()
+	startDate := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	endDate := startDate.AddDate(0, 1, -1)
+
+	objListRemainTask, err := db.Query("SELECT idc.idc_id, idc.idc_customer_type, mdt.mdt_position1, idc.idc_running_no, (SELECT idc3.idc_running_no FROM info_document_control AS idc3 WHERE idc3.idc_id = (SELECT idc4.idc_refer_doc FROM info_document_control AS idc4 WHERE idc4.idc_id = idc.idc_id)) AS refer_doc, idc_customer_name, idc.idc_status, idc.idc_created_date, idc.idc_created_by, su.su_firstname FROM info_document_control idc LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc.mdt_id LEFT JOIN sys_users su ON su.su_username = idc.idc_created_by WHERE idc_created_date BETWEEN ? AND ? ORDER BY idc.idc_created_date", startDate, endDate)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	defer objListRemainTask.Close()
+	for objListRemainTask.Next() {
+		var objRemain ManageTask
+		var strReferDoc sql.NullString
+
+		err := objListRemainTask.Scan(&objRemain.Idc_id, &objRemain.Idc_customer_type, &objRemain.Mdt_position1, &objRemain.Idc_running_no, &strReferDoc, &objRemain.Idc_customer_name, &objRemain.Idc_status, &objRemain.Idc_created_date, &objRemain.Idc_created_by, &objRemain.Su_firstname)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		}
+
+		if strReferDoc.Valid {
+			objRemain.Refer_doc = strReferDoc.String
+		}
+		objList = append(objList, objRemain)
+	}
+
+	err = objListRemainTask.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	var objData ManageTaskData
+	objData.Data = objList
+	c.IndentedJSON(http.StatusOK, objData)
+}
+
+func ListSearchManageTask(c *gin.Context) {
+	var objList []ManageTask
+	startDate := c.Param("startDate")
+	endDate := c.Param("endDate")
+
+	objListRemainTask, err := db.Query("SELECT idc.idc_id, idc.idc_customer_type, mdt.mdt_position1, idc.idc_running_no, (SELECT idc3.idc_running_no FROM info_document_control AS idc3 WHERE idc3.idc_id = (SELECT idc4.idc_refer_doc FROM info_document_control AS idc4 WHERE idc4.idc_id = idc.idc_id)) AS refer_doc, idc_customer_name, idc.idc_status, idc.idc_created_date, idc.idc_created_by, su.su_firstname FROM info_document_control idc LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc.mdt_id LEFT JOIN sys_users su ON su.su_username = idc.idc_created_by WHERE idc.idc_created_date BETWEEN ? AND ? ORDER BY idc.idc_created_date", startDate, endDate)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	defer objListRemainTask.Close()
+	for objListRemainTask.Next() {
+		var objRemain ManageTask
+		var strReferDoc sql.NullString
+
+		err := objListRemainTask.Scan(&objRemain.Idc_id, &objRemain.Idc_customer_type, &objRemain.Mdt_position1, &objRemain.Idc_running_no, &strReferDoc, &objRemain.Idc_customer_name, &objRemain.Idc_status, &objRemain.Idc_created_date, &objRemain.Idc_created_by, &objRemain.Su_firstname)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		}
+
+		if strReferDoc.Valid {
+			objRemain.Refer_doc = strReferDoc.String
+		}
+		objList = append(objList, objRemain)
+	}
+
+	err = objListRemainTask.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	var objData ManageTaskData
+	objData.Data = objList
+	c.IndentedJSON(http.StatusOK, objData)
+}
+
+func GetManageApproval(c *gin.Context) {
+	var objList []ManageTask
+	userID := c.Param("id")
+	now := time.Now()
+	startDate := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	endDate := startDate.AddDate(0, 1, -1)
+
+	objListRemainTask, err := db.Query("SELECT idc.idc_id, idc.idc_customer_type, mdt.mdt_position1, idc.idc_running_no, (SELECT idc3.idc_running_no FROM info_document_control AS idc3 WHERE idc3.idc_id = (SELECT idc4.idc_refer_doc FROM info_document_control AS idc4 WHERE idc4.idc_id = idc.idc_id)) AS refer_doc, idc_customer_name, idc.idc_status, idc.idc_created_date, idc.idc_created_by, su.su_firstname FROM info_document_control idc LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc.mdt_id LEFT JOIN sys_users su ON su.su_username = idc.idc_created_by LEFT JOIN info_document_approval ida ON ida.idc_id = idc.idc_id WHERE idc.idc_created_date BETWEEN ? AND ? AND ida.su_id = ? GROUP BY idc.idc_id ORDER BY idc.idc_created_date", startDate, endDate, userID)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	defer objListRemainTask.Close()
+	for objListRemainTask.Next() {
+		var objRemain ManageTask
+		var strReferDoc sql.NullString
+
+		err := objListRemainTask.Scan(&objRemain.Idc_id, &objRemain.Idc_customer_type, &objRemain.Mdt_position1, &objRemain.Idc_running_no, &strReferDoc, &objRemain.Idc_customer_name, &objRemain.Idc_status, &objRemain.Idc_created_date, &objRemain.Idc_created_by, &objRemain.Su_firstname)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		}
+
+		if strReferDoc.Valid {
+			objRemain.Refer_doc = strReferDoc.String
+		}
+		objList = append(objList, objRemain)
+	}
+
+	err = objListRemainTask.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	var objData ManageTaskData
+	objData.Data = objList
+	c.IndentedJSON(http.StatusOK, objData)
+}
+
+func ListSearchManageApproval(c *gin.Context) {
+	var objList []ManageTask
+	userID := c.Param("id")
+	startDate := c.Param("startDate")
+	endDate := c.Param("endDate")
+
+	objListRemainTask, err := db.Query("SELECT idc.idc_id, idc.idc_customer_type, mdt.mdt_position1, idc.idc_running_no, (SELECT idc3.idc_running_no FROM info_document_control AS idc3 WHERE idc3.idc_id = (SELECT idc4.idc_refer_doc FROM info_document_control AS idc4 WHERE idc4.idc_id = idc.idc_id)) AS refer_doc, idc_customer_name, idc.idc_status, idc.idc_created_date, idc.idc_created_by, su.su_firstname FROM info_document_control idc LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc.mdt_id LEFT JOIN sys_users su ON su.su_username = idc.idc_created_by LEFT JOIN info_document_approval ida ON ida.idc_id = idc.idc_id WHERE idc.idc_created_date BETWEEN ? AND ? AND ida.su_id = ? GROUP BY idc.idc_id ORDER BY idc.idc_created_date", startDate, endDate, userID)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	defer objListRemainTask.Close()
+	for objListRemainTask.Next() {
+		var objRemain ManageTask
+		var strReferDoc sql.NullString
+
+		err := objListRemainTask.Scan(&objRemain.Idc_id, &objRemain.Idc_customer_type, &objRemain.Mdt_position1, &objRemain.Idc_running_no, &strReferDoc, &objRemain.Idc_customer_name, &objRemain.Idc_status, &objRemain.Idc_created_date, &objRemain.Idc_created_by, &objRemain.Su_firstname)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		}
+
+		if strReferDoc.Valid {
+			objRemain.Refer_doc = strReferDoc.String
+		}
+		objList = append(objList, objRemain)
+	}
+
+	err = objListRemainTask.Err()
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	var objData ManageTaskData
 	objData.Data = objList
 	c.IndentedJSON(http.StatusOK, objData)
 }

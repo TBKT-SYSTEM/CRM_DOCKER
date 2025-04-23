@@ -30,7 +30,7 @@ func ListNbcTable(c *gin.Context) {
 		return
 	}
 
-	objListNbc, err := db.Query("SELECT idc.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file, (SELECT CASE WHEN COUNT(*) > 0 THEN 'true' ELSE 'false' END FROM info_document_control idc_sub LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc_sub.mdt_id WHERE mdt.mdt_name LIKE '%NBC%' AND idc_sub.idc_refer_doc = idc.idc_id) AS btnNBC, (SELECT CASE WHEN run_no.mdt_id != 3 THEN 'null' ELSE COALESCE(run_no.idc_running_no, 'null') END FROM info_document_control run_no WHERE run_no.idc_id = idc.idc_refer_doc) AS run_no FROM info_document_control AS idc LEFT JOIN sys_users AS su ON idc.idc_updated_by = su.su_username WHERE idc.mdt_id = ? AND idc.idc_created_date BETWEEN ? AND ? ORDER BY idc.idc_id", mdtID, c.Param("stratDate")+" 00:00:00", c.Param("endDate")+" 23:59:59")
+	objListNbc, err := db.Query("SELECT idc.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file, (SELECT CASE WHEN COUNT(*) > 0 THEN 'true' ELSE 'false' END FROM info_document_control idc_sub LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc_sub.mdt_id WHERE mdt.mdt_name LIKE '%NBC%' AND idc_sub.idc_refer_doc = idc.idc_id) AS btnNBC, (SELECT CASE WHEN run_no.mdt_id != 3 THEN 'null' ELSE COALESCE(run_no.idc_running_no, 'null') END FROM info_document_control run_no WHERE run_no.idc_id = idc.idc_refer_doc) AS run_no, (SELECT ida_reject_reason FROM info_document_approval WHERE ida_status = 6 AND idc_id = idc.idc_id ORDER BY ida_reject_reason IS NULL,   ida_reject_reason LIMIT 1 ) AS rejectMessage FROM info_document_control AS idc LEFT JOIN sys_users AS su ON idc.idc_updated_by = su.su_username WHERE idc.mdt_id = ? AND idc.idc_created_date BETWEEN ? AND ? ORDER BY idc.idc_id", mdtID, c.Param("startDate")+" 00:00:00", c.Param("endDate")+" 23:59:59")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -56,8 +56,9 @@ func ListNbcTable(c *gin.Context) {
 		var strSignPath sql.NullString
 		var strSignFile sql.NullString
 		var strRunNo sql.NullString
+		var strReject sql.NullString
 
-		err := objListNbc.Scan(&objNbc.Idc_id, &objNbc.Mdt_id, &strReferDoc, &objNbc.Idc_running_no, &objNbc.Idc_issue_year, &objNbc.Idc_issue_month, &objNbc.Idc_issue_seq_no, &objNbc.Idc_customer_type, &objNbc.Idc_customer_name, &objNbc.Idc_plant_cd, &objNbc.Mds_id, &strSubjectNote, &objNbc.Mde_id, &strEnclosuresNote, &objNbc.Idc_project_life, &objNbc.Idc_project_start, &strIssueDate, &objNbc.Idc_closing_date, &strReplyDate, &objNbc.Idc_result_confirm, &objNbc.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objNbc.Idc_created_date, &objNbc.Idc_created_by, &objNbc.Idc_updated_date, &objNbc.Idc_updated_by, &strFirstName, &strLastName, &strSignPath, &strSignFile, &objNbc.Btn_nbc, &strRunNo)
+		err := objListNbc.Scan(&objNbc.Idc_id, &objNbc.Mdt_id, &strReferDoc, &objNbc.Idc_running_no, &objNbc.Idc_issue_year, &objNbc.Idc_issue_month, &objNbc.Idc_issue_seq_no, &objNbc.Idc_customer_type, &objNbc.Idc_customer_name, &objNbc.Idc_plant_cd, &objNbc.Mds_id, &strSubjectNote, &objNbc.Mde_id, &strEnclosuresNote, &objNbc.Idc_project_life, &objNbc.Idc_project_start, &strIssueDate, &objNbc.Idc_closing_date, &strReplyDate, &objNbc.Idc_result_confirm, &objNbc.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objNbc.Idc_created_date, &objNbc.Idc_created_by, &objNbc.Idc_updated_date, &objNbc.Idc_updated_by, &strFirstName, &strLastName, &strSignPath, &strSignFile, &objNbc.Btn_nbc, &strRunNo, &strReject)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -109,6 +110,9 @@ func ListNbcTable(c *gin.Context) {
 		}
 		if strRunNo.Valid {
 			objNbc.Run_no = strRunNo.String
+		}
+		if strReject.Valid {
+			objNbc.Reject_message = strReject.String
 		}
 		objNbcList = append(objNbcList, objNbc)
 	}
@@ -240,7 +244,7 @@ func GetNBC(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, objData)
 }
 func GetDocByRunNo(c *gin.Context) {
-	var objDocNo GetRfq
+	var objDocNo GetRfqNew
 	var strReferDoc sql.NullInt64
 	var strPlant sql.NullInt64
 	var strMde sql.NullInt64
@@ -337,56 +341,6 @@ func GetDocByRunNo(c *gin.Context) {
 		return
 	}
 
-	rowsIdpu, err := db.Query("SELECT mdpu_id FROM `info_document_purchase_cost` WHERE idc_id = ? AND idpu_status = 1 ORDER BY idpu_id", objDocNo.Idc_id)
-	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": err.Error(),
-		})
-		return
-	}
-	defer rowsIdpu.Close()
-	for rowsIdpu.Next() {
-		var idpuID string
-		if err := rowsIdpu.Scan(&idpuID); err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{
-				"Error": err.Error(),
-			})
-			return
-		}
-		objDocNo.Idpu_item = append(objDocNo.Idpu_item, idpuID)
-	}
-	if err := rowsIdpu.Err(); err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": err.Error(),
-		})
-		return
-	}
-
-	rowsIdpc, err := db.Query("SELECT mdpc_id FROM `info_document_process_cost` WHERE idc_id = ? AND idpc_status = 1 ORDER BY idpc_id", objDocNo.Idc_id)
-	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": err.Error(),
-		})
-		return
-	}
-	defer rowsIdpc.Close()
-	for rowsIdpc.Next() {
-		var idpcID string
-		if err := rowsIdpc.Scan(&idpcID); err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{
-				"Error": err.Error(),
-			})
-			return
-		}
-		objDocNo.Idpc_item = append(objDocNo.Idpc_item, idpcID)
-	}
-	if err := rowsIdpc.Err(); err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": err.Error(),
-		})
-		return
-	}
-
 	rowsItem, err := db.Query("SELECT idi_id, idi_item_no, idi_item_name, idi_model, idi_remark FROM `info_document_item` WHERE idc_id = ? AND idi_status = 1 ORDER BY idi_id", objDocNo.Idc_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
@@ -417,40 +371,35 @@ func GetDocByRunNo(c *gin.Context) {
 		if strRemark.Valid {
 			groupPart.Idi_remark = strRemark.String
 		}
+
+		rowsVolume, err := db.Query("SELECT idi_id, idv_id, idv_year, idv_qty FROM `info_document_volume` WHERE idi_id = ? AND idv_status = 1 ORDER BY idv_id", groupPart.Idi_id)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error7": err.Error()})
+			return
+		}
+		defer rowsVolume.Close()
+		for rowsVolume.Next() {
+			var groupVolume RfqGroupVolumeDetail
+			if err := rowsVolume.Scan(
+				&groupVolume.Idi_id,
+				&groupVolume.Idv_id,
+				&groupVolume.Idv_year,
+				&groupVolume.Idv_qty,
+			); err != nil {
+				c.IndentedJSON(http.StatusOK, gin.H{"Error8": err.Error()})
+				return
+			}
+			groupPart.IrGroupVolume = append(groupPart.IrGroupVolume, groupVolume)
+		}
+
+		if err := rowsVolume.Err(); err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		}
 		objDocNo.IrGroupPart = append(objDocNo.IrGroupPart, groupPart)
 	}
 
 	if err := rowsItem.Err(); err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": err.Error(),
-		})
-		return
-	}
-
-	rowsVolume, err := db.Query("SELECT idv_id, idv_year, idv_qty FROM `info_document_volume` WHERE idc_id = ? AND idv_status = 1 ORDER BY idv_id", objDocNo.Idc_id)
-	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": err.Error(),
-		})
-		return
-	}
-	defer rowsVolume.Close()
-	for rowsVolume.Next() {
-		var groupVolume RfqGroupVolumeDetail
-		if err := rowsVolume.Scan(
-			&groupVolume.Idv_id,
-			&groupVolume.Idv_year,
-			&groupVolume.Idv_qty,
-		); err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{
-				"Error": err.Error(),
-			})
-			return
-		}
-		objDocNo.IrGroupVolume = append(objDocNo.IrGroupVolume, groupVolume)
-	}
-
-	if err := rowsVolume.Err(); err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
 		})
@@ -493,6 +442,14 @@ func EditNbc(c *gin.Context) {
 		Valid:  objNbc.Idc_physical_path != "",
 	}
 
+	_, err := db.Exec("UPDATE info_document_control SET idc_status = 3, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", objNbc.Idc_updated_date, objNbc.Idc_updated_by, objNbc.Idc_id)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
 	objResult, err := db.Exec("UPDATE info_document_control SET idc_note2 = ?, idc_file_path = ?, idc_physical_path = ?, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", strNote2, strFilePath, strPhysicalPath, objNbc.Idc_updated_date, objNbc.Idc_updated_by, objNbc.Idc_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{
@@ -527,7 +484,7 @@ func SubmitNbc(c *gin.Context) {
 		Su_email     string `json:"su_email"`
 	}
 
-	var objReferRfq GetRfq
+	var objReferRfq GetRfqNew
 	var objEmail userEmail
 	var idaCurrent int
 

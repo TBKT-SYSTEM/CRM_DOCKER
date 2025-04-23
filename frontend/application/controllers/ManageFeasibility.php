@@ -56,8 +56,8 @@ class ManageFeasibility extends CI_Controller
 		$pdf->AddFont('THSarabunNew', 'B', 'THSarabunNew-Bold.php');
 
 		$pdf->SetY(5);
-		$image_path = 'assets/images/logos/tbkk logo form.png';
-		$pdf->Image($image_path, 5, $pdf->GetY(), 20);
+		$image_path = 'assets/images/logos/logo-tbkk.png';
+		$pdf->Image($image_path, 2, $pdf->GetY() - 8, 27);
 		$pdf->SetFont('THSarabunNew', 'B', 28);
 		$pdf->SetX(28);
 		$pdf->Cell(40, 15, 'TEAM FEASIBILITY & RISK ANALYSIS');
@@ -180,15 +180,14 @@ class ManageFeasibility extends CI_Controller
 
 		// Table Part No.
 		$pdf->Ln(8);
-		// $pdf->SetLineWidth(1.3);
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->SetFont('THSarabunNew', 'B', 12);
+		$pdf->SetFont('THSarabunNew', 'B', 13);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 4, 'No', 1, 0, 'C', true);
-		$pdf->Cell(35, 4, 'PART NUMBER', 1, 0, 'C', true);
-		$pdf->Cell(55, 4, 'PART NAME', 1, 0, 'C', true);
-		$pdf->Cell(40, 4, 'MODEL', 1, 0, 'C', true);
-		$pdf->Cell(50, 4, 'Remark', 1, 1, 'C', true);
+		$pdf->Cell(15, 6, 'No', 1, 0, 'C', true);
+		$pdf->Cell(35, 6, 'PART NUMBER', 1, 0, 'C', true);
+		$pdf->Cell(55, 6, 'PART NAME', 1, 0, 'C', true);
+		$pdf->Cell(40, 6, 'MODEL', 1, 0, 'C', true);
+		$pdf->Cell(50, 6, 'Remark', 1, 1, 'C', true);
 
 		$idc_id = $this->input->get('idc_id');
 		$consern = $this->db->select('idi_item_no, idi_item_name, idi_model, idi_remark')
@@ -197,20 +196,20 @@ class ManageFeasibility extends CI_Controller
 			->where('idi_status', 1)
 			->order_by('idi_id', 'ASC')->get()->result();
 
-		for ($i = 0; $i < 20; $i++) {
+		for ($i = 0; $i < 10; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
 			$pdf->SetFont('THSarabunNew', 'B', 11);
-			$pdf->Cell(15, 4, $i + 1, 1, 0, "C");
+			$pdf->Cell(15, 5, $i + 1, 1, 0, "C");
 
 			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
 			$part_name = isset($consern[$i]->idi_item_name) ? $consern[$i]->idi_item_name : '';
 			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
 			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
-			$pdf->Cell(35, 4, $part_no, 1, 0, 'C');
-			$pdf->Cell(55, 4, $part_name, 1, 0, 'C');
-			$pdf->Cell(40, 4, $model, 1, 0, 'C');
-			$pdf->Cell(50, 4, $remark, 1, 1, 'C'); // 35 Characters
+			$pdf->Cell(35, 5, $part_no, 1, 0, 'C');
+			$pdf->Cell(55, 5, $part_name, 1, 0, 'C');
+			$pdf->Cell(40, 5, $model, 1, 0, 'C');
+			$pdf->Cell(50, 5, iconv('UTF-8', 'TIS-620//IGNORE', $remark), 1, 1, 'C'); // 35 Characters
 		}
 
 		$pdf->Ln(4);
@@ -274,7 +273,7 @@ class ManageFeasibility extends CI_Controller
 		$pdf->Cell(43, 16, $sum_total, 1, 1, 'C', true);
 
 		// Conclusion
-		$pdf->Ln(5);
+		$pdf->Ln(8);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 15);
 		$pdf->Cell(1, 1, 'Conclusion :');
@@ -414,10 +413,11 @@ class ManageFeasibility extends CI_Controller
 		$pdf->Cell(48.75, 5, $sign_group[7]->fullname, 'LBR', 0, 'C');
 		$pdf->Cell(48.75, 5, $sign_group[2]->fullname, 'LBR', 1, 'C');
 
+		////////////////////////// PAGE 2 ////////////////////////
 		$pdf->AddPage();
 		$pdf->SetY(5);
-		$image_path = 'assets/images/logos/tbkk logo form.png';
-		$pdf->Image($image_path, 5, $pdf->GetY(), 20);
+		$image_path = 'assets/images/logos/logo-tbkk.png';
+		$pdf->Image($image_path, 2, $pdf->GetY() - 8, 27);
 		$pdf->SetFont('THSarabunNew', 'B', 28);
 		$pdf->SetX(28);
 		$pdf->Cell(40, 15, 'TEAM FEASIBILITY & RISK ANALYSIS');
@@ -491,7 +491,7 @@ class ManageFeasibility extends CI_Controller
 				$pdf->Cell(15, $height_consern, (int)$consern[$i]->ifs_score, 1, 0, 'C');
 				$pdf->Cell(15, $height_consern, $consern[$i]->ifs_total, 1, 0, 'C');
 				$pdf->Cell(80, $height_consern_title, $title1, 'LR', 0, 'L');
-				$pdf->Cell(55, $height_consern, $consern[$i]->ifs_comment, 1, 0, 'C');
+				$pdf->Cell(55, $height_consern, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->ifs_comment), 1, 0, 'C');
 				$pdf->Cell(15, $height_consern, $consern[$i]->sd_dept_aname, 1, 1, 'C');
 
 				$pdf->SetY($pdf->GetY() - 4);
@@ -508,11 +508,11 @@ class ManageFeasibility extends CI_Controller
 				$pdf->Cell(15, 8, (int)$consern[$i]->ifs_score, 1, 0, 'C');
 				$pdf->Cell(15, 8, $consern[$i]->ifs_total, 1, 0, 'C');
 				$pdf->Cell(80, $height_consern_title, $title1, 'LBR', 0, 'L');
-				$pdf->Cell(55, 8, $consern[$i]->ifs_comment, 1, 0, 'C');
+				$pdf->Cell(55, 8, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->ifs_comment), 1, 0, 'C');
 				$pdf->Cell(15, 8, $consern[$i]->sd_dept_aname, 1, 1, 'C');
 			}
 		}
-
+		
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 13);
 		$pdf->SetFillColor(235, 235, 235);

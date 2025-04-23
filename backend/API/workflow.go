@@ -288,7 +288,7 @@ func ChangeSwdStatus(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update sys_workflow_detail SET swd_status = ? WHERE swd_id = ?", objWorkflowDetail.Swd_status, objWorkflowDetail.Swd_id)
+	objResult, err := db.Exec("Update sys_workflow_detail SET swd_status = ?, swd_updated_date = ?, swd_updated_by = ? WHERE swd_id = ?", objWorkflowDetail.Swd_status, objWorkflowDetail.Update_date, objWorkflowDetail.Update_by, objWorkflowDetail.Swd_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),

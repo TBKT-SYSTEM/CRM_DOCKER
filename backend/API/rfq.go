@@ -24,7 +24,7 @@ func RfqLastid(c *gin.Context) {
 }
 
 func GetRFQ(c *gin.Context) {
-	var objDocNo GetRfq
+	var objDocNo GetRfqNew
 	var strReferDoc sql.NullInt64
 	var strPlant sql.NullInt64
 	var strMde sql.NullInt64
@@ -44,7 +44,7 @@ func GetRFQ(c *gin.Context) {
 	query := "SELECT * FROM info_document_control WHERE idc_id = ?"
 	err := db.QueryRow(query, c.Param("id")).Scan(&objDocNo.Idc_id, &objDocNo.Mdt_id, &strReferDoc, &objDocNo.Idc_running_no, &objDocNo.Idc_issue_year, &objDocNo.Idc_issue_month, &objDocNo.Idc_issue_seq_no, &objDocNo.Idc_customer_type, &objDocNo.Idc_customer_name, &strPlant, &objDocNo.Mds_id, &strSubjectNote, &strMde, &strEnclosuresNote, &strProlife, &strProstart, &strIssueDate, &strCloseDate, &strReplyDate, &objDocNo.Idc_result_confirm, &objDocNo.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objDocNo.Idc_created_date, &objDocNo.Idc_created_by, &objDocNo.Idc_updated_date, &objDocNo.Idc_updated_by)
 	if err == sql.ErrNoRows {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error1": err.Error()})
 		return
 	}
 
@@ -96,64 +96,26 @@ func GetRFQ(c *gin.Context) {
 
 	rowsAttn, err := db.Query("SELECT mda_id FROM `info_document_attn` WHERE idc_id = ? AND idat_status = 1 ORDER BY idat_id", c.Param("id"))
 	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error2": err.Error()})
 		return
 	}
 	defer rowsAttn.Close()
 	for rowsAttn.Next() {
 		var idatID string
 		if err := rowsAttn.Scan(&idatID); err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			c.IndentedJSON(http.StatusOK, gin.H{"Error3": err.Error()})
 			return
 		}
 		objDocNo.Idat_item = append(objDocNo.Idat_item, idatID)
 	}
 	if err := rowsAttn.Err(); err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-		return
-	}
-
-	rowsIdpu, err := db.Query("SELECT mdpu_id FROM `info_document_purchase_cost` WHERE idc_id = ? AND idpu_status = 1 ORDER BY idpu_id", c.Param("id"))
-	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-		return
-	}
-	defer rowsIdpu.Close()
-	for rowsIdpu.Next() {
-		var idpuID string
-		if err := rowsIdpu.Scan(&idpuID); err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-			return
-		}
-		objDocNo.Idpu_item = append(objDocNo.Idpu_item, idpuID)
-	}
-	if err := rowsIdpu.Err(); err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-		return
-	}
-
-	rowsIdpc, err := db.Query("SELECT mdpc_id FROM `info_document_process_cost` WHERE idc_id = ? AND idpc_status = 1 ORDER BY idpc_id", c.Param("id"))
-	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-		return
-	}
-	defer rowsIdpc.Close()
-	for rowsIdpc.Next() {
-		var idpcID string
-		if err := rowsIdpc.Scan(&idpcID); err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-			return
-		}
-		objDocNo.Idpc_item = append(objDocNo.Idpc_item, idpcID)
-	}
-	if err := rowsIdpc.Err(); err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error4": err.Error()})
 		return
 	}
 
 	rowsItem, err := db.Query("SELECT idi_id, idi_item_no, idi_item_name, idi_model, idi_remark FROM `info_document_item` WHERE idc_id = ? AND idi_status = 1 ORDER BY idi_id", c.Param("id"))
 	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error5": err.Error()})
 		return
 	}
 	defer rowsItem.Close()
@@ -168,7 +130,7 @@ func GetRFQ(c *gin.Context) {
 			&strModel,
 			&strRemark,
 		); err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			c.IndentedJSON(http.StatusOK, gin.H{"Error6": err.Error()})
 			return
 		}
 		if strModel.Valid {
@@ -177,34 +139,36 @@ func GetRFQ(c *gin.Context) {
 		if strRemark.Valid {
 			groupPart.Idi_remark = strRemark.String
 		}
+
+		rowsVolume, err := db.Query("SELECT idi_id, idv_id, idv_year, idv_qty FROM `info_document_volume` WHERE idi_id = ? AND idv_status = 1 ORDER BY idv_id", groupPart.Idi_id)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error7": err.Error()})
+			return
+		}
+		defer rowsVolume.Close()
+		for rowsVolume.Next() {
+			var groupVolume RfqGroupVolumeDetail
+			if err := rowsVolume.Scan(
+				&groupVolume.Idi_id,
+				&groupVolume.Idv_id,
+				&groupVolume.Idv_year,
+				&groupVolume.Idv_qty,
+			); err != nil {
+				c.IndentedJSON(http.StatusOK, gin.H{"Error8": err.Error()})
+				return
+			}
+			groupPart.IrGroupVolume = append(groupPart.IrGroupVolume, groupVolume)
+		}
+
+		if err := rowsVolume.Err(); err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		}
+
 		objDocNo.IrGroupPart = append(objDocNo.IrGroupPart, groupPart)
 	}
 
 	if err := rowsItem.Err(); err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-		return
-	}
-
-	rowsVolume, err := db.Query("SELECT idv_id, idv_year, idv_qty FROM `info_document_volume` WHERE idc_id = ? AND idv_status = 1 ORDER BY idv_id", c.Param("id"))
-	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-		return
-	}
-	defer rowsVolume.Close()
-	for rowsVolume.Next() {
-		var groupVolume RfqGroupVolumeDetail
-		if err := rowsVolume.Scan(
-			&groupVolume.Idv_id,
-			&groupVolume.Idv_year,
-			&groupVolume.Idv_qty,
-		); err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
-			return
-		}
-		objDocNo.IrGroupVolume = append(objDocNo.IrGroupVolume, groupVolume)
-	}
-
-	if err := rowsVolume.Err(); err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
 	}
@@ -226,13 +190,14 @@ func RfqDocNo(c *gin.Context) {
 }
 
 func InsertRfq(c *gin.Context) {
-	var objRfq Rfq
+	var objRfq RfqNew
 	var chkDept int
 
 	if err := c.BindJSON(&objRfq); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	var strNote sql.NullString
 	var strComment sql.NullString
 	var strIssueDate sql.NullString
@@ -301,97 +266,58 @@ func InsertRfq(c *gin.Context) {
 	}
 
 	// Insert Part No
-	var sql string = "INSERT INTO info_document_item (idc_id, idi_item_no, idi_item_name, idi_model, idi_order_no, idi_status, idi_remark, idi_created_date, idi_created_by, idi_updated_date, idi_updated_by) VALUES "
-	values := []string{}
-
 	for index, partCurrent := range objRfq.IrGroupPart {
+		valuesVolume := []string{}
 		partNo := partCurrent.Idi_item_no
 		partName := partCurrent.Idi_item_name
 		model := partCurrent.Idi_model
 		remark := partCurrent.Idi_remark
 		orderNo := index + 1
 
-		if partNo == "" {
-			partNo = "NULL"
-		} else {
-			partNo = fmt.Sprintf("'%s'", partNo)
-		}
-
-		if partName == "" {
-			partName = "NULL"
-		} else {
-			partName = fmt.Sprintf("'%s'", partName)
-		}
-
-		if model == "" {
-			model = "NULL"
-		} else {
-			model = fmt.Sprintf("'%s'", model)
-		}
-
 		if remark == "" {
-			remark = "NULL"
-		} else {
-			remark = fmt.Sprintf("'%s'", remark)
+			remark = ""
 		}
 
-		value := fmt.Sprintf("(%d, %s, %s, %s, %d, %d, %s, '%s', '%s', '%s', '%s')",
-			objLastId,
-			partNo,
-			partName,
-			model,
-			orderNo,
-			1,
-			remark,
-			objRfq.Idc_created_date,
-			objRfq.Idc_created_by,
-			objRfq.Idc_created_date,
-			objRfq.Idc_created_by)
-		values = append(values, value)
-	}
+		query := "INSERT INTO info_document_item (idc_id, idi_item_no, idi_item_name, idi_model, idi_order_no, idi_status, idi_remark, idi_created_date, idi_created_by, idi_updated_date, idi_updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	if len(values) == 0 {
-		c.IndentedJSON(http.StatusOK, gin.H{"False": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
-		return
-	}
+		itemInsert, err := db.Exec(query, objLastId, partNo, partName, model, orderNo, 1, remark, objRfq.Idc_created_date, objRfq.Idc_created_by, objRfq.Idc_created_date, objRfq.Idc_created_by)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"False": err.Error()})
+			return
+		}
 
-	sql += strings.Join(values, ",")
-	_, errPartItem := db.Exec(sql)
+		itemLastId, err := itemInsert.LastInsertId()
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"False": "ไม่สามารถดึง Last Insert ID ได้"})
+			return
+		}
 
-	if errPartItem != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"False": errPartItem.Error()})
-		return
-	}
+		var sql string = "INSERT INTO info_document_volume (idi_id, idv_year, idv_qty, idv_status, idv_created_date, idv_created_by, idv_updated_date, idv_updated_by) VALUES "
+		for _, volume := range partCurrent.IrGroupVolume {
+			value := fmt.Sprintf("(%d, %s, %s, %d, '%s', '%s', '%s', '%s')",
+				itemLastId,
+				volume.Idv_year,
+				volume.Idv_qty,
+				1,
+				objRfq.Idc_created_date,
+				objRfq.Idc_created_by,
+				objRfq.Idc_created_date,
+				objRfq.Idc_created_by)
+			valuesVolume = append(valuesVolume, value)
+		}
 
-	// Insert Volume
-	var sqlVolume string = "INSERT INTO info_document_volume (idc_id, idv_year, idv_qty, idv_status, idv_created_date, idv_created_by, idv_updated_date, idv_updated_by) VALUES "
-	objListVolume := []string{}
+		if len(valuesVolume) == 0 {
+			c.IndentedJSON(http.StatusOK, gin.H{"False": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+			return
+		}
 
-	for _, volumeCurrent := range objRfq.IrGroupVolume {
-		objVolume := fmt.Sprintf("(%d, '%s', '%s', %d, '%s', '%s', '%s', '%s')",
-			objLastId,
-			volumeCurrent.Year,
-			volumeCurrent.Volume,
-			1,
-			objRfq.Idc_created_date,
-			objRfq.Idc_created_by,
-			objRfq.Idc_created_date,
-			objRfq.Idc_created_by)
+		sql += strings.Join(valuesVolume, ",")
+		_, errPartItem := db.Exec(sql)
 
-		objListVolume = append(objListVolume, objVolume)
-	}
-
-	if len(objListVolume) == 0 {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"False": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
-		return
-	}
-
-	sqlVolume += strings.Join(objListVolume, ",")
-
-	_, errVolume := db.Exec(sqlVolume)
-	if errVolume != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"False": errVolume.Error()})
-		return
+		if errPartItem != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"False": errPartItem.Error()})
+			return
+		}
 	}
 
 	// Insert Attn
@@ -431,80 +357,6 @@ func InsertRfq(c *gin.Context) {
 		return
 	}
 
-	// Insert Idpu
-	var sqlIdpu string = "INSERT INTO info_document_purchase_cost (idc_id, mdpu_id, idpu_note, idpu_status, idpu_created_date, idpu_created_by, idpu_updated_date, idpu_updated_by) VALUES "
-	objListIdpu := []string{}
-
-	for _, idpuCurrent := range objRfq.Idpu_item {
-
-		idpuID, err := strconv.Atoi(idpuCurrent)
-		if err != nil {
-			fmt.Println("Error converting attnCurrent to int:", err)
-			continue
-		}
-
-		objIdpu := fmt.Sprintf("(%d, %d, NULL, %d, '%s', '%s', '%s', '%s')",
-			objLastId,
-			idpuID,
-			1,
-			objRfq.Idc_created_date,
-			objRfq.Idc_created_by,
-			objRfq.Idc_created_date,
-			objRfq.Idc_created_by)
-
-		objListIdpu = append(objListIdpu, objIdpu)
-	}
-
-	if len(objListIdpu) == 0 {
-		c.IndentedJSON(http.StatusOK, gin.H{"False": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
-		return
-	}
-
-	sqlIdpu += strings.Join(objListIdpu, ",")
-
-	_, errIdpu := db.Exec(sqlIdpu)
-	if errIdpu != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"False": errIdpu.Error()})
-		return
-	}
-
-	// Insert Idpc
-	var sqlIdpc string = "INSERT INTO info_document_process_cost (idc_id, mdpc_id, idpc_note, idpc_status, idpc_created_date, idpc_created_by, idpc_updated_date, idpc_updated_by) VALUES "
-	objListIdpc := []string{}
-
-	for _, idpcCurrent := range objRfq.Idpc_item {
-
-		idpcID, err := strconv.Atoi(idpcCurrent)
-		if err != nil {
-			fmt.Println("Error converting attnCurrent to int:", err)
-			continue
-		}
-
-		objIdpc := fmt.Sprintf("(%d, %d, NULL, %d, '%s', '%s', '%s', '%s')",
-			objLastId,
-			idpcID,
-			1,
-			objRfq.Idc_created_date,
-			objRfq.Idc_created_by,
-			objRfq.Idc_created_date,
-			objRfq.Idc_created_by)
-
-		objListIdpc = append(objListIdpc, objIdpc)
-	}
-
-	if len(objListIdpc) == 0 {
-		c.IndentedJSON(http.StatusOK, gin.H{"False": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
-		return
-	}
-
-	sqlIdpc += strings.Join(objListIdpc, ",")
-
-	_, errIdpc := db.Exec(sqlIdpc)
-	if errIdpc != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"False": errIdpc.Error()})
-		return
-	}
-
 	_, errUpdateSeq := db.Exec("UPDATE mst_document_control_no SET mdcn_position2 = ? WHERE mdt_id = ?", objRfq.Idc_issue_seq_no, objRfq.Mdt_id)
 	if errUpdateSeq != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"False": errUpdateSeq.Error()})
@@ -534,7 +386,7 @@ func ListRfqTable(c *gin.Context) {
 		return
 	}
 
-	objListRfq, err := db.Query("SELECT idc.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file, ( SELECT CASE WHEN COUNT(*) > 0 THEN 'true' ELSE 'false' END FROM info_document_control idc_sub LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc_sub.mdt_id WHERE mdt.mdt_name LIKE '%NBC%' AND idc_sub.idc_refer_doc = idc.idc_id ) AS btnNBC FROM `info_document_control` AS idc LEFT JOIN sys_users AS su ON idc.idc_updated_by = su.su_username WHERE idc.mdt_id = ? AND idc.idc_created_date BETWEEN ? AND ? ORDER BY idc.idc_id;", mdtID, c.Param("stratDate")+" 00:00:00", c.Param("endDate")+" 23:59:59")
+	objListRfq, err := db.Query("SELECT idc.*, su.su_firstname, su.su_lastname, su.su_sign_path, su.su_sign_file, ( SELECT CASE WHEN COUNT(*) > 0 THEN 'true' ELSE 'false' END FROM info_document_control idc_sub LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc_sub.mdt_id WHERE mdt.mdt_name LIKE '%NBC%' AND idc_sub.idc_refer_doc = idc.idc_id ) AS btnNBC, (SELECT ida_reject_reason FROM info_document_approval WHERE ida_status = 6 AND idc_id = idc.idc_id ORDER BY ida_reject_reason IS NULL,   ida_reject_reason LIMIT 1 ) AS rejectMessage FROM `info_document_control` AS idc LEFT JOIN sys_users AS su ON idc.idc_updated_by = su.su_username WHERE idc.mdt_id = ? AND idc.idc_created_date BETWEEN ? AND ? ORDER BY idc.idc_id;", mdtID, c.Param("stratDate")+" 00:00:00", c.Param("endDate")+" 23:59:59")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
@@ -559,8 +411,9 @@ func ListRfqTable(c *gin.Context) {
 		var strLastName sql.NullString
 		var strSignPath sql.NullString
 		var strSignFile sql.NullString
+		var strReject sql.NullString
 
-		err := objListRfq.Scan(&objRfq.Idc_id, &objRfq.Mdt_id, &strReferDoc, &objRfq.Idc_running_no, &objRfq.Idc_issue_year, &objRfq.Idc_issue_month, &objRfq.Idc_issue_seq_no, &objRfq.Idc_customer_type, &objRfq.Idc_customer_name, &objRfq.Idc_plant_cd, &objRfq.Mds_id, &strSubjectNote, &objRfq.Mde_id, &strEnclosuresNote, &objRfq.Idc_project_life, &objRfq.Idc_project_start, &strIssueDate, &objRfq.Idc_closing_date, &strReplyDate, &objRfq.Idc_result_confirm, &objRfq.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objRfq.Idc_created_date, &objRfq.Idc_created_by, &objRfq.Idc_updated_date, &objRfq.Idc_updated_by, &strFirstName, &strLastName, &strSignPath, &strSignFile, &objRfq.Btn_nbc)
+		err := objListRfq.Scan(&objRfq.Idc_id, &objRfq.Mdt_id, &strReferDoc, &objRfq.Idc_running_no, &objRfq.Idc_issue_year, &objRfq.Idc_issue_month, &objRfq.Idc_issue_seq_no, &objRfq.Idc_customer_type, &objRfq.Idc_customer_name, &objRfq.Idc_plant_cd, &objRfq.Mds_id, &strSubjectNote, &objRfq.Mde_id, &strEnclosuresNote, &objRfq.Idc_project_life, &objRfq.Idc_project_start, &strIssueDate, &objRfq.Idc_closing_date, &strReplyDate, &objRfq.Idc_result_confirm, &objRfq.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objRfq.Idc_created_date, &objRfq.Idc_created_by, &objRfq.Idc_updated_date, &objRfq.Idc_updated_by, &strFirstName, &strLastName, &strSignPath, &strSignFile, &objRfq.Btn_nbc, &strReject)
 		if err != nil {
 			c.IndentedJSON(http.StatusOK, gin.H{
 				"Error": err.Error(),
@@ -609,6 +462,9 @@ func ListRfqTable(c *gin.Context) {
 		}
 		if strSignFile.Valid {
 			objRfq.Su_sign_file = strSignFile.String
+		}
+		if strReject.Valid {
+			objRfq.Reject_message = strReject.String
 		}
 		objRfqList = append(objRfqList, objRfq)
 	}
@@ -753,45 +609,14 @@ func ListRfqTable(c *gin.Context) {
 // 	c.IndentedJSON(http.StatusOK, objRfq)
 // }
 
-func CancelDocument(c *gin.Context) {
-	iId := c.Param("id")
-	iReason := c.Param("reason")
-	strUpdateBy := c.Param("userID")
-	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
-
-	objResult, err := db.Exec("UPDATE info_document_control SET idc_status = 5, idc_cancel_reason = ?, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", iReason, strUpdateDate, strUpdateBy, iId)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"Error": err.Error(),
-		})
-		return
-	}
-
-	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
-}
-
-func ReverseDocument(c *gin.Context) {
-	iId := c.Param("id")
-	strUpdateBy := c.Param("userID")
-	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
-
-	objResult, err := db.Exec("UPDATE info_document_control SET idc_status = 1, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", strUpdateDate, strUpdateBy, iId)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"Error": err.Error(),
-		})
-		return
-	}
-
-	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
-}
-
 func CreateNbc(c *gin.Context) {
 	iId := c.Param("id")
 	strUpdateBy := c.Param("userID")
 	strUpdateDate := time.Now().Format("2006-01-02 15:04:05")
 
-	var objReferRfq GetRfq
+	var objReferRfq GetRfqNew
+	var objDocNo GetDocNo
+	var runNo string
 
 	var strReferDoc sql.NullInt64
 	var strSubjectNote sql.NullString
@@ -807,10 +632,9 @@ func CreateNbc(c *gin.Context) {
 	queryGetRefer := "SELECT * FROM info_document_control WHERE idc_id = ?"
 	err := db.QueryRow(queryGetRefer, iId).Scan(&objReferRfq.Idc_id, &objReferRfq.Mdt_id, &strReferDoc, &objReferRfq.Idc_running_no, &objReferRfq.Idc_issue_year, &objReferRfq.Idc_issue_month, &objReferRfq.Idc_issue_seq_no, &objReferRfq.Idc_customer_type, &objReferRfq.Idc_customer_name, &objReferRfq.Idc_plant_cd, &objReferRfq.Mds_id, &strSubjectNote, &objReferRfq.Mde_id, &strEnclosuresNote, &objReferRfq.Idc_project_life, &objReferRfq.Idc_project_start, &strIssueDate, &objReferRfq.Idc_closing_date, &strReplyDate, &objReferRfq.Idc_result_confirm, &objReferRfq.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objReferRfq.Idc_created_date, &objReferRfq.Idc_created_by, &objReferRfq.Idc_updated_date, &objReferRfq.Idc_updated_by)
 	if err == sql.ErrNoRows {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error4": err.Error()})
 		return
 	}
-
 	if strReferDoc.Valid {
 		objReferRfq.Idc_refer_doc = int(strReferDoc.Int64)
 	}
@@ -822,6 +646,9 @@ func CreateNbc(c *gin.Context) {
 	}
 	if strIssueDate.Valid {
 		objReferRfq.Idc_issue_date = strIssueDate.String
+	}
+	if strReplyDate.Valid {
+		objReferRfq.Idc_reply_date = strReplyDate.String
 	}
 	if strNote1.Valid {
 		objReferRfq.Idc_note1 = strNote1.String
@@ -839,11 +666,31 @@ func CreateNbc(c *gin.Context) {
 		objReferRfq.Idc_cancel_reason = strCancelReason.String
 	}
 
-	rowsItem, err := db.Query("SELECT idi_id, idi_item_no, idi_item_name, idi_model, idi_remark FROM `info_document_item` WHERE idc_id = ? AND idi_status = 1 ORDER BY idi_id", c.Param("id"))
+	//////////////  GET Attn  ///////////////////////
+	rowsAttn, err := db.Query("SELECT mda_id FROM `info_document_attn` WHERE idc_id = ? AND idat_status = 1 ORDER BY idat_id", iId)
 	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": err.Error(),
-		})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error10": err.Error()})
+		return
+	}
+	defer rowsAttn.Close()
+	for rowsAttn.Next() {
+		var mdaID int
+		if err := rowsAttn.Scan(&mdaID); err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error11": err.Error()})
+			return
+		}
+		objReferRfq.Idat_item = append(objReferRfq.Idat_item, fmt.Sprintf("%d", mdaID))
+	}
+
+	if err := rowsAttn.Err(); err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error12": err.Error()})
+		return
+	}
+
+	/////////////////////  GET ITEM  ///////////////////////
+	rowsItem, err := db.Query("SELECT idi_id, idi_item_no, idi_item_name, idi_model, idi_remark FROM `info_document_item` WHERE idc_id = ? AND idi_status = 1 ORDER BY idi_id", iId)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error5": err.Error()})
 		return
 	}
 	defer rowsItem.Close()
@@ -858,9 +705,7 @@ func CreateNbc(c *gin.Context) {
 			&strModel,
 			&strRemark,
 		); err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{
-				"Error": err.Error(),
-			})
+			c.IndentedJSON(http.StatusOK, gin.H{"Error6": err.Error()})
 			return
 		}
 		if strModel.Valid {
@@ -869,24 +714,46 @@ func CreateNbc(c *gin.Context) {
 		if strRemark.Valid {
 			groupPart.Idi_remark = strRemark.String
 		}
+
+		rowsVolume, err := db.Query("SELECT idi_id, idv_id, idv_year, idv_qty FROM `info_document_volume` WHERE idi_id = ? AND idv_status = 1 ORDER BY idv_id", groupPart.Idi_id)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error7": err.Error()})
+			return
+		}
+		defer rowsVolume.Close()
+		for rowsVolume.Next() {
+			var groupVolume RfqGroupVolumeDetail
+			if err := rowsVolume.Scan(
+				&groupVolume.Idi_id,
+				&groupVolume.Idv_id,
+				&groupVolume.Idv_year,
+				&groupVolume.Idv_qty,
+			); err != nil {
+				c.IndentedJSON(http.StatusOK, gin.H{"Error8": err.Error()})
+				return
+			}
+			groupPart.IrGroupVolume = append(groupPart.IrGroupVolume, groupVolume)
+		}
+
+		if err := rowsVolume.Err(); err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		}
+
 		objReferRfq.IrGroupPart = append(objReferRfq.IrGroupPart, groupPart)
 	}
 
 	if err := rowsItem.Err(); err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"Error": err.Error(),
-		})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error7": err.Error()})
 		return
 	}
 
-	var objDocNo GetDocNo
-	var runNo string
-
-	query := "SELECT mdt.mdt_id, CONCAT(mdt.mdt_position1, '-', mdt.mdt_position2) AS doc_mst, mdcn.mdcn_position1 AS doc_cur_no_p1, mdcn.mdcn_position2 AS doc_cur_no_p2, CONCAT( CONCAT(mdt.mdt_position1, '-', mdt.mdt_position2), '-', CONCAT(mdcn.mdcn_position1) ) AS doc_run_no FROM mst_document_type mdt LEFT JOIN mst_document_control_no mdcn ON mdcn.mdt_id = mdt.mdt_id WHERE mdt.mdt_name LIKE ? AND mdt.mdt_status = 1"
-	err = db.QueryRow(query, "%NBC%").Scan(&objDocNo.Mdt_id, &objDocNo.Doc_mst, &objDocNo.Doc_cur_no_po1, &objDocNo.Doc_cur_no_po2, &objDocNo.Doc_run_no)
+	var strNote2Null sql.NullString
+	query := "SELECT mdt.mdt_id, CONCAT(mdt.mdt_position1, '-', mdt.mdt_position2) AS doc_mst, mdcn.mdcn_position1 AS doc_cur_no_p1, mdcn.mdcn_position2 AS doc_cur_no_p2, CONCAT( CONCAT(mdt.mdt_position1, '-', mdt.mdt_position2), '-', CONCAT(mdcn.mdcn_position1) ) AS doc_run_no FROM mst_document_type mdt LEFT JOIN mst_document_control_no mdcn ON mdcn.mdt_id = mdt.mdt_id WHERE mdt.mdt_id = ? AND mdt.mdt_status = 1"
+	err = db.QueryRow(query, 2).Scan(&objDocNo.Mdt_id, &objDocNo.Doc_mst, &objDocNo.Doc_cur_no_po1, &objDocNo.Doc_cur_no_po2, &objDocNo.Doc_run_no)
 
 	if err == sql.ErrNoRows {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error19": err.Error()})
 		return
 	}
 
@@ -904,89 +771,118 @@ func CreateNbc(c *gin.Context) {
 		runNo += fmt.Sprintf("-%d", objDocNo.Doc_cur_no_po2)
 	}
 
-	objResult, err := db.Exec("INSERT INTO info_document_control (mdt_id, idc_refer_doc, idc_running_no, idc_issue_year, idc_issue_month, idc_issue_seq_no, idc_customer_type, idc_customer_name, idc_plant_cd, mds_id, idc_subject_note, mde_id, idc_enclosures_note, idc_project_life, idc_project_start, idc_issue_date, idc_closing_date, idc_reply_date, idc_result_confirm, idc_status, idc_note1, idc_note2, idc_file_path, idc_physical_path, idc_cancel_reason, idc_created_date, idc_created_by, idc_updated_date, idc_updated_by) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", objDocNo.Mdt_id, iId, runNo, objReferRfq.Idc_issue_year, objReferRfq.Idc_issue_month, objDocNo.Doc_cur_no_po2, objReferRfq.Idc_customer_type, objReferRfq.Idc_customer_name, objReferRfq.Idc_plant_cd, objReferRfq.Mds_id, objReferRfq.Idc_subject_note, objReferRfq.Mde_id, objReferRfq.Idc_enclosures_note, objReferRfq.Idc_project_life, objReferRfq.Idc_project_start, strIssueDate, objReferRfq.Idc_closing_date, strReplyDate, objReferRfq.Idc_result_confirm, 1, strNote1, strNote2, strFilePath, strPhysicalPath, strCancelReason, strUpdateDate, strUpdateBy, strUpdateDate, strUpdateBy)
-
+	docCrurent, err := db.Exec("INSERT INTO info_document_control (mdt_id, idc_refer_doc, idc_running_no, idc_issue_year, idc_issue_month, idc_issue_seq_no, idc_customer_type, idc_customer_name, idc_plant_cd, mds_id, idc_subject_note, mde_id, idc_enclosures_note, idc_project_life, idc_project_start, idc_issue_date, idc_closing_date, idc_result_confirm, idc_status, idc_note1, idc_note2, idc_file_path, idc_physical_path, idc_cancel_reason, idc_created_date, idc_created_by, idc_updated_date, idc_updated_by) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", objDocNo.Mdt_id, iId, runNo, objReferRfq.Idc_issue_year, objReferRfq.Idc_issue_month, objDocNo.Doc_cur_no_po2, objReferRfq.Idc_customer_type, objReferRfq.Idc_customer_name, objReferRfq.Idc_plant_cd, objReferRfq.Mds_id, objReferRfq.Idc_subject_note, objReferRfq.Mde_id, objReferRfq.Idc_enclosures_note, objReferRfq.Idc_project_life, objReferRfq.Idc_project_start, strIssueDate, objReferRfq.Idc_closing_date, objReferRfq.Idc_result_confirm, 1, strNote1, strNote2Null, strFilePath, strPhysicalPath, strCancelReason, strUpdateDate, strUpdateBy, strUpdateDate, strUpdateBy)
 	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error20": err.Error()})
 		return
 	}
 
-	objLastId, err := objResult.LastInsertId()
+	iLastID, err := docCrurent.LastInsertId()
 	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error21": err.Error()})
 		return
 	}
 
-	// 	// Insert Part No
-	var sql string = "INSERT INTO info_document_item (idc_id, idi_item_no, idi_item_name, idi_model, idi_order_no, idi_status, idi_remark, idi_created_date, idi_created_by, idi_updated_date, idi_updated_by) VALUES "
-	values := []string{}
-
+	/////////////////////  Insert Refer Item  ///////////////////////
 	for index, partCurrent := range objReferRfq.IrGroupPart {
+		valuesVolume := []string{}
 		partNo := partCurrent.Idi_item_no
 		partName := partCurrent.Idi_item_name
 		model := partCurrent.Idi_model
 		remark := partCurrent.Idi_remark
 		orderNo := index + 1
 
-		if partNo == "" {
-			partNo = "NULL"
-		} else {
-			partNo = fmt.Sprintf("'%s'", partNo)
-		}
-
-		if partName == "" {
-			partName = "NULL"
-		} else {
-			partName = fmt.Sprintf("'%s'", partName)
-		}
-
-		if model == "" {
-			model = "NULL"
-		} else {
-			model = fmt.Sprintf("'%s'", model)
-		}
-
 		if remark == "" {
-			remark = "NULL"
+			remark = ""
 		} else {
 			remark = fmt.Sprintf("'%s'", remark)
 		}
 
-		value := fmt.Sprintf("(%d, %s, %s, %s, %d, %d, %s, '%s', '%s', '%s', '%s')",
-			objLastId,
-			partNo,
-			partName,
-			model,
-			orderNo,
+		query := "INSERT INTO info_document_item (idc_id, idi_item_no, idi_item_name, idi_model, idi_order_no, idi_status, idi_remark, idi_created_date, idi_created_by, idi_updated_date, idi_updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+		itemInsert, err := db.Exec(query, iLastID, partNo, partName, model, orderNo, 1, remark, strUpdateDate, strUpdateBy, strUpdateDate, strUpdateBy)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"False": err.Error()})
+			return
+		}
+
+		itemLastId, err := itemInsert.LastInsertId()
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"False": "ไม่สามารถดึง Last Insert ID ได้"})
+			return
+		}
+
+		var sql string = "INSERT INTO info_document_volume (idi_id, idv_year, idv_qty, idv_status, idv_created_date, idv_created_by, idv_updated_date, idv_updated_by) VALUES "
+		for _, volume := range partCurrent.IrGroupVolume {
+			value := fmt.Sprintf("(%d, %s, %s, %d, '%s', '%s', '%s', '%s')",
+				itemLastId,
+				volume.Idv_year,
+				volume.Idv_qty,
+				1,
+				strUpdateDate,
+				strUpdateBy,
+				strUpdateDate,
+				strUpdateBy)
+			valuesVolume = append(valuesVolume, value)
+		}
+
+		if len(valuesVolume) == 0 {
+			c.IndentedJSON(http.StatusOK, gin.H{"False": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+			return
+		}
+
+		sql += strings.Join(valuesVolume, ",")
+		_, errPartItem := db.Exec(sql)
+
+		if errPartItem != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"False": errPartItem.Error()})
+			return
+		}
+	}
+
+	var sqlAttn string = "INSERT INTO info_document_attn (idc_id, mda_id, idat_status, idat_created_date, idat_created_by, idat_updated_date, idat_updated_by) VALUES "
+	objListAttn := []string{}
+
+	for _, attnCurrent := range objReferRfq.Idat_item {
+
+		attnID, err := strconv.Atoi(attnCurrent)
+		if err != nil {
+			fmt.Println("Error converting attnCurrent to int:", err)
+			continue
+		}
+
+		objAttn := fmt.Sprintf("(%d, %d, %d, '%s', '%s', '%s', '%s')",
+			iLastID,
+			attnID,
 			1,
-			remark,
 			strUpdateDate,
 			strUpdateBy,
 			strUpdateDate,
 			strUpdateBy)
-		values = append(values, value)
+
+		objListAttn = append(objListAttn, objAttn)
 	}
 
-	if len(values) == 0 {
+	if len(objListAttn) == 0 {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
 		return
 	}
 
-	sql += strings.Join(values, ",")
-	_, errPartItem := db.Exec(sql)
+	sqlAttn += strings.Join(objListAttn, ",")
 
-	if errPartItem != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errPartItem.Error()})
+	_, errAttn := db.Exec(sqlAttn)
+	if errAttn != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error25": errAttn.Error()})
 		return
 	}
 
 	_, errUpdateSeq := db.Exec("UPDATE mst_document_control_no SET mdcn_position2 = ? WHERE mdt_id = ?", objDocNo.Doc_cur_no_po2, objDocNo.Mdt_id)
 	if errUpdateSeq != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errUpdateSeq.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error28": errUpdateSeq.Error()})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"Update": objLastId})
+	c.IndentedJSON(http.StatusOK, gin.H{"Update": iLastID})
 }
 func SubmitRfq(c *gin.Context) {
 	iId := c.Param("id")
@@ -1296,9 +1192,8 @@ func SubmitRfq(c *gin.Context) {
 // }
 
 func EditRfq(c *gin.Context) {
-	var objRfq Rfq
+	var objRfq RfqNew
 	var groupPartCountOld []int
-	var groupVolumeCountOld []int
 
 	if err := c.BindJSON(&objRfq); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -1356,9 +1251,7 @@ func EditRfq(c *gin.Context) {
 			return
 		}
 
-		newPartGroupCount := len(objRfq.IrGroupPart)
-
-		if len(groupPartCountOld) == newPartGroupCount {
+		if len(groupPartCountOld) == len(objRfq.IrGroupPart) {
 			//////////////////////////////////// Old Group Part //////////////////////////////////-------------
 			for i, part := range objRfq.IrGroupPart {
 				var remark sql.NullString
@@ -1372,10 +1265,40 @@ func EditRfq(c *gin.Context) {
 					"UPDATE info_document_item SET idi_item_no = ?, idi_item_name = ?, idi_model = ?, idi_remark = ?, idi_updated_date = ?, idi_updated_by = ? WHERE idi_id = ?",
 					part.Idi_item_no, part.Idi_item_name, part.Idi_model, remark, objRfq.Idc_updated_date, objRfq.Idc_updated_by, groupPartCountOld[i],
 				)
+
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
 					return
+				} else {
+					_, err := db.Exec("UPDATE info_document_volume SET idv_status = 0 WHERE idi_id = ?", groupPartCountOld[i])
+					if err != nil {
+						c.JSON(http.StatusInternalServerError, gin.H{"ErrorFlgStatus": "Failed to update old parts status"})
+						return
+					}
+
+					for _, volume := range part.IrGroupVolume {
+						if volume.Idv_id == 0 {
+							_, err := db.Exec(
+								"INSERT INTO info_document_volume(idi_id, idv_year, idv_qty, idv_created_date, idv_created_by, idv_updated_date, idv_updated_by) VALUES(?,?,?,?,?,?,?)",
+								groupPartCountOld[i], volume.Idv_year, volume.Idv_qty, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_updated_date, objRfq.Idc_updated_by,
+							)
+							if err != nil {
+								c.JSON(http.StatusInternalServerError, gin.H{"ErrorInsertNew(OldGroupPart)": err.Error()})
+								return
+							}
+						} else {
+							_, err := db.Exec(
+								"UPDATE info_document_volume SET idv_year = ?, idv_qty = ?, idv_status = 1, idv_updated_date = ?, idv_updated_by = ? WHERE idv_id = ? AND idi_id = ?",
+								volume.Idv_year, volume.Idv_qty, objRfq.Idc_updated_date, objRfq.Idc_updated_by, volume.Idv_id, groupPartCountOld[i],
+							)
+							if err != nil {
+								c.JSON(http.StatusInternalServerError, gin.H{"ErrorUpdate(OldGroupPart)": err.Error()})
+								return
+							}
+						}
+					}
 				}
+
 			}
 		} else {
 			// 	//////////////////////////////////// New Group Part //////////////////////////////////------------
@@ -1384,97 +1307,100 @@ func EditRfq(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update old parts status"})
 				return
 			}
+			_, err = db.Exec("UPDATE info_document_volume idv SET idv_status = 0 WHERE EXISTS ( SELECT 1 FROM info_document_item idi JOIN info_document_control idc ON idc.idc_id = idi.idc_id WHERE idi.idi_id = idv.idi_id AND idc.idc_id = ?)", objRfq.Idc_id)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update old parts status"})
+				return
+			}
 
-			var zeroIdParts []RfqGroupPart
-			var nonZeroIdParts []RfqGroupPart
+			var remark sql.NullString
 			var orderItem int
 
 			for _, item := range objRfq.IrGroupPart {
+				orderItem++
 				if item.Idi_id == 0 {
-					zeroIdParts = append(zeroIdParts, item)
+
+					if item.Idi_remark == "" {
+						remark = sql.NullString{String: "", Valid: false}
+					} else {
+						remark = sql.NullString{String: item.Idi_remark, Valid: true}
+					}
+
+					itemInsert, err := db.Exec("INSERT INTO info_document_item (idc_id, idi_item_no, idi_item_name, idi_model, idi_order_no, idi_status, idi_remark, idi_created_date, idi_created_by, idi_updated_date, idi_updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+						objRfq.Idc_id, item.Idi_item_no, item.Idi_item_name, item.Idi_model, orderItem, 1, remark, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_updated_date, objRfq.Idc_updated_by,
+					)
+
+					if err != nil {
+						c.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						return
+					} else {
+						itemLastId, errLastID := itemInsert.LastInsertId()
+						if errLastID != nil {
+							c.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+							return
+						}
+
+						for _, volume := range item.IrGroupVolume {
+							if volume.Idv_id == 0 {
+								_, err := db.Exec(
+									"INSERT INTO info_document_volume(idi_id, idv_year, idv_qty, idv_created_date, idv_created_by, idv_updated_date, idv_updated_by) VALUES(?,?,?,?,?,?,?)",
+									itemLastId, volume.Idv_year, volume.Idv_qty, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_updated_date, objRfq.Idc_updated_by,
+								)
+								if err != nil {
+									c.JSON(http.StatusInternalServerError, gin.H{"ErrorInsertNew(OldGroupPart)": err.Error()})
+									return
+								}
+							} else {
+								_, err := db.Exec(
+									"UPDATE info_document_volume SET idv_year = ?, idv_qty = ?, idv_status = 1, idv_updated_date = ?, idv_updated_by = ? WHERE idv_id = ? AND idi_id = ?",
+									volume.Idv_year, volume.Idv_qty, objRfq.Idc_updated_date, objRfq.Idc_updated_by, volume.Idv_id, itemLastId,
+								)
+								if err != nil {
+									c.JSON(http.StatusInternalServerError, gin.H{"ErrorUpdate(OldGroupPart)": err.Error()})
+									return
+								}
+							}
+						}
+					}
 				} else {
-					nonZeroIdParts = append(nonZeroIdParts, item)
-				}
-			}
+					if item.Idi_remark == "" {
+						remark = sql.NullString{String: "", Valid: false}
+					} else {
+						remark = sql.NullString{String: item.Idi_remark, Valid: true}
+					}
 
-			if len(nonZeroIdParts) > 0 {
-				sqlUpdate := "UPDATE info_document_item SET idi_item_no = ?, idi_item_name = ?, idi_model = ?, idi_remark = ?, idi_order_no = ?, idi_status = ?, idi_updated_date = ?, idi_updated_by = ? WHERE idi_id = ?"
-
-				for _, partCurrent := range nonZeroIdParts {
-					orderItem++
-					_, err := db.Exec(sqlUpdate, partCurrent.Idi_item_no, partCurrent.Idi_item_name, partCurrent.Idi_model, partCurrent.Idi_remark, orderItem, 1, objRfq.Idc_updated_date, objRfq.Idc_updated_by, partCurrent.Idi_id)
+					_, err := db.Exec("UPDATE info_document_item SET idi_item_no = ?, idi_item_name = ?, idi_model = ?, idi_remark = ?, idi_order_no = ?, idi_status = ?, idi_updated_date = ?, idi_updated_by = ? WHERE idi_id = ?", item.Idi_item_no, item.Idi_item_name, item.Idi_model, remark, orderItem, 1, objRfq.Idc_updated_date, objRfq.Idc_updated_by, item.Idi_id)
 
 					if err != nil {
-						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+						c.JSON(http.StatusInternalServerError, gin.H{"ErrorFlgStatus": "Failed to update old parts status"})
 						return
+					} else {
+						for _, volume := range item.IrGroupVolume {
+							if volume.Idv_id == 0 {
+								_, err := db.Exec(
+									"INSERT INTO info_document_volume(idi_id, idv_year, idv_qty, idv_created_date, idv_created_by, idv_updated_date, idv_updated_by) VALUES(?,?,?,?,?,?,?)",
+									item.Idi_id, volume.Idv_year, volume.Idv_qty, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_updated_date, objRfq.Idc_updated_by,
+								)
+								if err != nil {
+									c.JSON(http.StatusInternalServerError, gin.H{"ErrorInsertNew(OldGroupPart)": err.Error()})
+									return
+								}
+							} else {
+								_, err := db.Exec(
+									"UPDATE info_document_volume SET idv_year = ?, idv_qty = ?, idv_status = 1, idv_updated_date = ?, idv_updated_by = ? WHERE idv_id = ? AND idi_id = ?",
+									volume.Idv_year, volume.Idv_qty, objRfq.Idc_updated_date, objRfq.Idc_updated_by, volume.Idv_id, item.Idi_id,
+								)
+								if err != nil {
+									c.JSON(http.StatusInternalServerError, gin.H{"ErrorUpdate(OldGroupPart)": err.Error()})
+									return
+								}
+							}
+						}
 					}
 				}
 			}
-
-			if len(zeroIdParts) > 0 {
-				sqlInsert := `INSERT INTO info_document_item (idc_id, idi_item_no, idi_item_name, idi_model, idi_order_no, idi_status, idi_remark, idi_created_date, idi_created_by, idi_updated_date, idi_updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-
-				for _, partCurrent := range zeroIdParts {
-					orderItem++
-					_, err := db.Exec(sqlInsert, objRfq.Idc_id, partCurrent.Idi_item_no, partCurrent.Idi_item_name, partCurrent.Idi_model, orderItem, 1, partCurrent.Idi_remark, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_updated_date, objRfq.Idc_updated_by)
-
-					if err != nil {
-						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
-						return
-					}
-				}
-			}
-		}
-		//////////////////////////////////// Group Volume //////////////////////////////////-------------
-		rowsVolume, err := db.Query(
-			"SELECT idv_id FROM info_document_volume WHERE idc_id = ? AND idv_status = 1", objRfq.Idc_id)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
-			return
-		}
-		defer rowsVolume.Close()
-
-		for rowsVolume.Next() {
-			var idv_id int
-			if err := rowsVolume.Scan(&idv_id); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
-				return
-			}
-			groupVolumeCountOld = append(groupVolumeCountOld, idv_id)
 		}
 
-		if err := rowsVolume.Err(); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
-			return
-		}
-
-		if len(groupVolumeCountOld) == len(objRfq.IrGroupVolume) {
-			for i, item := range objRfq.IrGroupVolume {
-				_, err := db.Exec(
-					"UPDATE info_document_volume SET idv_year = ?, idv_qty = ?, idv_updated_date = ?, idv_updated_by = ? WHERE idv_id = ?", item.Year, item.Volume, objRfq.Idc_updated_date, objRfq.Idc_updated_by, groupVolumeCountOld[i])
-				if err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
-					return
-				}
-			}
-		} else {
-			_, err := db.Exec("UPDATE info_document_volume SET idv_status = 0 WHERE idc_id = ?", objRfq.Idc_id)
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update old volume status"})
-				return
-			}
-
-			sqlInsert := `INSERT INTO info_document_volume (idc_id, idv_year, idv_qty, idv_status, idv_created_date, idv_created_by, idv_updated_date, idv_updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-
-			for _, partCurrent := range objRfq.IrGroupVolume {
-				_, err := db.Exec(sqlInsert, objRfq.Idc_id, partCurrent.Year, partCurrent.Volume, 1, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_updated_date, objRfq.Idc_updated_by)
-
-				if err != nil {
-					c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
-					return
-				}
-			}
-		}
 		//////////////////////////////////// Attn //////////////////////////////////-----------------------
 		var currentAttn []int
 		var noCurrentAttn []int
@@ -1527,122 +1453,6 @@ func EditRfq(c *gin.Context) {
 				}
 			} else {
 				_, err := db.Exec(insertSQL, objRfq.Idc_id, id, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_updated_date, objRfq.Idc_updated_by)
-				if err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{"error": "Error inserting record", "id": id})
-					return
-				}
-			}
-		}
-		//////////////////////////////////// Mdpu //////////////////////////////////-----------------------
-		var currentMdpu []int
-		var noCurrentMdpu []int
-
-		rows, err = db.Query("SELECT mdpu_id FROM info_document_purchase_cost WHERE idc_id = ?", objRfq.Idc_id)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
-			return
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var value int
-			if err := rows.Scan(&value); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
-				return
-			}
-			currentMdpu = append(currentMdpu, value)
-		}
-
-		for _, item := range objRfq.Idpu_item {
-			num, err := strconv.Atoi(item)
-			if err != nil {
-				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
-				return
-			}
-			noCurrentMdpu = append(noCurrentMdpu, num)
-		}
-
-		currentMdpuMap := make(map[int]bool)
-		for _, id := range currentMdpu {
-			currentMdpuMap[id] = true
-		}
-
-		_, err = db.Exec("UPDATE info_document_purchase_cost SET idpu_status = 0 WHERE idc_id = ?", objRfq.Idc_id)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update old volume status"})
-			return
-		}
-
-		updateMdpuSQL := "UPDATE info_document_purchase_cost SET idpu_status = 1, idpu_updated_date = ?, idpu_updated_by = ? WHERE idc_id = ? AND mdpu_id = ?"
-		insertMdpuSQL := "INSERT INTO info_document_purchase_cost (idc_id, mdpu_id, idpu_created_date, idpu_created_by, idpu_updated_date, idpu_updated_by, idpu_status) VALUES (?, ?, ?, ?, ?, ?, 1)"
-
-		for _, id := range noCurrentMdpu {
-			if currentMdpuMap[id] {
-				_, err := db.Exec(updateMdpuSQL, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_id, id)
-				if err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating record", "id": id})
-					return
-				}
-			} else {
-				_, err := db.Exec(insertMdpuSQL, objRfq.Idc_id, id, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_updated_date, objRfq.Idc_updated_by)
-				if err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{"error": "Error inserting record", "id": id})
-					return
-				}
-			}
-		}
-		//////////////////////////////////// Mdpc //////////////////////////////////-----------------------
-		var currentMdpc []int
-		var noCurrentMdpc []int
-
-		rows, err = db.Query("SELECT mdpc_id FROM info_document_process_cost WHERE idc_id = ?", objRfq.Idc_id)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
-			return
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var value int
-			if err := rows.Scan(&value); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
-				return
-			}
-			currentMdpc = append(currentMdpc, value)
-		}
-
-		for _, item := range objRfq.Idpc_item {
-			num, err := strconv.Atoi(item)
-			if err != nil {
-				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
-				return
-			}
-			noCurrentMdpc = append(noCurrentMdpc, num)
-		}
-
-		currentMdpcMap := make(map[int]bool)
-		for _, id := range currentMdpc {
-			currentMdpcMap[id] = true
-		}
-
-		_, err = db.Exec("UPDATE info_document_process_cost SET idpc_status = 0 WHERE idc_id = ?", objRfq.Idc_id)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to update old volume status"})
-			return
-		}
-
-		updateMdpcSQL := "UPDATE info_document_process_cost SET idpc_status = 1, idpc_updated_date = ?, idpc_updated_by = ? WHERE idc_id = ? AND mdpc_id = ?"
-		insertMdpcSQL := "INSERT INTO info_document_process_cost (idc_id, mdpc_id, idpc_created_date, idpc_created_by, idpc_updated_date, idpc_updated_by, idpc_status) VALUES (?, ?, ?, ?, ?, ?, 1)"
-
-		for _, id := range noCurrentMdpc {
-			if currentMdpcMap[id] {
-				_, err := db.Exec(updateMdpcSQL, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_id, id)
-				if err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating record", "id": id})
-					return
-				}
-			} else {
-				_, err := db.Exec(insertMdpcSQL, objRfq.Idc_id, id, objRfq.Idc_updated_date, objRfq.Idc_updated_by, objRfq.Idc_updated_date, objRfq.Idc_updated_by)
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": "Error inserting record", "id": id})
 					return

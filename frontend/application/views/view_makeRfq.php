@@ -350,7 +350,7 @@
     function listCustomer() {
         $.ajax({
             type: 'get',
-            url: 'http://192.168.161.106/etax_invoice_system_debug/api/customers',
+            url: 'http://192.168.161.106/etax_invoice_system/api/customers',
             success: function(result) {
                 var option_text = '<option value="" disabled selected>Choose Costomer</option>';
                 $.each(result, function(key, value) {

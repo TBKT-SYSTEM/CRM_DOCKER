@@ -64,6 +64,19 @@ async function getDocNo(url, id) {
         throw err;
     }
 }
+
+async function getSingleData(url, id) {
+    try {
+        var result = await $.ajax({
+            type: 'GET',
+            url: url,
+        });
+        return result;
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
 // validate functions ----------------
 async function is_unique(data, url) {
     try {
@@ -108,14 +121,16 @@ function form_err(element, message) {
 
 function form_errValid(element, message) {
     element.classList.add('is-invalid');
-    if (element.classList.contains('select2')) {
-        const select2Selection = element.parentElement.querySelector('.select2-selection.select2-selection--single');
-        select2Selection.style.borderColor = 'var(--bs-danger2)';
-        select2Selection.style.paddingRight = 'calc(1.5em + 16px)';
-        select2Selection.style.backgroundImage = 'url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 width=%2712%27 height=%2712%27 fill=%27none%27 stroke=%27%23FA896B%27%3e%3ccircle cx=%276%27 cy=%276%27 r=%274.5%27/%3e%3cpath stroke-linejoin=%27round%27 d=%27M5.8 3.6h.4L6 6.5z%27/%3e%3ccircle cx=%276%27 cy=%278.2%27 r=%270.6%27 fill=%27%23FA896B%27 stroke=%27none%27/%3e%3c/svg%3e")';
-        select2Selection.style.backgroundRepeat = 'no-repeat';
-        select2Selection.style.backgroundPosition = 'right calc(2.375em + 4px) center';
-        select2Selection.style.backgroundSize = 'calc(0.75em + 8px) calc(0.75em + 8px)';
+    if ($(element).hasClass('select2-hidden-accessible')) {
+        let $select2Selection = $(element).next('.select2-container').find('.select2-selection');
+        $select2Selection.css({
+            'border': '1px solid var(--bs-danger)',
+            'border-radius': '0.25rem',
+            'background-image': 'url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 width=%2712%27 height=%2712%27 fill=%27none%27 stroke=%27%23FA896B%27%3e%3ccircle cx=%276%27 cy=%276%27 r=%274.5%27/%3e%3cpath stroke-linejoin=%27round%27 d=%27M5.8 3.6h.4L6 6.5z%27/%3e%3ccircle cx=%276%27 cy=%278.2%27 r=%270.6%27 fill=%27%23FA896B%27 stroke=%27none%27/%3e%3c/svg%3e")',
+            'background-repeat': 'no-repeat',
+            'background-position': 'right calc(2.375em + 4px) center',
+            'background-size': 'calc(0.75em + 8px) calc(0.75em + 8px)',
+        });
     }
     let invalidFeedback = element.parentElement.querySelector('.invalid-feedback');
     if (invalidFeedback) {
@@ -129,16 +144,16 @@ function form_errValid(element, message) {
 function form_okValid(element) {
     element.classList.remove('is-invalid');
     element.classList.add('is-valid');
-    if (element.classList.contains('select2')) {
-        const select2Selection = element.parentElement.querySelector('.selection .select2-selection.select2-selection--single');
-        if (select2Selection) {
-            select2Selection.style.borderColor = 'var(--bs-success)';
-            select2Selection.style.paddingRight = 'calc(1.5em + 16px)';
-            select2Selection.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%2313DEB9%27 d=%27M2.3 6.73l-1.7-2.2c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z%27/%3E%3C/svg%3E")';
-            select2Selection.style.backgroundRepeat = 'no-repeat';
-            select2Selection.style.backgroundPosition = 'right calc(2.375em + 4px) center';
-            select2Selection.style.backgroundSize = 'calc(0.75em + 8px) calc(0.75em + 8px)';
-        }
+    if ($(element).hasClass('select2-hidden-accessible')) {
+        let $select2Selection = $(element).next('.select2-container').find('.select2-selection');
+        $select2Selection.css({
+            'border': '1px solid var(--bs-success)',
+            'border-radius': '0.25rem',
+            'background-image': 'url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%2313DEB9%27 d=%27M2.3 6.73l-1.7-2.2c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z%27/%3E%3C/svg%3E")',
+            'background-repeat': 'no-repeat',
+            'background-position': 'right calc(2.375em + 4px) center',
+            'background-size': 'calc(0.75em + 8px) calc(0.75em + 8px)',
+        });
     }
     let invalidFeedback = element.parentElement.querySelector('.invalid-feedback');
     if (invalidFeedback) {
@@ -147,9 +162,22 @@ function form_okValid(element) {
 
 }
 
-
 function form_defaultValid(element) {
-    element.classList.remove('is-valid');
+    element.classList.remove('is-valid', 'is-invalid');
+    if ($(element).hasClass('select2-hidden-accessible')) {
+        let $select2Selection = $(element).next('.select2-container').find('.select2-selection');
+        $select2Selection.css({
+            'border': '1px solid var(--bs-border-color)',
+            'color': 'var(--bs-body-color)',
+            'box-shadow': '0 0.125rem 0.25rem rgba(var(--bs-body-color-rgb), 0.075) !important',
+            'border-radius': '',
+            'background-image': '',
+        });
+    }
+    let invalidFeedback = element.parentElement.querySelector('.invalid-feedback');
+    if (invalidFeedback) {
+        invalidFeedback.style.display = "none";
+    }
 }
 
 
@@ -1545,6 +1573,63 @@ async function Fs_valid(formType) {
                     }
                 } else {
                     // console.log(id);
+                    if (!id) {
+                        return false;
+                    }
+                    return true, id;
+                }
+            }
+        }
+    }
+}
+
+async function Meeting_valid(formType) {
+    var id, mdt_id, idc_id, imc_date, imc_detail;
+
+    if (formType == "add") {
+        mdt_id = document.add_form.mdt_id;
+        idc_id = document.add_form.idc_id;
+        imc_date = document.add_form.imc_date;
+        imc_detail = document.add_form.imc_detail;
+        id = 0;
+    } else {
+        let getid = document.edit_form.imc_id;
+        mdt_id = document.edit_form.mdt_id;
+        idc_id = document.edit_form.idc_id;
+        imc_date = document.edit_form.imc_date;
+        imc_detail = document.edit_form.imc_detail;
+        id = parseInt(getid.value);
+    }
+
+    if (is_empty(mdt_id.value)) {
+        form_errValid(mdt_id, "*Please choose meeting topic!!");
+        return false;
+    } else {
+        form_okValid(mdt_id);
+        if (is_empty(idc_id.value)) {
+            form_errValid(idc_id, "*Please choose document reference!!");
+            return false;
+        } else {
+            form_okValid(idc_id);
+            if (is_empty(imc_date.value)) {
+                form_errValid(imc_date, "*Please choose date!!");
+                return false;
+            } else {
+                form_okValid(imc_date);
+                if (imc_detail.disabled) {
+                    form_okValid(imc_detail);
+                } else {
+                    if (is_empty(imc_detail.value)) {
+                        form_errValid(imc_detail, "*Please inout design concerns!!");
+                        return false;
+                    } else {
+                        form_okValid(imc_detail);
+                    }
+                }
+
+                if (formType == "add") {
+                    return true;
+                } else {
                     if (!id) {
                         return false;
                     }

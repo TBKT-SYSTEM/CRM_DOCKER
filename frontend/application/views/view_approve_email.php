@@ -142,12 +142,6 @@
                             } else {
                                 console.error('Failed to create valid PDF URL');
                             }
-                        } else if (result.idc_running_no.substring(0, 3) == 'NBC') {
-                            return;
-                        } else if (result.idc_running_no.substring(0, 2) == 'FS') {
-                            return;
-                        } else if (result.idc_running_no.substring(0, 2) == 'QT') {
-                            return;
                         } else {
                             console.error('Invalid response data from API');
                         }

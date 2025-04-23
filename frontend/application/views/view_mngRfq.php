@@ -142,7 +142,7 @@
                             <th>Part No.</th>
                             <th>Part Name</th>
                             <th>Model</th>
-                            <th>Part Remark</th>
+                            <th>Remark</th>
                         </tr>
                     </thead>
                     <tbody id="bodyPartNo">
@@ -261,53 +261,13 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <!-------------------------- Purchase Cost ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center" name="mdpu_group">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Purchase Cost :</h4>
-                                                </div>
-                                                <?php
-                                                $option_topic = $this->ManageBackend->list_option("option/list_mdpu");
-                                                foreach ($option_topic as $topic) {
-                                                    echo '<div class="col-md-2">';
-                                                    echo '<input type="checkbox" class="form-check-input me-2" name="ir_mdpu[]" id="' . $topic['mdpu_id'] . '">';
-                                                    echo '<label class="form-check-label fw-semibold" for="inpAttn' . $topic['mdpu_id'] . '">' . $topic['mdpu_name'] . '</label>';
-                                                    echo '</div>';
-                                                }
-                                                ?>
-                                            </div>
-                                            <span class="invalid-feedback"></span>
-                                            <!-------------------------- Process Cost ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center" name="mdpc_group">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Process Cost :</h4>
-                                                </div>
-                                                <?php
-                                                $option_topic = $this->ManageBackend->list_option("option/list_mdpc");
-                                                foreach ($option_topic as $topic) {
-                                                    if (strlen($topic['mdpc_name']) > 14) {
-                                                        echo '<div class="col-md-3">';
-                                                        echo '<input type="checkbox" class="form-check-input me-2" name="ir_mdpc[]" id="' . $topic['mdpc_id'] . '">';
-                                                        echo '<label class="form-check-label fw-semibold col-auto" for="inpAttn' . $topic['mdpc_id'] . '">' . $topic['mdpc_name'] . '</label>';
-                                                        echo '</div>';
-                                                    } else {
-                                                        echo '<div class="col-md-2">';
-                                                        echo '<input type="checkbox" class="form-check-input me-2" name="ir_mdpc[]" id="' . $topic['mdpc_id'] . '">';
-                                                        echo '<label class="form-check-label fw-semibold col-auto" for="inpAttn' . $topic['mdpc_id'] . '">' . $topic['mdpc_name'] . '</label>';
-                                                        echo '</div>';
-                                                    }
-                                                }
-                                                ?>
-                                            </div>
-                                            <span class="invalid-feedback"></span>
                                             <!-------------------------- Note ---------------------------->
                                             <div class="d-flex col-md-12 mb-3">
                                                 <div class="col-md-2">
                                                     <h4 class="mb-2 fs-4 fw-semibold">Note :</h4>
                                                 </div>
                                                 <div class="d-flex col-md-10 me-3 gap-5">
-                                                    <textarea name="idc_note1" class="form-control" rows="4" id="inpNoteEdit"></textarea>
+                                                    <textarea name="idc_note1" class="form-control" rows="4" id="inpNoteEdit" maxlength="200"></textarea>
                                                     <span class="invalid-feedback"></span>
                                                 </div>
                                             </div>
@@ -318,7 +278,7 @@
                                                     <h4 class="mb-2 fs-4 fw-semibold">Comment / Additional :</h4>
                                                 </div>
                                                 <div class="d-flex col-md-10 me-3 gap-5">
-                                                    <textarea name="idc_note2" class="form-control" rows="4" id="inpCommentEdit"></textarea>
+                                                    <textarea name="idc_note2" class="form-control" rows="4" id="inpCommentEdit" maxlength="200"></textarea>
                                                     <span class="invalid-feedback"></span>
                                                 </div>
                                             </div>
@@ -355,14 +315,14 @@
                                         <div class="row" style="padding: 15px;">
                                             <div class="col-md-7 d-flex">
                                                 <h4 class="fs-5 fw-semibold me-2">Section 2 : Item Information</h4>
-                                                <span>( Max 20 Items )</span>
+                                                <span>( Max 10 Items )</span>
                                             </div>
                                             <hr>
                                         </div>
                                         <div class="row" style="padding: 15px;">
                                             <!----------- Table Part No.  ------------>
                                             <div class="table-responsive mb-5">
-                                                <table class="table table-hover text-wrap mb-0 align-middle table-b text-center bg-info-subtle border rounded shadow-sm" id="tblPartNo">
+                                                <table class="table table-hover text-wrap mb-0 align-middle table-b text-center bg-info-subtle border rounded shadow-sm" id="tblPartNoEdit">
                                                     <thead class="text-dark fs-4">
                                                         <tr>
                                                             <th class="border-bottom-0">
@@ -401,7 +361,6 @@
                                                 <div class="d-flex col-md-12 mb-3 align-items-center gap-5">
                                                     <div class="d-flex col-md-4 align-items-center">
                                                         <label for="" class="col-md-auto form-label fw-semibold me-3">Project Life :</label>
-
                                                         <div class="col-md-6 me-3">
                                                             <input type="number" min="1" max="10" class="form-control" id="inpProjectLifeEdit" name="idc_project_life" onchange="changeProLife()" placeholder="Enter Number ..." value="1">
                                                             <div class="invalid-feedback">
@@ -428,17 +387,20 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-5">
+                                                <div class="col-md-12">
                                                     <!----------- Table Project Life  ------------>
-                                                    <div class="table-responsive border rounded mb-5 shadow-sm">
-                                                        <table class="table text-wrap mb-0 align-middle text-center" id="tblProjectLifeEdit">
+                                                    <div class="table-responsive border rounded mb-3 shadow-sm" style="overflow-x: auto;">
+                                                        <table class="table table-bordered text-wrap mb-0 align-middle text-center" id="tblProjectLifeEdit">
                                                             <thead class="text-dark fs-4">
                                                                 <tr>
-                                                                    <th class="border-bottom-0 border-end">
-                                                                        <h6 class="fw-semibold mb-0">Year</h6>
+                                                                    <th class="border-bottom-0 align-middle" rowspan="2">
+                                                                        <h6 class="fw-semibold mb-0">No.</h6>
                                                                     </th>
-                                                                    <th class="border-bottom-0">
-                                                                        <h6 class="fw-semibold mb-0">Volume</h6>
+                                                                    <th class="border-bottom-0 align-middle" rowspan="2">
+                                                                        <h6 class="fw-semibold mb-0">Part No.</h6>
+                                                                    </th>
+                                                                    <th class="border-bottom-0 align-middle" id="tlbHeadProjectLifeEdit">
+                                                                        <h6 class="fw-semibold mb-0">Year/Volume</h6>
                                                                     </th>
                                                                 </tr>
                                                             </thead>
@@ -502,8 +464,8 @@
     </div>
 </div>
 
-
 <script>
+    var groupPartData = [];
     let dataTable;
     let isProcessing = false;
 
@@ -511,6 +473,24 @@
         initializeDateInputs('startDate', 'endDate');
     });
 
+    function checkPartNo(event) {
+        event.preventDefault();
+        const input = event.target;
+        const row = input.closest('tr');
+        const tbody = row.parentElement;
+        const rowIndex = Array.from(tbody.querySelectorAll('tr')).indexOf(row);
+
+        const targetRow = document.querySelectorAll('#tblBodyProjectLifeEdit tr')[rowIndex];
+        if (targetRow) {
+            const partNoTd = targetRow.querySelector('td[name="part_no"]');
+            if (partNoTd) {
+                partNoTd.innerText = input.value;
+            }
+        }
+        if (rowIndex >= 0 && rowIndex < groupPartData.length) {
+            groupPartData[rowIndex].idi_item_no = input.value;
+        }
+    }
     async function referRFQ(data, type) {
         $('#mdlEdit #inpDocNoEdit').val(data.idc_running_no);
         $.ajax({
@@ -577,30 +557,6 @@
         $('#inpOtherEnclosuresEdit').prop('disabled', !isOtherEnclosures);
         $('#inpOtherEnclosuresEdit').val(isOtherEnclosures ? data.idc_enclosures_note : '');
 
-        const checkboxesIdpu = document.querySelectorAll('input[name="ir_mdpu[]"]');
-        checkboxesIdpu.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        data.idpu_item.forEach(id => {
-            checkboxesIdpu.forEach(checkbox => {
-                if (checkbox.id === id) {
-                    checkbox.checked = true;
-                }
-            });
-        });
-
-        const checkboxesIdpc = document.querySelectorAll('input[name="ir_mdpc[]"]');
-        checkboxesIdpc.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        data.idpc_item.forEach(id => {
-            checkboxesIdpc.forEach(checkbox => {
-                if (checkbox.id === id) {
-                    checkbox.checked = true;
-                }
-            });
-        });
-
         $('#inpNoteEdit').val(data.idc_note1);
         $('#inpCommentEdit').val(data.idc_note2);
         $('#inpDuedateEdit').val(data.idc_closing_date);
@@ -610,22 +566,48 @@
             select.value = data.idc_plant_cd;
         });
 
-        $('#inpProjectLifeEdit').val(data.idc_project_life);
+        await listTablePartNo(data.ir_group_part, 'edit');
 
+        $('#inpProjectLifeEdit').val(data.idc_project_life);
         const selectProgramStart = document.querySelectorAll('select[name="idc_project_start"]');
         selectProgramStart.forEach(select => {
             select.value = data.idc_project_start;
         });
 
-        const tableProLife = document.getElementById('tblProjectLifeEdit').querySelector('tbody');
-        let htmlProLife = '';
-        for (i = 0; i < data.ir_group_volume.length; i++) {
-            htmlProLife += '<tr>';
-            htmlProLife += '<td class="text-center col-6 border-end">' + data.ir_group_volume[i].idv_year + '</td>';
-            htmlProLife += '<td><div class="col"><input type="number" class="form-control text-center col-6" min="0" max="999999" id="inpVolume' + i + '" value="' + data.ir_group_volume[i].idv_qty + '"><span class="invalid-feedback"></span></div></td>';
-            htmlProLife += '</tr>';
+        $('#tblProjectLifeEdit thead tr:not(:first-child)').remove();
+        $('#tlbHeadProjectLifeEdit').attr('colspan', 0);
+        document.querySelector('#tblBodyProjectLifeEdit').innerHTML = '';
+
+        if (!is_empty(document.getElementById('inpProjectLifeEdit').value) && !is_empty(document.getElementById('inpProTim').value)) {
+            $('#tlbHeadProjectLifeEdit').attr('colspan', document.getElementById('inpProjectLifeEdit').value + 1);
+            let html = '<tr>';
+            let year = parseInt(document.getElementById('inpProTim').value, 10);
+            for (let i = 0; i <= document.getElementById('inpProjectLifeEdit').value; i++) {
+                html += `<th class="border-bottom-0 align-middle">
+                    <h6 class="fw-semibold mb-0">${year + i}</h6>
+                </th>`;
+            }
+            html += '</tr>';
+            document.querySelector('#tblProjectLifeEdit thead').insertAdjacentHTML('beforeend', html);
+            let htmlBody = '';
+            for (let i = 0; i < groupPartData.length; i++) {
+                htmlBody += `<tr>`;
+                htmlBody += `<td>${i+1}</td>`
+                htmlBody += `<td name="part_no">${groupPartData[i].idi_item_no}</td>`
+                for (let q = 0; q < groupPartData[i].ir_group_volume.length; q++) {
+                    htmlBody += `<td>
+                                    <input type="number" class="form-control form-control-sm text-center" 
+                                        min="0" max="999999" data-id="${groupPartData[i].ir_group_volume[q].idv_id}"
+                                        data-year="${groupPartData[i].ir_group_volume[q].idv_year}" 
+                                        placeholder="Please input volume ${groupPartData[i].ir_group_volume[q].idv_year}"
+                                        value="${groupPartData[i].ir_group_volume[q].idv_qty}">
+                                    <span class="invalid-feedback"></span>
+                                </td>`;
+                }
+                htmlBody += `</tr>`
+            }
+            document.querySelector('#tblBodyProjectLifeEdit').innerHTML = htmlBody;
         }
-        tableProLife.innerHTML = htmlProLife;
     }
 
     function initializeDateInputs(startDateId, endDateId) {
@@ -673,49 +655,6 @@
         }
         return true;
     }
-    async function checkGroupMdpu() {
-        const checkboxContainers = document.querySelectorAll('[name="mdpu_group"] input[type="checkbox"]');
-        const labelContainers = document.querySelectorAll('[name="mdpu_group"] label, [name="mdpu_group"]  h4');
-        let isChecked = false;
-
-        labelContainers.forEach(label => label.classList.remove('text-danger'));
-        checkboxContainers.forEach(checkbox => {
-            if (checkbox.checked) {
-                isChecked = true;
-            }
-        });
-
-        if (!isChecked) {
-            labelContainers.forEach(label => label.classList.add('text-danger'));
-            if (checkboxContainers.length > 0) {
-                checkboxContainers[0].focus();
-            }
-            return false;
-        }
-        return true;
-    }
-    async function checkGroupMdpc() {
-        const checkboxContainers = document.querySelectorAll('[name="mdpc_group"] input[type="checkbox"]');
-        const labelContainers = document.querySelectorAll('[name="mdpc_group"] label, [name="mdpc_group"]  h4');
-        let isChecked = false;
-
-        labelContainers.forEach(label => label.classList.remove('text-danger'));
-        checkboxContainers.forEach(checkbox => {
-            if (checkbox.checked) {
-                isChecked = true;
-            }
-        });
-
-        if (!isChecked) {
-            labelContainers.forEach(label => label.classList.add('text-danger'));
-            if (checkboxContainers.length > 0) {
-                checkboxContainers[0].focus();
-            }
-            return false;
-        }
-        return true;
-    }
-
     async function saveChange(groupPart, groupVolume, mdt_id) {
         if (isProcessing) return;
         isProcessing = true;
@@ -728,18 +667,6 @@
 
         let chk = await Rfq_valid("edit");
         if (!chk) {
-            isProcessing = false;
-            return;
-        }
-
-        let checkMdpu = await checkGroupMdpu();
-        if (!checkMdpu) {
-            isProcessing = false;
-            return;
-        }
-
-        let checkMdpc = await checkGroupMdpc();
-        if (!checkMdpc) {
             isProcessing = false;
             return;
         }
@@ -839,7 +766,6 @@
             isProcessing = false;
             return;
         }
-        // console.log(groupPartData);
 
         if (document.edit_form.idc_project_life.value < 1 || document.edit_form.idc_project_life.value > 10) {
             form_errValid(document.edit_form.idc_project_life, '*Please Enter Project Life 1-10');
@@ -855,37 +781,17 @@
             form_okValid(document.edit_form.idc_project_start);
         }
 
-        $('#tblBodyProjectLifeEdit tr').each(function() {
-            if (hasError) return false;
-
-            let rowData = {};
-            const label = $(this).find('td:first-child').text().trim();
-            const inputElement = $(this).find('td:last-child input');
-            const inputValue = inputElement.val().trim();
-
-            if (is_empty(inputValue)) {
-                form_errValid(inputElement[0], "*Please Enter Value");
-                hasError = true;
-                return false;
-            } else if (inputValue < 1 || inputValue > 999999) {
-                form_errValid(inputElement[0], "*Enter Volume 1-999999");
-                hasError = true;
+        let isValid = true;
+        $('#tblBodyProjectLifeEdit input[type="number"]').each(function() {
+            if ($(this).val().trim() === "" || $(this).val().trim() < 1 || $(this).val().trim() > 999999) {
+                form_errValid(this, "*Please Enter Volume 1-999999");
+                isValid = false;
                 return false;
             } else {
-                form_okValid(inputElement[0]);
-                rowData['year'] = label;
-                rowData['volume'] = inputValue;
-            }
-
-            if (Object.keys(rowData).length > 0) {
-                groupVolumeData.push(rowData);
+                form_okValid(this);
             }
         });
-        if (hasError) {
-            isProcessing = false;
-            return;
-        }
-        // console.log(groupVolumeData);
+        if (!isValid) return;
 
         Swal.fire({
             title: 'Are you sure?',
@@ -929,11 +835,20 @@
                 const checkboxesAttn = document.querySelectorAll('input[name="ir_attn[]"]:checked');
                 const checkedIdsAttn = Array.from(checkboxesAttn).map(checkbox => checkbox.id);
 
-                const checkboxesMdpu = document.querySelectorAll('input[name="ir_mdpu[]"]:checked');
-                const checkedIdsMdpu = Array.from(checkboxesMdpu).map(checkbox => checkbox.id);
-
-                const checkboxesMdpc = document.querySelectorAll('input[name="ir_mdpc[]"]:checked');
-                const checkedIdsMdpc = Array.from(checkboxesMdpc).map(checkbox => checkbox.id);
+                groupPartData.forEach(item => {
+                    document.querySelectorAll('#tblBodyProjectLifeEdit td[name="part_no"]').forEach(td => {
+                        if (td.innerText.trim() === item.idi_item_no) {
+                            let tr = td.closest('tr');
+                            let inputValues = Array.from(tr.querySelectorAll('input[type="number"]'))
+                                .map(input => ({
+                                    idv_id: parseInt(input.getAttribute('data-id'), 10),
+                                    idv_year: input.getAttribute('data-year'),
+                                    idv_qty: input.value.trim()
+                                }));
+                            item.ir_group_volume = inputValues;
+                        }
+                    });
+                });
 
                 edit_form["idc_updated_date"] = getTimeNow();
                 edit_form["idc_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
@@ -951,10 +866,7 @@
                 edit_form["idc_cancel_reason"] = '';
 
                 edit_form["ir_group_part"] = groupPartData;
-                edit_form["ir_group_volume"] = groupVolumeData;
                 edit_form["idat_item"] = checkedIdsAttn;
-                edit_form["idpu_item"] = checkedIdsMdpu;
-                edit_form["idpc_item"] = checkedIdsMdpc;
                 edit_form["idc_running_no"] = '';
                 edit_form["idc_id"] = chk;
 
@@ -1005,33 +917,77 @@
 
         isProcessing = false;
     }
-
     async function changeProLife() {
         let proLife = document.getElementById('inpProjectLifeEdit');
         let proTim = document.getElementById('inpProTim');
 
+        $('#tblProjectLifeEdit thead tr:not(:first-child)').remove();
+        $('#tlbHeadProjectLifeEdit').attr('colspan', 0);
+        document.querySelector('#tblBodyProjectLifeEdit').innerHTML = '';
+        if (groupPartData.length == 0) {
+            Swal.fire({
+                html: "<h3>Please Insert Item Information</h3>",
+                icon: 'warning',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            })
+            form_errValid(document.add_form.idi_item_no, '*Plase Enter Part No.');
+            form_errValid(document.add_form.idi_item_name, '*Plase Enter Part Name');
+            form_errValid(document.add_form.idi_model, '*Plase Enter Model');
+            return;
+        }
+
         if (proLife.value <= 0 || proLife.value > 10) {
             form_errValid(document.getElementById('inpProjectLifeEdit'), "*Please Enter Number 1-10");
-            document.getElementById('tlbBodyProjectLife').innerHTML = '';
             return;
         } else {
             form_okValid(document.getElementById('inpProjectLifeEdit'));
         }
 
+        if (proLife.value > 4) {
+            $('#tblProjectLifeEdit').css('min-width', '1800px');
+        } else {
+            $('#tblProjectLifeEdit').css('min-width', 'auto');
+        }
+
         if (!is_empty(proLife.value) && !is_empty(proTim.value)) {
-            let html = '';
-            let count = 1;
-            let year = proTim.value;
+            $('#tlbHeadProjectLifeEdit').attr('colspan', proLife.value + 1);
+            let groupVolume = [];
+            let html = '<tr>';
+            let year = parseInt(proTim.value, 10);
             for (let i = 0; i <= proLife.value; i++) {
-                html += '<tr>' +
-                    '<td class="text-center col-6 border-end">' + (parseInt(year) + i) + '</td>' +
-                    '<td><div class="col"><input type="number" class="form-control text-center col-6" min="0" max="999999" id="inpVolume' + i + '"><span class="invalid-feedback"></span></div></td>' +
-                    '</tr>';
+                groupVolume.push({
+                    year: year + i
+                });
+                html += `<th class="border-bottom-0 align-middle">
+                    <h6 class="fw-semibold mb-0">${year + i}</h6>
+                </th>`;
             }
-            document.getElementById('tblBodyProjectLifeEdit').innerHTML = html;
+            html += '</tr>';
+            document.querySelector('#tblProjectLifeEdit thead').insertAdjacentHTML('beforeend', html);
+            let htmlBody = '';
+            for (let i = 0; i < groupPartData.length; i++) {
+                htmlBody += `<tr>`;
+                htmlBody += `<td>${i+1}</td>`
+                htmlBody += `<td name="part_no">${groupPartData[i].idi_item_no}</td>`
+                for (let q = 0; q < groupVolume.length; q++) {
+                    htmlBody += `<td>
+                                    <input type="number" class="form-control form-control-sm text-center" 
+                                        min="0" max="999999" data-id="0" 
+                                        data-year="${groupVolume[q % groupVolume.length].year}" 
+                                        placeholder="Please input volume ${groupVolume[q % groupVolume.length].year}">
+                                    <span class="invalid-feedback"></span>
+                                </td>`;
+                }
+                htmlBody += `</tr>`
+            }
+            document.querySelector('#tblBodyProjectLifeEdit').innerHTML = htmlBody;
         }
     }
-
     async function changeRequirement() {
         let data = $('#selRequirementEdit option:selected').text();
         if (data == 'Other') {
@@ -1041,7 +997,6 @@
             $('#inpOtherSubjectEdit').prop('disabled', true);
         }
     }
-
     async function changeEnclosures() {
         let data = $('#inpEnclosuresEdit option:selected').text();
 
@@ -1052,15 +1007,21 @@
             $('#inpOtherEnclosuresEdit').prop('disabled', true);
         }
     }
-
     async function btnTable(type) {
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+            const popover = bootstrap.Popover.getInstance(el);
+            if (popover) popover.dispose();
+        });
         dataTable
             .columns(5)
             .search(type)
             .draw();
     }
-
     async function ViewAll() {
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+            const popover = bootstrap.Popover.getInstance(el);
+            if (popover) popover.dispose();
+        });
         $('#inpImportFrom').prop('selectedIndex', 0);
         $('#inpCustomer').val($('#inpCustomer option:first').val()).trigger('change');
         $('#inpSearchDocNo').val('');
@@ -1069,11 +1030,10 @@
             .columns().search('')
             .draw();
     }
-
     async function listCustomer() {
         $.ajax({
             type: 'get',
-            url: 'http://192.168.161.106/etax_invoice_system_debug/api/customers',
+            url: 'http://192.168.161.106/etax_invoice_system/api/customers',
             success: function(result) {
                 var option_text = '<option value="" disabled selected>Choose Costomer Name</option>';
                 $.each(result, function(key, value) {
@@ -1085,7 +1045,6 @@
             }
         })
     }
-
     async function listImportfromView(id, type) {
         const url = `${API_URL}option/list_import`;
         const response = await fetch(url);
@@ -1109,9 +1068,8 @@
             }
         }
     }
-
     async function listCustomerView(name, type) {
-        const url = 'http://192.168.161.106/etax_invoice_system_debug/api/customers';
+        const url = 'http://192.168.161.106/etax_invoice_system/api/customers';
         const response = await fetch(url);
         const result = await response.json();
 
@@ -1136,7 +1094,6 @@
         const formElem = type === 'edit' ? document.querySelector('form[name="edit_form"]') : document.querySelector('form[name="view_edit_form"]');
         formElem.ir_customer.innerHTML = optionText;
     }
-
     async function filterData() {
         const elementId = event.target.id
         var customerType = $('#inpImportFrom').val();
@@ -1187,7 +1144,6 @@
             .search(docNo)
             .draw();
     }
-
     async function listTablePartNo(data, type) {
         let html = '';
         if (type == 'view') {
@@ -1204,19 +1160,26 @@
             for (let i = 0; i < data.length; i++) {
                 html += '<tr>';
                 html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="hidden" name="idi_id" value="' + data[i].idi_id + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_no" value="' + data[i].idi_item_no + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_name" value="' + data[i].idi_item_name + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_model" value="' + data[i].idi_model + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_remark" value="' + data[i].idi_remark + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div><button type="button" onclick="deletePartNoByItem(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnDeletePartNo" name="btnDeletePartNo" data-id="' + data[i].idi_id + '"><i class="ti ti-trash-x fs-6"></i></button></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_no" onchange="checkPartNo(event)" maxlength="50" value="' + data[i].idi_item_no + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_name" maxlength="100" value="' + data[i].idi_item_name + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_model" maxlength="50" value="' + data[i].idi_model + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_remark" maxlength="100" value="' + data[i].idi_remark + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div><button type="button" onclick="deleteRow(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnDeletePartNo" name="btnDeletePartNo" data-id="' + data[i].idi_id + '"><i class="ti ti-trash-x fs-6"></i></button></td>';
                 html += '</tr>';
+                groupPartData.push({
+                    idi_item_no: data[i].idi_item_no,
+                    idi_item_name: data[i].idi_item_name,
+                    idi_model: data[i].idi_model,
+                    idi_remark: data[i].idi_remark,
+                    ir_group_volume: data[i].ir_group_volume
+                });
             }
             html += '<tr>';
             html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="hidden" id="inpId" value="0"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartNo" placeholder="Part No"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartName" placeholder="Part Name"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpModel" placeholder="Model"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpRemark" placeholder="Remark"><span class="invalid-feedback"></span></div></td>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartNo" maxlength="50" placeholder="Part No"><span class="invalid-feedback"></span></div></td>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartName" maxlength="100" placeholder="Part Name"><span class="invalid-feedback"></span></div></td>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpModel" maxlength="50" placeholder="Model"><span class="invalid-feedback"></span></div></td>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpRemark" maxlength="100" placeholder="Remark"><span class="invalid-feedback"></span></div></td>';
             html += '<td><button type="button" onclick="addPartNoByItem(event)" class="btn mb-1 btn-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnAddPartNo" name="btnAddPartNo" data-id=""><i class="ti ti-plus fs-6"></i></button></td>';
             html += '</tr>';
             document.getElementById('tblEditBodyPartNo').innerHTML = html;
@@ -1232,9 +1195,12 @@
         const model = currentRow.querySelector('input[id="inpModel"]');
         const remark = currentRow.querySelector('input[id="inpRemark"]');
 
-        if ($('#tblEditBodyPartNo tr').length > 20) {
+        let proLife = document.getElementById('inpProjectLifeEdit');
+        let proTim = document.getElementById('inpProTim');
+
+        if ($('#tblEditBodyPartNo tr').length > 10) {
             Swal.fire({
-                html: "<h4>Cannot add more than 20 items.</h4>",
+                html: "<h4>Cannot add more than 10 items.</h4>",
                 icon: 'warning',
                 showClass: {
                     popup: 'animate__animated animate__fadeInDown'
@@ -1249,7 +1215,6 @@
             remark.value = "";
             return;
         }
-
         if (is_empty(partNo.value.trim())) {
             form_errValid(partNo, '*Plase Enter Part No.');
             return;
@@ -1268,61 +1233,92 @@
                 }
             }
         }
-
         form_defaultValid(partNo);
         form_defaultValid(partName);
         form_defaultValid(model);
 
         const tbody = document.getElementById('tblEditBodyPartNo');
         const newRow = document.createElement('tr');
+        const rowIndex = Array.from(tbody.querySelectorAll('tr')).length;
+
         newRow.innerHTML = `
         <td><div class="col"><input class="form-control text-center" type="hidden" name="idi_id" value="0"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="idi_item_no" value="${partNo.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="idi_item_name" value="${partName.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="idi_model" value="${model.value.trim()}"><span class="invalid-feedback"></span></div></td>
-        <td><div class="col"><input class="form-control text-center" type="text" name="idi_remark" value="${remark.value.trim()}"><span class="invalid-feedback"></span></div></td>
+        <td><div class="col"><input class="form-control text-center" type="text" name="idi_item_no" maxlength="50" value="${partNo.value.trim()}"><span class="invalid-feedback"></span></div></td>
+        <td><div class="col"><input class="form-control text-center" type="text" name="idi_item_name" maxlength="100" value="${partName.value.trim()}"><span class="invalid-feedback"></span></div></td>
+        <td><div class="col"><input class="form-control text-center" type="text" name="idi_model" maxlength="50" value="${model.value.trim()}"><span class="invalid-feedback"></span></div></td>
+        <td><div class="col"><input class="form-control text-center" type="text" name="idi_remark" maxlength="100" value="${remark.value.trim()}"><span class="invalid-feedback"></span></div></td>
         <td>
-            <button type="button" onclick="deletePartNoByItem(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm">
+            <button type="button" onclick="deleteRow(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm">
                 <i class="ti ti-trash-x fs-6"></i>
             </button>
         </td>`;
         tbody.insertBefore(newRow, currentRow);
+
+        if (tbody.appendChild(currentRow)) {
+            let html = ``;
+            html += `<tr>`;
+            html += `<td>${rowIndex}</td>`;
+            html += `<td name="part_no">${partNo.value.trim()}</td>`;
+            for (let q = 0; q <= parseInt(proLife.value); q++) {
+                html += `<td>
+                            <input type="number" class="form-control form-control-sm text-center" min="0" max="999999" data-id="0" data-year="${(parseInt(proTim.value) + q)}" placeholder="Please input volume ${(parseInt(proTim.value) + q)}">
+                            <span class="invalid-feedback"></span>
+                        </td>`;
+            }
+            html += `</tr>`;
+            document.querySelector('#tblBodyProjectLifeEdit').insertAdjacentHTML('beforeend', html);
+        }
+
+        groupPartData.push({
+            idi_item_no: partNo.value.trim(),
+            idi_item_name: partName.value.trim(),
+            idi_model: model.value.trim(),
+            idi_remark: remark.value.trim()
+        });
 
         currentRow.querySelector('input[placeholder="Part No"]').value = '';
         currentRow.querySelector('input[placeholder="Part Name"]').value = '';
         currentRow.querySelector('input[placeholder="Model"]').value = '';
         currentRow.querySelector('input[placeholder="Remark"]').value = '';
 
-        tbody.appendChild(currentRow);
     }
 
-    function deletePartNoByItem(event) {
-        const button = event.target.closest('button');
-        const row = button.closest('tr');
-        row.remove();
-    }
+    function deleteRow(event) {
+        const table = document.getElementById('tblPartNoEdit').querySelector('tbody');
+        const row = event.target.closest('tr');
+        const rowIndex = Array.from(table.rows).indexOf(row);
 
-    async function listTableProLife(data, type) {
-        let html = '';
-        if (type == 'view') {
-            for (let i = 0; i < data.length; i++) {
-                html += '<tr>';
-                html += '<td class="border-end">' + data[i].year + '</td>';
-                html += '<td>' + data[i].volume + '</td>';
-                html += '</tr>';
+        if (rowIndex !== -1) {
+            table.deleteRow(rowIndex);
+            if (rowIndex < groupPartData.length) {
+                groupPartData.splice(rowIndex, 1);
+                document.querySelector('#tblBodyProjectLifeEdit').innerHTML = '';
+                let htmlBody = '';
+                for (let i = 0; i < groupPartData.length; i++) {
+                    htmlBody += `<tr>`;
+                    htmlBody += `<td>${i + 1}</td>`;
+                    htmlBody += `<td name="part_no">${groupPartData[i].idi_item_no}</td>`;
+                    for (let q = 0; q < groupPartData[i].ir_group_volume.length; q++) {
+                        htmlBody += `<td>
+                                        <input type="number" class="form-control form-control-sm text-center" 
+                                            min="0" max="999999"
+                                            data-id="${groupPartData[i].ir_group_volume[q].idv_id}"
+                                            data-year="${groupPartData[i].ir_group_volume[q].idv_year}" 
+                                            placeholder="Please input volume ${groupPartData[i].ir_group_volume[q].idv_year}"
+                                            value="${groupPartData[i].ir_group_volume[q].idv_qty}">
+                                        <span class="invalid-feedback"></span>
+                                    </td>`;
+                    }
+                    htmlBody += `</tr>`;
+                }
+                document.querySelector('#tblBodyProjectLifeEdit').innerHTML = htmlBody;
+            } else {
+                console.error('Row index out of bounds for groupPartData');
             }
-            document.getElementById('tblViewBodyProjectLife').innerHTML = html;
         } else {
-            for (let i = 0; i < data.length; i++) {
-                html += '<tr>';
-                html += '<td class="border-end"><label class="form-label">' + data[i].year + '</label></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" value="' + data[i].volume + '"><span class="invalid-feedback"></span></div></td>';
-                html += '</tr>';
-            }
-            document.getElementById('tblBodyProjectLifeEdit').innerHTML = html;
+            console.error('Invalid row index');
         }
     }
-
     async function listSubjectView(name, type) {
         const url = `${API_URL}option/list_mrt`;
         const response = await fetch(url);
@@ -1443,7 +1439,6 @@
                                 success: function(data) {
                                     if (!data.Error) {
                                         referRFQ(data, '( Edit Form )');
-                                        listTablePartNo(data.ir_group_part, 'edit');
                                         resolve(data);
                                     } else {
                                         reject(data.Error);
@@ -1487,6 +1482,7 @@
         $('#mdlEdit').modal('show');
 
         $('#mdlEdit').on('hidden.bs.modal', function() {
+            groupPartData = [];
             const formElements = document.edit_form.querySelectorAll('input, select, textarea');
             formElements.forEach(element => {
                 form_defaultValid(element);
@@ -1527,11 +1523,13 @@
                                 success: function(data) {
                                     if (!data.Error) {
                                         referRFQ(data, '( View Only )');
-                                        listTablePartNo(data.ir_group_part, 'edit');
+                                        setTimeout(() => {
+                                            document.querySelectorAll('#edit_form input, #edit_form select, #edit_form textarea, #edit_form button')
+                                                .forEach(element => element.disabled = true);
+                                            $('#btnSaveChange').hide();
+                                            $('#edit_form *').css('cursor', 'not-allowed');
+                                        }, 500);
                                         resolve(data);
-                                        document.querySelectorAll('#edit_form input, #edit_form select,  #edit_form textarea, #edit_form button').forEach(element => element.disabled = true);
-                                        $('#btnSaveChange').hide();
-                                        $('#edit_form *').css('cursor', 'not-allowed');
                                     } else {
                                         reject(data.Error);
                                     }
@@ -1574,6 +1572,7 @@
         $('#mdlEdit').modal('show');
 
         $('#mdlEdit').on('hidden.bs.modal', function() {
+            groupPartData = [];
             const formElements = document.edit_form.querySelectorAll('input, select, textarea');
             formElements.forEach(element => {
                 form_defaultValid(element);
@@ -1946,7 +1945,7 @@
                 const nbcCheck = result.value.nbcCheck;
                 const feasibilityCheck = result.value.feasibilityCheck;
                 const intReplydate = result.value.intReplydate;
-                const createDate = '<?php echo date('Y-m-d H:i:s'); ?>';
+                const createDate = dayjs().format("YYYY-MM-DD HH:mm:ss");
                 const userID = '<?php echo $this->session->userdata('sessUsr'); ?>';
                 var data = {
                     nbcCheck: nbcCheck,
@@ -2010,7 +2009,10 @@
         } else if (status == 2) {
             return '<span class="badge bg-warning-subtle text-warning fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-clock-hour-4 fs-4"></i>Wait Approve</span>';
         } else if (status == 6) {
-            return '<span class="badge text-perple fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #ffafbb !important; color: #C7253E !important"><i class="ti ti-repeat-off fs-4"></i>Rejected</span>';
+            return `<span class="badge text-perple fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #ffafbb !important; color: #C7253E !important" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="top" data-bs-content="${id}">
+                        <i class="ti ti-repeat-off fs-4"></i>
+                        Rejected
+                    </span>`;
         } else if (status == 9) {
             return '<span class="badge bg-success-subtle text-success fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-check fs-4"></i>Approved</span>';
         } else if (status == 5) {
@@ -2093,6 +2095,10 @@
     function searchDate() {
         event.preventDefault();
         if ($.fn.DataTable.isDataTable('#tblRFQ')) {
+            document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+                const popover = bootstrap.Popover.getInstance(el);
+                if (popover) popover.dispose();
+            });
             $('#tblRFQ').DataTable().destroy();
         }
         let stratDate = $('#startDate').val();
@@ -2139,18 +2145,20 @@
                     data: 'idc_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<div class="d-flex justify-content-around gap-1">' +
+                            let disp = '<div class="d-flex justify-content-around gap-1">' +
                                 '<button type="button" onclick="modalPartno(\'' + row.idc_id + '\' , \'' + row.idc_running_no + '\', \'' + row.idc_refer_doc + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
                                 '</div>';
+                            return disp;
                         }
-                        return disp;
+                        return '';
                     }
                 },
                 {
                     className: 'text-center',
                     data: 'idc_status',
                     "render": function(data, type, row) {
-                        return showStatus(row.idc_status);
+                        const msg_reject = row.reject_message?.trim() ? row.reject_message : "No reason was given for rejection of this document.";
+                        return showStatus(row.idc_status, msg_reject);
                     }
                 },
                 {
@@ -2162,18 +2170,18 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'idc_created_by',
+                    data: 'idc_updated_by',
                     "render": function(data, type, row) {
                         if (type === 'display') {
                             if (row.create_by != "") {
-                                let emp_code = row.idc_created_by.substring(2, 7);
+                                let emp_code = row.idc_updated_by.substring(2, 7);
                                 let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
                                 disp = '<div class="d-flex align-items-center justify-content-center">' +
-                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" onerror="this.onerror=null; this.src="assets/images/logo/user-2.png" width="35">' +
                                     '<div class="ms-3">' +
                                     '<div class="user-meta-info">' +
                                     '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + '</h6>' +
-                                    '<span class="user-work fs-3" data-occupation="' + row.idc_created_by + '">' + row.idc_created_by + '</span>' +
+                                    '<span class="user-work fs-3" data-occupation="' + row.idc_updated_by + '">' + row.idc_updated_by + '</span>' +
                                     '</div></div></div>';
                             } else {
                                 disp = "";
@@ -2206,6 +2214,9 @@
             tooltipTriggerList.forEach(function(tooltipTriggerEl) {
                 new bootstrap.Tooltip(tooltipTriggerEl);
             });
+            document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+                new bootstrap.Popover(el);
+            });
         });
     }
 
@@ -2225,6 +2236,14 @@
             'line-height': '35px',
         });
 
+        $(document).on('click', function(e) {
+            document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+                const popover = bootstrap.Popover.getInstance(el);
+                if (popover && !el.contains(e.target) && !document.querySelector('.popover')?.contains(e.target)) {
+                    popover.hide();
+                }
+            });
+        });
 
         if ($.fn.DataTable.isDataTable('#tblRFQ')) {
             $('#tblRFQ').DataTable().destroy();
@@ -2273,18 +2292,20 @@
                     data: 'idc_id',
                     "render": function(data, type, row) {
                         if (type === 'display') {
-                            disp = '<div class="d-flex justify-content-around gap-1">' +
+                            let disp = '<div class="d-flex justify-content-around gap-1">' +
                                 '<button type="button" onclick="modalPartno(\'' + row.idc_id + '\' , \'' + row.idc_running_no + '\', \'' + row.idc_refer_doc + '\')" class="btn bg-secondary-subtle text-secondary waves-effect" data-bs-toggle="modal" data-bs-target="#mdlPartNo"> <i class="ti ti-augmented-reality" style="font-size: 1.5rem !important;"></i></button>' +
                                 '</div>';
+                            return disp;
                         }
-                        return disp;
+                        return '';
                     }
                 },
                 {
                     className: 'text-center',
                     data: 'idc_status',
                     "render": function(data, type, row) {
-                        return showStatus(row.idc_status);
+                        const msg_reject = row.reject_message?.trim() ? row.reject_message : "No reason was given for rejection of this document.";
+                        return showStatus(row.idc_status, msg_reject);
                     }
                 },
                 {
@@ -2296,19 +2317,21 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'idc_created_by',
+                    data: 'idc_updated_by',
                     "render": function(data, type, row) {
                         if (type === 'display') {
                             if (row.create_by != "") {
-                                let emp_code = row.idc_created_by.substring(2, 7);
+                                let emp_code = row.idc_updated_by.substring(2, 7);
                                 let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
+                                let img_error = '<?php echo base_url() ?>' + 'assets/images/logos/user-3.png';
                                 disp = '<div class="d-flex align-items-center justify-content-center">' +
-                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" width="35">' +
+                                    '<img src="' + img_ok + '" alt="avatar" class="rounded-circle avatar" onerror="this.onerror=null; this.src=\'' + img_error + '\'" width="35">' +
                                     '<div class="ms-3">' +
                                     '<div class="user-meta-info">' +
                                     '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + '</h6>' +
-                                    '<span class="user-work fs-3" data-occupation="' + row.idc_created_by + '">' + row.idc_created_by + '</span>' +
+                                    '<span class="user-work fs-3" data-occupation="' + row.idc_updated_by + '">' + row.idc_updated_by + '</span>' +
                                     '</div></div></div>';
+
                             } else {
                                 disp = "";
                             }
@@ -2339,6 +2362,9 @@
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.forEach(function(tooltipTriggerEl) {
                 new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+                new bootstrap.Popover(el);
             });
         });
         setInterval(function() {

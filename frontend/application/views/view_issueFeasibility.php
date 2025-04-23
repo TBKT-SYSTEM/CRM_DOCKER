@@ -99,7 +99,7 @@
                                 <div class="row" style="padding: 15px;">
                                     <div class="col-md-7 d-flex">
                                         <h4 class="fs-5 fw-semibold me-2">Section 2 : Item Information</h4>
-                                        <label class="fs-3 fw-semibold">( Max 20 Items )</label>
+                                        <label class="fs-3 fw-semibold">( Max 10 Items )</label>
                                     </div>
                                     <hr class="mb-4">
                                     <div class="col-lg-12">
@@ -138,25 +138,25 @@
                                                         </td>
                                                         <td>
                                                             <div class="col">
-                                                                <input class="form-control text-center shadow-sm" type="text" id="inpPartNo" placeholder="Part No">
+                                                                <input class="form-control text-center shadow-sm" type="text" id="inpPartNo" maxlength="50" placeholder="Part No">
                                                                 <span class="invalid-feedback"></span>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div class="col">
-                                                                <input class="form-control text-center shadow-sm" type="text" id="inpPartName" placeholder="Part Name">
+                                                                <input class="form-control text-center shadow-sm" type="text" id="inpPartName" maxlength="100" placeholder="Part Name">
                                                                 <span class="invalid-feedback"></span>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div class="col">
-                                                                <input class="form-control text-center shadow-sm" type="text" id="inpModel" placeholder="Model">
+                                                                <input class="form-control text-center shadow-sm" type="text" id="inpModel" maxlength="50" placeholder="Model">
                                                                 <span class="invalid-feedback"></span>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div class="col">
-                                                                <input class="form-control text-center shadow-sm" type="text" id="inpRemark" placeholder="Remark">
+                                                                <input class="form-control text-center shadow-sm" type="text" id="inpRemark" maxlength="100" placeholder="Remark">
                                                                 <span class="invalid-feedback"></span>
                                                             </div>
                                                         </td>
@@ -199,9 +199,9 @@
         const model = currentRow.querySelector('input[id="inpModel"]');
         const remark = currentRow.querySelector('input[id="inpRemark"]');
 
-        if ($('#tblEditBodyPartNo tr').length > 20) {
+        if ($('#tblEditBodyPartNo tr').length > 10) {
             Swal.fire({
-                html: "<h4>Cannot add more than 20 items.</h4>",
+                html: "<h4>Cannot add more than 10 items.</h4>",
                 icon: 'warning',
                 showClass: {
                     popup: 'animate__animated animate__fadeInDown'
@@ -325,7 +325,7 @@
                     await listTablePartNo(data.ir_group_part, 'edit');
                     groupPart = data.ir_group_part;
                     mdt_id = data.mdt_id;
-                    $('#add_form input, #add_form button, #add_form select').not('#inpRefRfq, #btnSaveChange').prop('disabled', true);
+                    $('#add_form input, #add_form button, #add_form select').not('#btnSaveChange').prop('disabled', true);
                     Swal.close();
                 },
                 error: function(xhr, status, error) {
@@ -417,7 +417,7 @@
     async function listCustomer() {
         $.ajax({
             type: 'get',
-            url: 'http://192.168.161.106/etax_invoice_system_debug/api/customers',
+            url: 'http://192.168.161.106/etax_invoice_system/api/customers',
             success: function(result) {
                 var option_text = '<option value="" disabled selected>Choose Costomer Name</option>';
                 $.each(result, function(key, value) {
@@ -461,7 +461,7 @@
         }
     }
 
-    async function saveChange(mdt_id) {
+    async function saveChange() {
         if (isProcessing) return;
         isProcessing = true;
 
@@ -558,6 +558,14 @@
             confirmButtonText: 'Yes, Add it.!'
         }).then((result) => {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Loading...',
+                    text: 'Please wait while we submit the data...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                })
                 $('#add_form input, #add_form button, #add_form select').not('#inpOtherSubjectEdit').prop('disabled', false);
                 var add_form = {};
                 $('#add_form').serializeArray().forEach(function(item) {
@@ -599,6 +607,7 @@
                     url: API_URL + 'feasibility/insert',
                     data: JSON.stringify(add_form),
                     success: function(data) {
+                        Swal.close();
                         if (data.Error != "null" || data.Error != "") {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Add Feasibility success!</p>",

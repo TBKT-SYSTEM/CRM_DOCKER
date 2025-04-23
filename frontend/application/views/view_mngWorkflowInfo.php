@@ -678,6 +678,8 @@
                 var status_form = {};
                 status_form["swd_id"] = id;
                 status_form["swd_status"] = status;
+                status_form["swd_updated_date"] = getTimeNow();
+                status_form["swd_updated_by"] = "<?php echo $this->session->userdata('sessUsr') ?>";
                 $.ajax({
                     type: 'PUT',
                     dataType: 'json',

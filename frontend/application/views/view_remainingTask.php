@@ -306,7 +306,7 @@
         if (doc_type == 'RFQ') {
             $.ajax({
                 type: 'get',
-                url: API_URL + 'doc/runno/' + run_no, // ส่งค่า run_no ใน URL
+                url: API_URL + 'doc/runno/' + run_no,
                 success: async function(result) {
                     let param = {
                         ...result
@@ -349,14 +349,14 @@
                 url: API_URL + 'doc/runno/' + run_no,
                 success: async function(result) {
                     console.log(result);
-                    
+
                     let param = {
                         ...result
                     };
 
                     let IssueDate = param.idc_created_date.split(" ")[0];
                     param.idc_created_date = formatDate(IssueDate);
-                    
+
                     let Duedate = param.idc_closing_date.split(" ")[0];
                     param.idc_closing_date = formatDate(Duedate);
 
@@ -501,14 +501,14 @@
             ajax: {
                 url: API_URL + 'remainTask/table/' + '<?php echo $this->session->userdata('sessUsrId'); ?>',
                 dataSrc: function(json) {
-                    let data = (json.data || []).filter(item => {
-                        if (item.doc_type == "FS") {
-                            return true;
-                        }
-                        return item.ida_prev_action !== 0;
-                    });
+                    const data = (json.data || []).filter(item =>
+                        item.doc_type === "FS" ||
+                        item.ida_prev_action === 1 ||
+                        (item.doc_type === "RFQ" && item.ida_seq_no === 1 && item.ida_prev_action === 0) ||
+                        (item.doc_type === "NBC" && item.ida_seq_no === 1 && item.ida_prev_action === 0)
+                    );
                     let html = '';
-                    if (json.data == null || json.data.length === 0) {
+                    if (json.data == null || json.data.length == 0) {
                         html += `<div class="alert alert-light-success bg-success-subtle text-success" role="alert">
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="ti ti-mood-wink text-success me-2" style="font-size: 3rem !important;"></i>
@@ -530,7 +530,6 @@
                     $('#box_alert').html(html);
                     return data || [];
                 }
-
             },
             columnDefs: [{
                 searchable: true,

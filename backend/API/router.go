@@ -9,7 +9,7 @@ func Routy() {
 	router := gin.Default()
 	router.Use(cors.Default())
 
-	router.POST("/login/login", LoginNew)
+	router.POST("/login/login", Login)
 	router.POST("/login/username_unique", UsernameIsUnique)
 	router.POST("/log/login", LogLogin)
 	router.POST("/log/logout", LogLogout)
@@ -89,7 +89,7 @@ func Routy() {
 	router.PUT("/feasibility/saveScore", SaveScore)
 	router.PUT("/feasibility/cancel/:id/:reason/:userID", CancelDocument)
 	router.PUT("/feasibility/reverse/:id/:userID", ReverseDocument)
-	router.PUT("/feasibility/submit/:id", SubmitFeasibility)
+	router.PUT("/feasibility/submit/:id", NewSubmitFeasibility)
 
 	router.GET("/feasibilityHistory/table", ListFeasibilityTableHistory)
 	router.GET("/feasibilityHistory/tableDate/:date", ListFeasibilityTableHistoryDate)
@@ -109,7 +109,7 @@ func Routy() {
 	router.PUT("/rfq/reverse/:id/:userID", ReverseDocument)
 	router.PUT("/rfq/submit/:id", SubmitRfq)
 
-	router.GET("/nbc/table/:id/:stratDate/:endDate", ListNbcTable)
+	router.GET("/nbc/table/:id/:startDate/:endDate", ListNbcTable)
 	router.PUT("/nbc/cancel/:id/:reason/:userID", CancelDocument)
 	router.PUT("/nbc/reverse/:id/:userID", ReverseDocument)
 	router.GET("/nbc/:id", GetNBC)
@@ -118,6 +118,13 @@ func Routy() {
 	router.PUT("/nbc/submit/:id", SubmitNbc)
 
 	router.GET("/remainTask/table/:id", GetRemainTask)
+	router.GET("/manageTask/table", GetManageTask)
+	router.GET("/manageTask/searchDate/:startDate/:endDate", ListSearchManageTask)
+	router.GET("/manageTask/viewAll/:startDate/:endDate", ListSearchManageTask)
+
+	router.GET("/manageApproval/table/:id", GetManageApproval)
+	router.GET("/manageApproval/searchDate/:startDate/:endDate/:id", ListSearchManageApproval)
+	router.GET("/manageApproval/viewAll/:startDate/:endDate/:id", ListSearchManageApproval)
 
 	router.GET("/manage_feasibility/table/:id", ListManageFeasibilityTable)
 	router.GET("/manage_feasibility/table_consern/:if_id/:sd_id", ListConsiderationScoreByid)
@@ -140,6 +147,16 @@ func Routy() {
 
 	router.GET("/side_menu/side_menuGroup/:id", SideMenuGroup)
 	router.GET("/side_menu/side_menuDetail/:id", SideMenuDetail)
+
+	router.POST("/meeting/insert", InsertMeeting)
+	router.PUT("/meeting/edit", EditMeeting)
+	router.GET("/meeting/:id", GetMeeting)
+	router.GET("/meeting/table", ListMeetingTable)
+	router.GET("/meeting/viewAll", ListMeetingViewAll)
+	router.GET("/meeting/searchDate/:startDate", ListMeetingSearch)
+	router.PUT("/meeting/cancel/:id/:reason/:userID", CancelMeeting)
+	router.PUT("/meeting/reverse/:id/:userID", ReverseMeeting)
+	router.PUT("/meeting/close/:id/:userID", CloseMeeting)
 
 	router.GET("/option/list_plant", ListPlant)
 	router.GET("/option/list_spg", ListPermissionGroup)
@@ -164,6 +181,7 @@ func Routy() {
 	router.GET("/option/list_mde", ListEnclosures)
 	router.GET("/option/last_seq", LastSequence)
 	router.GET("/option/list_doc_rfq", ListDocRfq)
+	router.GET("/option/list_doc", ListDoc)
 
 	router.GET("/view/feas_score/:id", ListConsiderationScore)
 	router.GET("/view/in_dept", ListIncharge)
@@ -176,6 +194,15 @@ func Routy() {
 	router.POST("/email/userdata", EmailUserData)
 	// router.GET("/send/mail", SendMail)
 	// router.GET("/send/mail", TestSendMail)
+
+	router.GET("/dashboard/getDone/:year", GetDone)
+	router.GET("/dashboard/getPending/:year", GetPending)
+	router.GET("/dashboard/docPending/:docNo", GetDocPending)
+	router.GET("/dashboard/getDelay/:year", GetDelay)
+	router.GET("/dashboard/docDelay/:docNo", GetDocDelay)
+	router.GET("/dashboard/getCancel/:year", GetCancel)
+	router.GET("/dashboard/getCsutomer/:year", GetCustomer)
+	router.GET("/dashboard/getDate/:docNo", GetDate)
 
 	router.PUT("/email/approve_email/:documentId/:idaId/:caseType", ApproveByEmail)
 	router.PUT("/email/reject_email/:documentId/:idaId/:reason/:caseType", RejectByEmail)

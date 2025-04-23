@@ -198,6 +198,7 @@
     async function editScore(mc_id, if_id, element) {
         event.preventDefault();
         let chk = await scoring_validate(element);
+        console.log(chk);
         if (chk) {
             var sending = {};
             sending['mc_id'] = mc_id;

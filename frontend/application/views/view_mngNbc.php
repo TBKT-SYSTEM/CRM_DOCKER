@@ -69,6 +69,7 @@
                                     <div class="d-flex align-items-center flex-nowrap">
                                         <label class="text-dark fw-semibold fs-3 me-3">Status :</label>
                                         <button class="btn btn-sm bg-secondary text-white card-hover me-2 shadow-sm" onclick="btnTable('open')">Open</button>
+                                        <button class="btn btn-sm bg-warning text-white card-hover me-2 shadow-sm" style="background-color:rgb(255, 103, 35) !important;" onclick="btnTable('in progress')">In Progress</button>
                                         <button class="btn btn-sm bg-warning text-white card-hover me-2 shadow-sm" onclick="btnTable('wait approve')">Wait Approve</button>
                                         <button class="btn btn-sm bg-danger text-white card-hover shadow-sm me-2" style="background-color: #C7253E !important;" onclick="btnTable('Rejected')">Rejected</button>
                                         <button class="btn btn-sm bg-success text-white card-hover shadow-sm me-2" onclick="btnTable('Approved')">Approved</button>
@@ -154,7 +155,7 @@
 <div class="modal fade" id="mdlEdit" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header d-flex flex-wrap gap-3 mt-3">
+            <div class="modal-header d-flex flex-wrap gap-3 mt-3 mx-4">
                 <div class="d-flex align-items-center flex-grow-1 me-2">
                     <label class="col-auto fs-5 text-dark fw-semibold me-2" id="myLargeModalLabel">NBC Document No.</label>
                     <input type="text" class="form-control flex-grow-1 shadow-sm" id="inpDocNoEdit" name="idc_running_no_edit" value="" placeholder="RFQ Document No." disabled>
@@ -246,45 +247,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-------------------------- Purchase Cost ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center d-none" name="mdpu_group">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Purchase Cost :</h4>
-                                                </div>
-                                                <?php
-                                                $option_topic = $this->ManageBackend->list_option("option/list_mdpu");
-                                                foreach ($option_topic as $topic) {
-                                                    echo '<div class="col-md-2">';
-                                                    echo '<input type="checkbox" class="form-check-input me-2" name="ir_mdpu[]" id="' . $topic['mdpu_id'] . '">';
-                                                    echo '<label class="form-check-label fw-semibold" for="inpAttn' . $topic['mdpu_id'] . '">' . $topic['mdpu_name'] . '</label>';
-                                                    echo '</div>';
-                                                }
-                                                ?>
-                                            </div>
-                                            <span class="invalid-feedback"></span>
-                                            <!-------------------------- Process Cost ---------------------------->
-                                            <div class="d-flex col-md-12 mb-3 align-items-center d-none" name="mdpc_group">
-                                                <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Process Cost :</h4>
-                                                </div>
-                                                <?php
-                                                $option_topic = $this->ManageBackend->list_option("option/list_mdpc");
-                                                foreach ($option_topic as $topic) {
-                                                    if (strlen($topic['mdpc_name']) > 14) {
-                                                        echo '<div class="col-md-3">';
-                                                        echo '<input type="checkbox" class="form-check-input me-2" name="ir_mdpc[]" id="' . $topic['mdpc_id'] . '">';
-                                                        echo '<label class="form-check-label fw-semibold col-auto" for="inpAttn' . $topic['mdpc_id'] . '">' . $topic['mdpc_name'] . '</label>';
-                                                        echo '</div>';
-                                                    } else {
-                                                        echo '<div class="col-md-2">';
-                                                        echo '<input type="checkbox" class="form-check-input me-2" name="ir_mdpc[]" id="' . $topic['mdpc_id'] . '">';
-                                                        echo '<label class="form-check-label fw-semibold col-auto" for="inpAttn' . $topic['mdpc_id'] . '">' . $topic['mdpc_name'] . '</label>';
-                                                        echo '</div>';
-                                                    }
-                                                }
-                                                ?>
-                                            </div>
-                                            <span class="invalid-feedback"></span>
                                             <!-------------------------- Note ---------------------------->
                                             <div class="d-flex col-md-12 mb-3 d-none">
                                                 <div class="col-md-2">
@@ -351,97 +313,58 @@
                                                 </table>
                                             </div>
 
-                                            <div class="row d-flex">
-                                                <!-- Volume Information -->
-                                                <div class="col-md-6">
-                                                    <h4 class="fs-5 fw-semibold me-2">Volume Information</h4>
-                                                    <div class="table-responsive border rounded mb-5 shadow-sm">
-                                                        <table class="table text-wrap mb-0 align-middle text-center" id="tblProjectLifeEdit">
-                                                            <thead class="text-dark fs-4">
-                                                                <tr>
-                                                                    <th class="border-bottom-0 border-end">
-                                                                        <h6 class="fw-semibold mb-0">Year</h6>
-                                                                    </th>
-                                                                    <th class="border-bottom-0">
-                                                                        <h6 class="fw-semibold mb-0">Volume</h6>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody class="border-top text-wrap" id="tblBodyProjectLifeEdit">
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
+                                            <!-- Volume Information -->
+                                            <h4 class="fs-5 fw-semibold me-2">Volume Information</h4>
+                                            <div class="table-responsive mb-3" style="overflow-x: auto;">
+                                                <table class="table table-bordered text-wrap mb-0 align-middle text-center" id="tblProjectLifeEdit">
+                                                    <thead class="text-dark fs-4">
+                                                        <tr>
+                                                            <th class="border-bottom-0 align-middle" rowspan="2">
+                                                                <h6 class="fw-semibold mb-0">No.</h6>
+                                                            </th>
+                                                            <th class="border-bottom-0 align-middle" rowspan="2">
+                                                                <h6 class="fw-semibold mb-0">Part No.</h6>
+                                                            </th>
+                                                            <th class="border-bottom-0 align-middle" id="tlbHeadProjectLifeEdit">
+                                                                <h6 class="fw-semibold mb-0">Year/Volume</h6>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="border-top text-wrap" id="tblBodyProjectLifeEdit">
+                                                    </tbody>
+                                                </table>
+                                            </div>
 
-                                                <!-- R&D Note/Comment -->
-                                                <div class="col-md-6">
-                                                    <h4 class="fs-5 fw-semibold me-2">R&D Note/Comment :</h4>
-                                                    <div class="d-flex col-md-12 gap-3 mb-3">
-                                                        <textarea name="idc_note2" class="form-control shadow-sm" rows="4" id="inpCommentEdit"></textarea>
-                                                        <span class="invalid-feedback"></span>
-                                                    </div>
-                                                    <h4 class="fs-5 fw-semibold me-2">R&D Attach File :</h4>
-                                                    <div class="container card-hover" style="margin-top: 0.75rem !important;" id="boxFile">
-                                                        <input type="file" class="filepond" name="inaf_file" id="file_nbc" />
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex justify-content-end gap-3">
-                                                    <button type="reset" class="btn bg-warning-subtle text-warning waves-effect text-start" data-bs-dismiss="modal" style="cursor: pointer;">Close</button>
-                                                    <button type="button" onclick="saveNbc()" id="btnSaveNbc" class="btn bg-success-subtle text-success waves-effect text-start" style="cursor: pointer;">Save NBC</button>
+                                            <!-- R&D Note/Comment -->
+                                            <h4 class="fs-5 fw-semibold me-2">R&D Note/Comment :</h4>
+                                            <div class="d-flex col-md-12 mb-3">
+                                                <div class="d-flex col-md-12 gap-3 mb-3">
+                                                    <textarea name="idc_note2" class="form-control shadow-sm" rows="4" id="inpCommentEdit"></textarea>
+                                                    <span class="invalid-feedback"></span>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <!------------------------------------------------------ Section 2  -------------------------------------------------------->
-                                    <div class="card d-none">
-                                        <div class="card-body">
-                                            <div class="row" style="padding: 15px;">
-                                                <div class="row" style="padding: 15px;">
-                                                    <div class="col-md-7">
-                                                        <h4 class="fs-5 fw-semibold">Section 3 : Volume Information</h4>
-                                                    </div>
+                                            <h4 class="fs-5 fw-semibold me-2">R&D Attach File :</h4>
+                                            <div class="d-flex col-md-12 mb-3">
+                                                <div class="container card-hover" style="margin-top: 0.75rem !important;" id="boxFile">
+                                                    <input type="file" class="filepond" name="inaf_file" id="file_nbc" />
                                                 </div>
-                                                <div class="row" style="padding: 15px;">
-
-                                                    <!-------------------------- Project Life ---------------------------->
-                                                    <div class="d-flex col-md-12 mb-3 align-items-center gap-5">
-                                                        <div class="d-flex col-md-4 align-items-center">
-                                                            <label for="" class="col-md-auto form-label fw-semibold me-3">Project Life :</label>
-
-                                                            <div class="col-md-6 me-3">
-                                                                <input type="number" min="1" max="10" class="form-control" id="inpProjectLifeEdit" name="idc_project_life" onchange="changeProLife()" placeholder="Enter Number ..." value="1">
-                                                                <div class="invalid-feedback">
-                                                                </div>
-                                                            </div>
-                                                            <label for="" class="col form-label fw-semibold">Years</label>
-                                                        </div>
-
-                                                        <div class="d-flex col-md-4 align-items-center">
-                                                            <label for="" class="col-md-auto form-label fw-semibold me-3">Program Timing Info :</label>
-                                                            <div class="col">
-                                                                <select class="select2 form-select" name="idc_project_start" id="inpProTim" onchange="changeProLife()">
-                                                                    <?php
-                                                                    echo '<option value="">Choose Year ...</option>';
-                                                                    $year_cur = (int)date('Y');
-                                                                    $year_end = $year_cur + 20;
-                                                                    for ($i = $year_cur; $i <= $year_end; $i++) {
-                                                                        echo '<option value="' . $i . '">' . $i . '</option>';
-                                                                    }
-                                                                    ?>
-                                                                </select>
-                                                                <span class="invalid-feedback"></span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                <div class="container" style="margin-top: 0.75rem !important;" id="boxDowload">
+                                                    <a href="" id="downloadFile" class="btn bg-success-subtle text-success waves-effect text-start" download>Download File</a>
                                                     <hr>
-                                                    <div class="col-12">
-                                                        <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
-                                                            <button type="button" class="btn bg-success-subtle text-success card-hover" id="btnSaveChange"><i class="ti ti-download me-2" style="font-size: 20px;"></i>Save Change</button>
-                                                        </div>
+                                                    <div class="col-md-12 d-flex align-items-center">
+                                                        <label class="fs-3 fw-semibold me-1 text-dark">Status :</label>
+                                                        <div class="spinner-grow spinner-grow-sm text-success me-2" role="status"></div>
+                                                        <label class="fs-2 fw-semibold me-3 text-success">Has file to download</label>
+                                                        <div class="spinner-grow spinner-grow-sm text-danger me-2" role="status"></div>
+                                                        <label class="fs-2 fw-semibold text-danger">No file to download</label>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="d-flex justify-content-end gap-3">
+                                                <button type="reset" id="btnCloseEdit" class="btn bg-warning-subtle text-warning waves-effect text-start" data-bs-dismiss="modal" style="cursor: pointer;">Close</button>
+                                                <button type="button" onclick="saveNbc()" id="btnSaveNbc" class="btn bg-success-subtle text-success waves-effect text-start" style="cursor: pointer;">Save NBC</button>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -478,6 +401,7 @@
     let isProcessing = false;
     var filePath = '';
     var physicalPath = '';
+    let groupPartData = [];
 
     document.addEventListener('DOMContentLoaded', function() {
         initializeDateInputs('startDate', 'endDate');
@@ -495,18 +419,27 @@
             confirmButtonText: 'Yes, submit it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                const idc_created_date = '<?php echo date('Y-m-d H:i:s'); ?>';
+                const idc_created_date = dayjs().format("YYYY-MM-DD HH:mm:ss");
                 const idc_created_by = '<?php echo $this->session->userdata('sessUsr'); ?>';
                 var data = {
                     idc_created_date: idc_created_date,
                     idc_created_by: idc_created_by
                 }
+                Swal.fire({
+                    title: 'Loading...',
+                    text: 'Please wait while we submit the data...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                })
                 $.ajax({
                     method: 'PUT',
                     url: API_URL + 'nbc/submit/' + id,
                     data: JSON.stringify(data),
                     dataType: 'json',
                     success: function(data) {
+                        Swal.close();
                         if (data != false) {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Submit NBC Success!</p>",
@@ -541,6 +474,7 @@
     }
 
     function viewEditModal(id) {
+        let userDept = '<?php echo $this->session->userdata('sessDeptId'); ?>';
         var idc_id_edit = '';
         var inaf_id = '';
         if ($('#mdlEdit').hasClass('show')) {
@@ -586,13 +520,31 @@
                                 success: function(data) {
                                     if (!data.Error) {
                                         referRFQ(data, '( Edit Form )');
-                                        listTablePartNo(data.ir_group_part, 'edit');
                                         resolve(data);
                                         document.querySelectorAll('#edit_form input, #edit_form select, #edit_form textarea').forEach(element => {
                                             element.disabled = true;
                                         });
+                                        const isAllowed = userDept == 19 || userDept == 37;
+                                        if (isAllowed) {
+                                            $('#inpCommentEdit').prop('disabled', false);
+                                            $('#btnSaveNbc').removeClass('d-none');
+                                            $('#boxDowload').addClass('d-none');
+                                        } else {
+                                            $('#inpCommentEdit').prop('disabled', true);
+                                            $('#btnSaveNbc').addClass('d-none');
+                                            $('#boxFile').addClass('d-none');
+                                            if (data.idc_file_path == "") {
+                                                $('#downloadFile').attr('href', 'javascript:void(0)');
+                                                $('#downloadFile').removeClass('bg-success-subtle text-success');
+                                                $('#downloadFile').addClass('bg-danger-subtle text-danger');
+                                            } else {
+                                                $('#downloadFile').attr('href', data.idc_file_path);
+                                                $('#downloadFile').removeClass('bg-danger-subtle text-danger');
+                                                $('#downloadFile').addClass('bg-success-subtle text-success');
+                                            }
+                                        }
                                         idc_id_edit = $('#inpIdcIdEdit').val();
-                                        $('#edit_form *').css('cursor', 'not-allowed');
+                                        $('#edit_form *:not(#downloadFile):not(#btnCloseEdit)').css('cursor', 'not-allowed');
                                         $('#btnSaveNbc').hide();
                                     } else {
                                         reject(data.Error);
@@ -682,6 +634,7 @@
         $('#mdlEdit').modal('show');
 
         $('#mdlEdit').on('hidden.bs.modal', function() {
+            groupPartData = [];
             filePath = '';
             physicalPath = '';
             document.querySelector('#boxFile').innerHTML = '';
@@ -692,6 +645,7 @@
                 form_defaultValid(element);
             });
             document.querySelectorAll('#edit_form input, #edit_form select,  #edit_form textarea, #edit_form button').forEach(element => element.disabled = false);
+            $('#edit_form *').css('cursor', 'default');
         });
     }
 
@@ -736,6 +690,8 @@
                                 }
                             }).then((result) => {
                                 if (result.isConfirmed) {
+                                    var dataTable = $('#tblNBC').DataTable();
+                                    dataTable.ajax.reload(null, false);
                                     $('#mdlEdit').modal('hide');
                                 }
                             })
@@ -751,6 +707,8 @@
                                 }
                             }).then((result) => {
                                 if (result.isConfirmed) {
+                                    var dataTable = $('#tblNBC').DataTable();
+                                    dataTable.ajax.reload(null, false);
                                     $('#mdlEdit').modal('hide');
                                 }
                             })
@@ -762,6 +720,10 @@
     }
 
     async function btnTable(type) {
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+            const popover = bootstrap.Popover.getInstance(el);
+            if (popover) popover.dispose();
+        });
         dataTable
             .columns(5)
             .search(type)
@@ -769,6 +731,10 @@
     }
 
     async function ViewAll() {
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+            const popover = bootstrap.Popover.getInstance(el);
+            if (popover) popover.dispose();
+        });
         $('#inpImportFrom').prop('selectedIndex', 0);
         $('#inpCustomer').val($('#inpCustomer option:first').val()).trigger('change');
         $('#inpSearchDocNo').val('');
@@ -806,7 +772,7 @@
     async function listCustomer() {
         $.ajax({
             type: 'get',
-            url: 'http://192.168.161.106/etax_invoice_system_debug/api/customers',
+            url: 'http://192.168.161.106/etax_invoice_system/api/customers',
             success: function(result) {
                 var option_text = '<option value="" disabled selected>Choose Costomer Name</option>';
                 $.each(result, function(key, value) {
@@ -903,8 +869,15 @@
             return '<span class="badge bg-info-subtle text-info fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-send fs-4"></i>Open</span>';
         } else if (status == 2) {
             return '<span class="badge bg-warning-subtle text-warning fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-clock-hour-4 fs-4"></i>Wait Approve</span>';
+        } else if (status == 3) {
+            return `<span class="badge text-perple fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color:#ff67233d !important; color: #ff6723 !important">
+                        <i class="ti ti-loader fs-4"></i> In progress
+                    </span>`;
         } else if (status == 6) {
-            return '<span class="badge text-perple fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #ffafbb !important; color: #C7253E !important"><i class="ti ti-repeat-off fs-4"></i>Rejected</span>';
+            return `<span class="badge text-perple fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm" style="background-color: #ffafbb !important; color: #C7253E !important" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="top" data-bs-content="${id}">
+                        <i class="ti ti-repeat-off fs-4"></i>
+                        Rejected
+                    </span>`;
         } else if (status == 9) {
             return '<span class="badge bg-success-subtle text-success fw-semibold fs-2 gap-1 d-inline-flex align-items-center shadow-sm"><i class="ti ti-check fs-4"></i>Approved</span>';
         } else if (status == 5) {
@@ -915,7 +888,20 @@
     }
 
     function showbtnAction(status, id, ) {
-        if (status == 1 || status == 6) {
+        if (status == 1) {
+            return `
+            <div class="d-flex justify-content-evenly gap-1">
+                <button type="button" onclick="editModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See/Edit">
+                    <i class="ti ti-pencil-minus" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
+                </button>
+                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
+                    <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
+                </button>
+                <button type="button" onclick="docCancel(${id})" class="btn bg-danger-subtle text-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel">
+                    <i class="ti ti-x" style="font-size: 1.5rem !important;"></i>
+                </button>
+            </div>`;
+        } else if (status == 3 || status == 6) {
             return `
             <div class="d-flex justify-content-evenly gap-1">
                 <button type="button" onclick="editModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See/Edit">
@@ -926,9 +912,6 @@
                 </button>
                 <button type="button" onclick="nbcSubmit(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Submit">
                     <i class="ti ti-check" style="font-size: 1.5rem !important;"></i>
-                </button>
-                <button type="button" onclick="docCancel(${id})" class="btn bg-danger-subtle text-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel">
-                    <i class="ti ti-x" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
         } else if (status == 2) {
@@ -1156,6 +1139,10 @@
     function searchDate() {
         event.preventDefault();
         if ($.fn.DataTable.isDataTable('#tblNBC')) {
+            document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+                const popover = bootstrap.Popover.getInstance(el);
+                if (popover) popover.dispose();
+            });
             $('#tblNBC').DataTable().destroy();
         }
         let stratDate = $('#startDate').val();
@@ -1213,7 +1200,8 @@
                     className: 'text-center',
                     data: 'idc_status',
                     "render": function(data, type, row) {
-                        return showStatus(row.idc_status);
+                        const msg_reject = row.reject_message?.trim() ? row.reject_message : "No reason was given for rejection of this document.";
+                        return showStatus(row.idc_status, msg_reject);
                     }
                 },
                 {
@@ -1268,6 +1256,9 @@
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.forEach(function(tooltipTriggerEl) {
                 new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+                new bootstrap.Popover(el);
             });
         });
     }
@@ -1341,30 +1332,6 @@
         $('#inpOtherEnclosuresEdit').prop('disabled', !isOtherEnclosures);
         $('#inpOtherEnclosuresEdit').val(isOtherEnclosures ? data.idc_enclosures_note : '');
 
-        const checkboxesIdpu = document.querySelectorAll('input[name="ir_mdpu[]"]');
-        checkboxesIdpu.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        data.idpu_item.forEach(id => {
-            checkboxesIdpu.forEach(checkbox => {
-                if (checkbox.id === id) {
-                    checkbox.checked = true;
-                }
-            });
-        });
-
-        const checkboxesIdpc = document.querySelectorAll('input[name="ir_mdpc[]"]');
-        checkboxesIdpc.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        data.idpc_item.forEach(id => {
-            checkboxesIdpc.forEach(checkbox => {
-                if (checkbox.id === id) {
-                    checkbox.checked = true;
-                }
-            });
-        });
-
         $('#inpNoteEdit').val(data.idc_note1);
         $('#inpCommentEdit').val(data.idc_note2);
         $('#inpDuedateEdit').val(data.idc_closing_date);
@@ -1374,22 +1341,47 @@
             select.value = data.idc_plant_cd;
         });
 
-        $('#inpProjectLifeEdit').val(data.idc_project_life);
+        await listTablePartNo(data.ir_group_part, 'edit');
 
+        $('#inpProjectLifeEdit').val(data.idc_project_life);
         const selectProgramStart = document.querySelectorAll('select[name="idc_project_start"]');
         selectProgramStart.forEach(select => {
             select.value = data.idc_project_start;
         });
 
-        const tableProLife = document.getElementById('tblProjectLifeEdit').querySelector('tbody');
-        let htmlProLife = '';
-        for (i = 0; i < data.ir_group_volume.length; i++) {
-            htmlProLife += '<tr>';
-            htmlProLife += '<td class="text-center col-6 border-end">' + data.ir_group_volume[i].idv_year + '</td>';
-            htmlProLife += '<td class="text-center col-6">' + data.ir_group_volume[i].idv_qty + '</td>';
-            htmlProLife += '</tr>';
+        if ($('#inpProjectLifeEdit').val() > 4) {
+            $('#tblProjectLifeEdit').css('min-width', '1800px');
+        } else {
+            $('#tblProjectLifeEdit').css('min-width', 'auto');
         }
-        tableProLife.innerHTML = htmlProLife;
+
+        $('#tblProjectLifeEdit thead tr:not(:first-child)').remove();
+        $('#tlbHeadProjectLifeEdit').attr('colspan', 0);
+        document.querySelector('#tblBodyProjectLifeEdit').innerHTML = '';
+
+        if (!is_empty(String(data.idc_project_life)) && !is_empty(String(data.idc_project_start))) {
+            $('#tlbHeadProjectLifeEdit').attr('colspan', parseInt(data.idc_project_life) + 1);
+            let html = '<tr>';
+            let year = parseInt(data.idc_project_start, 10);
+            for (let i = 0; i <= parseInt(data.idc_project_life, 10); i++) {
+                html += `<th class="border-bottom-0 align-middle">
+                    <h6 class="fw-semibold mb-0">${year + i}</h6>
+                </th>`;
+            }
+            html += '</tr>';
+            document.querySelector('#tblProjectLifeEdit thead').insertAdjacentHTML('beforeend', html);
+            let htmlBody = '';
+            for (let i = 0; i < groupPartData.length; i++) {
+                htmlBody += `<tr>`;
+                htmlBody += `<td>${i+1}</td>`
+                htmlBody += `<td name="part_no">${groupPartData[i].idi_item_no}</td>`
+                for (let q = 0; q < groupPartData[i].ir_group_volume.length; q++) {
+                    htmlBody += `<td>${groupPartData[i].ir_group_volume[q].idv_qty}</td>`;
+                }
+                htmlBody += `</tr>`
+            }
+            document.querySelector('#tblBodyProjectLifeEdit').innerHTML = htmlBody;
+        }
     }
 
     async function listTablePartNo(data, type) {
@@ -1412,12 +1404,20 @@
                 html += '<td class="text-center">' + data[i].idi_model + '</td>';
                 html += '<td class="text-center">' + data[i].idi_remark + '</td>';
                 html += '</tr>';
+                groupPartData.push({
+                    idi_item_no: data[i].idi_item_no,
+                    idi_item_name: data[i].idi_item_name,
+                    idi_model: data[i].idi_model,
+                    idi_remark: data[i].idi_remark,
+                    ir_group_volume: data[i].ir_group_volume
+                });
             }
             document.getElementById('tblEditBodyPartNo').innerHTML = html;
         }
     }
 
     function editModal(id) {
+        let userDept = '<?php echo $this->session->userdata('sessDeptId'); ?>';
         var idc_id_edit = '';
         var inaf_id = '';
         if ($('#mdlEdit').hasClass('show')) {
@@ -1463,7 +1463,6 @@
                                 success: function(data) {
                                     if (!data.Error) {
                                         referRFQ(data, '( Edit Form )');
-                                        listTablePartNo(data.ir_group_part, 'edit');
                                         resolve(data);
                                         document.querySelectorAll('#edit_form input, #edit_form select, #edit_form textarea').forEach(element => {
                                             if (element.name == 'inaf_file' || element.name == 'idc_note2') {
@@ -1472,6 +1471,27 @@
                                                 element.disabled = true;
                                             }
                                         });
+                                        const isAllowed = userDept == 19 || userDept == 37;
+                                        if (isAllowed) {
+                                            $('#inpCommentEdit').prop('disabled', false);
+                                            $('#btnSaveNbc').removeClass('d-none');
+                                            $('#boxDowload').addClass('d-none');
+                                        } else {
+                                            $('#inpCommentEdit').prop('disabled', true);
+                                            $('#btnSaveNbc').addClass('d-none');
+                                            $('#boxFile').addClass('d-none');
+                                            if (data.idc_file_path == "") {
+                                                $('#downloadFile').attr('href', 'javascript:void(0)');
+                                                $('#downloadFile').removeClass('bg-success-subtle text-success');
+                                                $('#downloadFile').addClass('bg-danger-subtle text-danger');
+                                                $('#downloadFile').html('<span class="ti ti-download-off me-1 fs-6"></span> Download File');
+                                            } else {
+                                                $('#downloadFile').attr('href', data.idc_file_path);
+                                                $('#downloadFile').removeClass('bg-danger-subtle text-danger');
+                                                $('#downloadFile').addClass('bg-success-subtle text-success');
+                                                $('#downloadFile').html('<span class="ti ti-download me-1 fs-6"></span> Download File');
+                                            }
+                                        }
                                         idc_id_edit = $('#inpIdcIdEdit').val();
                                     } else {
                                         reject(data.Error);
@@ -1539,6 +1559,7 @@
                             physicalPath = data.idc_physical_path;
                             filepond.addFile(data.idc_file_path);
                         }
+
                     })
                     .catch((error) => {
                         Swal.fire({
@@ -1561,6 +1582,7 @@
         $('#mdlEdit').modal('show');
 
         $('#mdlEdit').on('hidden.bs.modal', function() {
+            groupPartData = [];
             filePath = '';
             physicalPath = '';
             document.querySelector('#boxFile').innerHTML = '';
@@ -1590,6 +1612,14 @@
             'line-height': '35px',
         });
 
+        $(document).on('click', function(e) {
+            document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+                const popover = bootstrap.Popover.getInstance(el);
+                if (popover && !el.contains(e.target) && !document.querySelector('.popover')?.contains(e.target)) {
+                    popover.hide();
+                }
+            });
+        });
 
         if ($.fn.DataTable.isDataTable('#tblNBC')) {
             $('#tblNBC').DataTable().destroy();
@@ -1649,7 +1679,8 @@
                     className: 'text-center',
                     data: 'idc_status',
                     "render": function(data, type, row) {
-                        return showStatus(row.idc_status);
+                        const msg_reject = row.reject_message?.trim() ? row.reject_message : "No reason was given for rejection of this document.";
+                        return showStatus(row.idc_status, msg_reject);
                     }
                 },
                 {
@@ -1704,6 +1735,9 @@
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.forEach(function(tooltipTriggerEl) {
                 new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+                new bootstrap.Popover(el);
             });
         });
         setInterval(function() {

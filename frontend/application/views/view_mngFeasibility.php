@@ -210,7 +210,7 @@
                                         <div class="row" style="padding: 15px;">
                                             <div class="col-md-7 d-flex">
                                                 <h4 class="fs-5 fw-semibold me-2">Item Information</h4>
-                                                <label class="fs-3 fw-semibold">( Max 20 Items )</label>
+                                                <label class="fs-3 fw-semibold">( Max 10 Items )</label>
                                             </div>
                                             <hr class="mb-4">
                                             <div class="col-lg-12">
@@ -266,7 +266,7 @@
 <div class="modal fade" id="mdlScore" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-xxl modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header d-flex flex-wrap gap-3 mt-3">
+            <div class="modal-header d-flex flex-wrap gap-3 mt-3 px-5">
                 <div class="d-flex align-items-center flex-grow-1 me-2">
                     <label class="col-auto fs-5 text-dark fw-semibold me-2" id="myLargeModalLabel">FS Document No.</label>
                     <input type="text" class="form-control flex-grow-1 shadow-sm" id="inpDocNoEditScore" name="idc_running_no_edit" value="" placeholder="RFQ Document No." disabled>
@@ -275,6 +275,7 @@
                     <label class="col-auto fs-5 text-dark fw-semibold me-2" id="myLargeModalLabel">Refer RFQ Document No.</label>
                     <input type="text" class="form-control flex-grow-1 shadow-sm" id="inpDocNoRefEditScore" name="idc_refer_doc_edit" value="" placeholder="Ref RFQ Document No." disabled>
                 </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="background-color: #edededad !important;">
                 <div class="datatables">
@@ -376,7 +377,7 @@
                                             </div>
                                             <hr class="mt-3">
                                             <div class="d-flex justify-content-end mt-2">
-                                                <button type="button" onclick="fsSubmit()" id="btnSubmitScore" class="btn bg-info-subtle text-info waves-effect text-start rounded-pill" style="cursor: pointer;">Submit Feasibility</button>
+                                                <button type="button" onclick="fsSubmit()" id="btnSubmitScore" class="btn bg-info-subtle text-info waves-effect text-start rounded-pill d-none" style="cursor: pointer;">Submit Feasibility</button>
                                             </div>
                                         </div>
                                     </div>
@@ -457,7 +458,6 @@
     function fsSubmit() {
         event.preventDefault();
         let id = $('#inpIdcId').val();
-        console.log(id);
 
         Swal.fire({
             title: 'Are you sure?',
@@ -469,11 +469,12 @@
             confirmButtonText: 'Yes, submit it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                const idc_created_date = '<?php echo date('Y-m-d H:i:s'); ?>';
+                const idc_created_date = dayjs().format("YYYY-MM-DD HH:mm:ss");
                 const idc_created_by = '<?php echo $this->session->userdata('sessUsr'); ?>';
                 var data = {
                     idc_created_date: idc_created_date,
-                    idc_created_by: idc_created_by
+                    idc_created_by: idc_created_by,
+                    sd_id: <?php echo $this->session->userdata('sessDeptId') ?>
                 }
                 Swal.fire({
                     title: 'Loading...',
@@ -483,6 +484,7 @@
                         Swal.showLoading();
                     }
                 });
+
                 $.ajax({
                     method: 'PUT',
                     url: API_URL + 'feasibility/submit/' + id,
@@ -717,6 +719,14 @@
             confirmButtonText: 'Yes, save it.!'
         }).then((result) => {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Loading...',
+                    text: 'Please wait while we submit the data...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                })
                 var edit_form = {};
                 let groupCheckBoxAttn = [];
                 document.querySelectorAll('#edit_form input, #edit_form select, #edit_form button').forEach(element => element.disabled = false);
@@ -769,6 +779,7 @@
                     url: API_URL + 'feasibility/update',
                     data: JSON.stringify(edit_form),
                     success: function(data) {
+                        Swal.close();
                         if (data.Error != "null" || data.Error != "") {
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Updated Feasibility success!</p>",
@@ -918,7 +929,7 @@
     async function listCustomer() {
         $.ajax({
             type: 'get',
-            url: 'http://192.168.161.106/etax_invoice_system_debug/api/customers',
+            url: 'http://192.168.161.106/etax_invoice_system/api/customers',
             success: function(result) {
                 var option_text = '<option value="" disabled selected>Choose Costomer Name</option>';
                 $.each(result, function(key, value) {
@@ -1027,52 +1038,77 @@
     }
 
     function showbtnAction(status, id) {
+        let btnEdit, btnPreview, btnScore, btnCancle, btnReverse;
+        let dept = <?php echo $this->session->userdata('sessDeptId') ?>;
+        if (dept == 22) {
+            btnEdit = '';
+            btnPreview = '';
+            btnScore = '';
+            btnCancle = '';
+            btnReverse = '';
+        } else if (dept == 19 || dept == 31 || dept == 41 || dept == 47 || dept == 16 || dept == 20 || dept == 15) {
+            btnEdit = 'd-none';
+            btnPreview = '';
+            btnScore = '';
+            btnCancle = 'd-none';
+            btnReverse = 'd-none';
+        } else {
+            btnEdit = 'd-none';
+            btnPreview = 'd-none';
+            btnScore = 'd-none';
+            btnCancle = 'd-none';
+            btnReverse = '';
+        }
+
         if (status == 1 || status == 6) {
             return `
             <div class="d-flex justify-content-evenly gap-1">
-                <button type="button" onclick="editModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See/Edit">
+                <button type="button" onclick="editModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnEdit}" data-bs-toggle="tooltip" data-bs-placement="top" title="See/Edit">
                     <i class="ti ti-pencil-minus" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
                 </button>
-                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
+                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnPreview}" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
                     <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
                 </button>
-                <button type="button" onclick="editScore(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Score">
+                <button type="button" onclick="editScore(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnScore}" data-bs-toggle="tooltip" data-bs-placement="top" title="Score">
                     <i class="ti ti-thumb-up" data-bs-target="#mdlScore" data-bs-toggle="modal"  style="font-size: 1.5rem !important;"></i>
                 </button>
-                <button type="button" onclick="docCancel(${id})" class="btn bg-danger-subtle text-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel">
+                <button type="button" onclick="docCancel(${id})" class="btn bg-danger-subtle text-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnCancle}" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel">
                     <i class="ti ti-x" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
         } else if (status == 2) {
             return `
             <div class="d-flex justify-content-evenly gap-1">
-                <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
+                <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnEdit}" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
                     <i class="ti ti-zoom-exclamation" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
                 </button>
-                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
+                <button type="button" onclick="editScore(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnScore}" data-bs-toggle="tooltip" data-bs-placement="top" title="Score">
+                    <i class="ti ti-thumb-up" data-bs-target="#mdlScore" data-bs-toggle="modal"  style="font-size: 1.5rem !important;"></i>
+                </button>
+                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnPreview}" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
                     <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
         } else if (status == 9) {
             return `
             <div class="d-flex justify-content-evenly gap-1">
-                <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
+                <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnEdit}" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
                     <i class="ti ti-zoom-exclamation" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
                 </button>
                 <button type="button" onclick="viewEditScore(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Score">
                     <i class="ti ti-numbers" data-bs-target="#mdlScore" data-bs-toggle="modal"  style="font-size: 1.5rem !important;"></i>
                 </button>
-                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
+                <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnPreview}" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
                     <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
         } else if (status == 5) {
             return `
             <div class="d-flex justify-content-evenly gap-1">
-                <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
+                <button type="button" onclick="viewEditModal(${id})" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnPreview}" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
                     <i class="ti ti-zoom-exclamation" data-bs-target="#mdlEdit" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
                 </button>
-                <button type="button" onclick="docReverse(${id})" class="btn bg-info-subtle text-info rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Reverse">
+                <button type="button" onclick="docReverse(${id})" class="btn bg-info-subtle text-info rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnReverse}" data-bs-toggle="tooltip" data-bs-placement="top" title="Reverse">
                     <i class="ti ti-arrow-back-up" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
@@ -1125,7 +1161,7 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             })
-                            var dataTable = $('#tblRFQ').DataTable();
+                            var dataTable = $('#tblFS').DataTable();
                             dataTable.ajax.reload(null, false);
                         }
                     }
@@ -1455,19 +1491,19 @@
             for (let i = 0; i < data.length; i++) {
                 html += '<tr>';
                 html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="hidden" name="idi_id" value="' + data[i].idi_id + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_no" value="' + data[i].idi_item_no + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_name" value="' + data[i].idi_item_name + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_model" value="' + data[i].idi_model + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_remark" value="' + data[i].idi_remark + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_no" maxlength="50" value="' + data[i].idi_item_no + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_name" maxlength="100" value="' + data[i].idi_item_name + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_model" maxlength="50" value="' + data[i].idi_model + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_remark" maxlength="100" value="' + data[i].idi_remark + '"><span class="invalid-feedback"></span></div></td>';
                 html += '<td><div><button type="button" onclick="deletePartNoByItem(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnDeletePartNo" name="btnDeletePartNo" data-id="' + data[i].idi_id + '"><i class="ti ti-trash-x fs-6"></i></button></td>';
                 html += '</tr>';
             }
             html += '<tr>';
             html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="hidden" id="inpId" value="0"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartNo" placeholder="Part No"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartName" placeholder="Part Name"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpModel" placeholder="Model"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpRemark" placeholder="Remark"><span class="invalid-feedback"></span></div></td>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartNo" maxlength="50" placeholder="Part No"><span class="invalid-feedback"></span></div></td>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartName" maxlength="100" placeholder="Part Name"><span class="invalid-feedback"></span></div></td>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpModel" maxlength="50" placeholder="Model"><span class="invalid-feedback"></span></div></td>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpRemark" maxlength="100" placeholder="Remark"><span class="invalid-feedback"></span></div></td>';
             html += '<td><button type="button" onclick="addPartNoByItem(event)" class="btn mb-1 btn-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnAddPartNo" name="btnAddPartNo" data-id=""><i class="ti ti-plus fs-6"></i></button></td>';
             html += '</tr>';
             document.getElementById('tblEditBodyPartNo').innerHTML = html;
@@ -1489,6 +1525,23 @@
         const model = currentRow.querySelector('input[id="inpModel"]');
         const remark = currentRow.querySelector('input[id="inpRemark"]');
 
+        if ($('#tblEditBodyPartNo tr').length > 10) {
+            Swal.fire({
+                html: "<h4>Cannot add more than 10 items.</h4>",
+                icon: 'warning',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            })
+            partNo.value = "";
+            partName.value = "";
+            model.value = "";
+            remark.value = "";
+            return;
+        }
         if (is_empty(partNo.value.trim())) {
             form_errValid(partNo, '*Plase Enter Part No.');
             return;
@@ -1758,20 +1811,38 @@
                                             success: async function(response) {
                                                 let html = '';
                                                 let allStatusValid = true;
+                                                let userDept = '<?php echo $this->session->userdata('sessDeptId') ?>';
                                                 const scoreTotal = await $.ajax({
                                                     type: 'GET',
                                                     url: API_URL + 'feasibility/totalScore/' + data.idc_id,
                                                 });
+                                                if (userDept == 41 || userDept == 47|| userDept == 20) {
+                                                    allStatusValid = false;
+                                                }
                                                 response.forEach(item => {
-                                                    if (item.ifs_status != 1) {
-                                                        allStatusValid = false;
+                                                    const isMyDept = item.sd_id === <?php echo $this->session->userdata('sessDeptId') ?>;
+
+                                                    let bgTr = '';
+                                                    let btnNone = 'd-none';
+                                                    let disabled = 'disabled';
+
+                                                    if (isMyDept) {
+                                                        btnNone = '';
+                                                        disabled = '';
+                                                        
+                                                        if (item.ifs_status == 0) {
+                                                            allStatusValid = false;
+                                                        } else if (item.ifs_status == 2) {
+                                                            btnNone = 'd-none';
+                                                            bgTr = `style="background-color: #bfbfbf61;"`;
+                                                        } else if (item.ifs_status == 9) {
+                                                            btnNone = 'd-none';
+                                                            bgTr = `style="background-color: #9aff713d;"`;
+                                                        }
                                                     }
-                                                    const isEditable = item.sd_id === <?php echo $this->session->userdata('sessDeptId') ?>;
-                                                    const disabled = isEditable ? '' : 'disabled';
-                                                    const btnNone = isEditable ? '' : 'd-none';
-                                                    const scoreClass = item.ifs_score ? 'bg-success-subtle border-success-subtle' : 'bg-warning-subtle border-warning-subtle';
+                                                    const scoreClass = parseInt(item.ifs_score) > 0 ? 'bg-success-subtle border-success-subtle' : 'bg-warning-subtle border-warning-subtle';
                                                     const weightedScore = item.mcip_weight * (item.ifs_score || 0);
-                                                    html += `<tr>
+                                                    html += `<tr ${bgTr}>
                                                                 <td class="text-center" id="inpWeight_${item.ifs_id}">${item.mcip_weight}</td>
                                                                 <td class="text-center">
                                                                     <div class="col">
@@ -1795,7 +1866,7 @@
                                                                 </td>
                                                             </tr>`;
                                                 });
-                                                const btnSubmitClass = allStatusValid ? '' : 'd-none';
+
                                                 $('#tblBodyScore').html(html);
                                                 $('#total_score').text(scoreTotal);
                                                 if (scoreTotal >= 90 && scoreTotal <= 100) {
@@ -1805,7 +1876,12 @@
                                                 } else {
                                                     $('#red_score').addClass('bg-dark');
                                                 }
-                                                $('#btnSubmitScore').addClass(btnSubmitClass);
+
+                                                if (allStatusValid) {
+                                                    $('#btnSubmitScore').removeClass('d-none');
+                                                } else {
+                                                    $('#btnSubmitScore').addClass('d-none');
+                                                }
                                             }
                                         });
                                         resolve(data);
@@ -1990,6 +2066,15 @@
         $('.select2-container--default .select2-selection__arrow').css({
             'height': '35px',
             'line-height': '35px',
+        });
+
+        $(document).on('click', function(e) {
+            document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+                const popover = bootstrap.Popover.getInstance(el);
+                if (popover && !el.contains(e.target) && !document.querySelector('.popover')?.contains(e.target)) {
+                    popover.hide();
+                }
+            });
         });
 
         if ($.fn.DataTable.isDataTable('#tblFS')) {

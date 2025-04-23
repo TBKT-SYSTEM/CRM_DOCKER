@@ -182,8 +182,8 @@ class ManageNbc extends CI_Controller
 		$pdf->AddFont('THSarabunNew', 'B', 'THSarabunNew-Bold.php');
 
 		$pdf->SetY(5);
-		$image_path = 'assets/images/logos/tbkk logo form.png';
-		$pdf->Image($image_path, 5, $pdf->GetY(), 20);
+		$image_path = 'assets/images/logos/logo-tbkk.png';
+		$pdf->Image($image_path, 2, $pdf->GetY() - 8, 27);
 		$pdf->SetFont('THSarabunNew', 'B', 25);
 		$pdf->SetX(28);
 		$pdf->Cell(40, 15, 'Confirmation Sheet for New Business');
@@ -193,7 +193,7 @@ class ManageNbc extends CI_Controller
 
 		$pdf->SetX($pdf->GetX() + 60);
 		$issue_date = 'Doc. No. :';
-		$run_no = $this->input->get('run_no');
+		$run_no = $this->input->get('idc_running_no');
 		$width_issue_date = $pdf->GetStringWidth($issue_date) + 2;
 		$pdf->SetX($pdf->GetX() + 5);
 		$pdf->Cell($width_issue_date, 5, $issue_date);
@@ -305,13 +305,13 @@ class ManageNbc extends CI_Controller
 		// Table Part No.
 		$pdf->Ln(4);
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->SetFont('THSarabunNew', 'B', 12);
+		$pdf->SetFont('THSarabunNew', 'B', 13);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 4, 'No', 1, 0, 'C', true);
-		$pdf->Cell(35, 4, 'PART NUMBER', 1, 0, 'C', true);
-		$pdf->Cell(55, 4, 'PART NAME', 1, 0, 'C', true);
-		$pdf->Cell(40, 4, 'MODEL', 1, 0, 'C', true);
-		$pdf->Cell(50, 4, 'Remark', 1, 1, 'C', true);
+		$pdf->Cell(15, 4.5, 'No', 1, 0, 'C', true);
+		$pdf->Cell(35, 4.5, 'PART NUMBER', 1, 0, 'C', true);
+		$pdf->Cell(55, 4.5, 'PART NAME', 1, 0, 'C', true);
+		$pdf->Cell(40, 4.5, 'MODEL', 1, 0, 'C', true);
+		$pdf->Cell(50, 4.5, 'Remark', 1, 1, 'C', true);
 
 		$idc_id = $this->input->get('idc_id');
 		$consern = $this->db->select('idi_item_no, idi_item_name, idi_model, idi_remark')
@@ -320,20 +320,20 @@ class ManageNbc extends CI_Controller
 			->where('idi_status', 1)
 			->order_by('idi_id', 'ASC')->get()->result();
 
-		for ($i = 0; $i < 20; $i++) {
+		for ($i = 0; $i < 10; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
-			$pdf->SetFont('THSarabunNew', 'B', 11);
-			$pdf->Cell(15, 4, $i + 1, 1, 0, "C");
+			$pdf->SetFont('THSarabunNew', 'B', 12);
+			$pdf->Cell(15, 4.5, $i + 1, 1, 0, "C");
 
 			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
 			$part_name = isset($consern[$i]->idi_item_name) ? $consern[$i]->idi_item_name : '';
 			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
 			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
-			$pdf->Cell(35, 4, $part_no, 1, 0, 'C');
-			$pdf->Cell(55, 4, $part_name, 1, 0, 'C');
-			$pdf->Cell(40, 4, $model, 1, 0, 'C');
-			$pdf->Cell(50, 4, $remark, 1, 1, 'C'); // 35 Characters
+			$pdf->Cell(35, 4.5, $part_no, 1, 0, 'C');
+			$pdf->Cell(55, 4.5, $part_name, 1, 0, 'C');
+			$pdf->Cell(40, 4.5, $model, 1, 0, 'C');
+			$pdf->Cell(50, 4.5, iconv('UTF-8', 'TIS-620//IGNORE', $remark), 1, 1, 'C'); // 35 Characters
 		}
 
 		// Table Volume
@@ -345,31 +345,62 @@ class ManageNbc extends CI_Controller
 		$pdf->Cell($width_val, 5, $val);
 
 		$pdf->Ln(5);
-		$countYears = $this->db->select('idv_year, idv_qty')
-			->from('info_document_volume')
+		$itemInfo = $this->db->select('idi_id, idi_item_no')
+			->from('info_document_item')
 			->where('idc_id', $idc_id)
-			->where('idv_status', 1)
-			->order_by('idv_id', 'ASC')->get()->result();
+			->where('idi_status', 1)
+			->order_by('idi_id', 'ASC')->get()->result();
 
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 5, 'Year', 1, 0, 'R', true);
-		for ($i = 0; $i < 11; $i++) {
-			$year = isset($countYears[$i]->idv_year) ? $countYears[$i]->idv_year : '';
-			$pdf->Cell(16.35, 5, $year, 1, 0, 'C');
+		$idc_project_life = $this->input->get('idc_project_life');
+		$idc_project_start = $this->input->get('idc_project_start');
+
+		$years = [];
+		for ($i = 0; $i <= $idc_project_life; $i++) {
+			$years[] = strval($idc_project_start + $i);
 		}
+		$headerHeight = 4.5;
 
-		$pdf->Ln();
-		$pdf->SetX($pdf->GetX() - 4);
+		$pdf->SetFont('THSarabunNew', 'B', 13);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 5, 'Volume', 1, 0, 'R', true);
-		for ($i = 0; $i < 11; $i++) {
-			$volume = isset($countYears[$i]->idv_qty) ? $countYears[$i]->idv_qty : '';
-			$pdf->Cell(16.35, 5, $volume, 1, 0, 'C');
+		$pdf->SetX($pdf->GetX() - 4);
+		$pdf->Cell(15, $headerHeight * 2, 'No', 1, 0, 'C', true); // rowspan 2
+		$pdf->Cell(35, $headerHeight * 2, 'PART NUMBER', 1, 0, 'C', true); // rowspan 2
+		$pdf->Cell(145, $headerHeight, 'YEAR / VOLUME', 1, 1, 'C', true); // colspan
+
+		$pdf->SetX($pdf->GetX() + 50 - 4);
+		for ($i = 0; $i < 10; $i++) {
+			$pdf->SetFont('THSarabunNew', 'B', 12);
+			$label = isset($years[$i]) ? $years[$i] : '';
+			$pdf->SetFillColor(218, 233, 248);
+			$pdf->Cell(14.5, $headerHeight, $label, 1, 0, 'C', true);
+		}
+		$pdf->Ln();
+
+		for ($i = 0; $i < 10; $i++) {
+			$pdf->SetX($pdf->GetX() - 4);
+			$pdf->SetFont('THSarabunNew', 'B', 11);
+			$pdf->Cell(15, 4.5, $i + 1, 1, 0, "C");
+
+			$part_no = isset($itemInfo[$i]->idi_item_no) ? $itemInfo[$i]->idi_item_no : '';
+			$idi_id = isset($itemInfo[$i]->idi_id) ? $itemInfo[$i]->idi_id : 0;
+			$pdf->Cell(35, 4.5, $part_no, 1, 0, 'C');
+
+			$idv_qty = $this->db->select('idv_qty')
+				->from('info_document_volume')
+				->where('idi_id', $idi_id)
+				->where('idv_status', 1)
+				->order_by('idv_id', 'ASC')
+				->get()
+				->result();
+			for ($q = 0; $q < 10; $q++) {
+				$label = isset($idv_qty[$q]) ? $idv_qty[$q]->idv_qty : ''; // ต้องใช้ ->idv_qty
+				$pdf->Cell(14.5, 4.5, $label, 1, 0, 'C');
+			}
+			$pdf->Ln();
 		}
 
 		// Table Note
-		$pdf->Ln(8);
+		$pdf->Ln(3);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 12);
 		$pdf->SetFillColor(235, 235, 235);
@@ -498,7 +529,7 @@ class ManageNbc extends CI_Controller
 		$pdf->Ln();
 		$pdf->SetX($pdf->GetX() - 4);
 		$idc_note2 = $this->input->get('idc_note2');
-		$pdf->Cell(195, 20, $idc_note2, 'LBR', 1, 'L',);
+		$pdf->Cell(195, 15, iconv('UTF-8', 'TIS-620//IGNORE', $idc_note2), 'LBR', 1, 'L',);
 
 		$pdf->Ln(3);
 		$arrow = 'assets/images/logos/arrow-right-removebg-preview.png';

@@ -39,8 +39,8 @@ class ViewPDF extends CI_Controller
 		$pdf->AddFont('THSarabunNew', 'B', 'THSarabunNew-Bold.php');
 
 		$pdf->SetY(5);
-		$image_path = 'assets/images/logos/tbkk logo form.png';
-		$pdf->Image($image_path, 5, $pdf->GetY(), 20);
+		$image_path = 'assets/images/logos/logo-tbkk.png';
+		$pdf->Image($image_path, 2, $pdf->GetY() - 8, 27);
 		$pdf->SetFont('THSarabunNew', 'B', 30);
 		$pdf->SetX(28);
 		$pdf->Cell(40, 15, 'IN-HOUSE RFQ');
@@ -273,7 +273,7 @@ class ViewPDF extends CI_Controller
 		}
 
 		// Project Life 
-		$pdf->Ln(10);
+		$pdf->Ln(8);
 		$ir_pro_life = $this->input->get('idc_project_life');
 		$pdf->SetX($pdf->GetX() - 5);
 		$proj = 'Project Life :';
@@ -292,15 +292,15 @@ class ViewPDF extends CI_Controller
 		$pdf->Cell(40, 5, $ir_sop_tim, 'B', 0, 'C');
 
 		// Table Part No.
-		$pdf->Ln(10);
+		$pdf->Ln(8);
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->SetFont('THSarabunNew', 'B', 12);
+		$pdf->SetFont('THSarabunNew', 'B', 14);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 4, 'No', 1, 0, 'C', true);
-		$pdf->Cell(35, 4, 'PART NUMBER', 1, 0, 'C', true);
-		$pdf->Cell(55, 4, 'PART NAME', 1, 0, 'C', true);
-		$pdf->Cell(40, 4, 'MODEL', 1, 0, 'C', true);
-		$pdf->Cell(50, 4, 'Remark', 1, 1, 'C', true);
+		$pdf->Cell(15, 5.5, 'No', 1, 0, 'C', true);
+		$pdf->Cell(35, 5.5, 'PART NUMBER', 1, 0, 'C', true);
+		$pdf->Cell(55, 5.5, 'PART NAME', 1, 0, 'C', true);
+		$pdf->Cell(40, 5.5, 'MODEL', 1, 0, 'C', true);
+		$pdf->Cell(50, 5.5, 'Remark', 1, 1, 'C', true);
 
 		$idc_id = $this->input->get('idc_id');
 		$consern = $this->db->select('idi_item_no, idi_item_name, idi_model, idi_remark')
@@ -309,141 +309,94 @@ class ViewPDF extends CI_Controller
 			->where('idi_status', 1)
 			->order_by('idi_id', 'ASC')->get()->result();
 
-		for ($i = 0; $i < 20; $i++) {
+		for ($i = 0; $i < 10; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
-			$pdf->SetFont('THSarabunNew', 'B', 11);
-			$pdf->Cell(15, 4, $i + 1, 1, 0, "C");
+			$pdf->SetFont('THSarabunNew', 'B', 13);
+			$pdf->Cell(15, 5.5, $i + 1, 1, 0, "C");
 
 			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
 			$part_name = isset($consern[$i]->idi_item_name) ? $consern[$i]->idi_item_name : '';
 			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
 			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
-			$pdf->Cell(35, 4, $part_no, 1, 0, 'C');
-			$pdf->Cell(55, 4, $part_name, 1, 0, 'C');
-			$pdf->Cell(40, 4, $model, 1, 0, 'C');
-			$pdf->Cell(50, 4, $remark, 1, 1, 'C'); // 35 Characters
+			$pdf->Cell(35, 5.5, $part_no, 1, 0, 'C');
+			$pdf->Cell(55, 5.5, $part_name, 1, 0, 'C');
+			$pdf->Cell(40, 5.5, $model, 1, 0, 'C');
+			$pdf->Cell(50, 5.5, iconv('UTF-8', 'TIS-620//IGNORE', $remark), 1, 1, 'C'); // 35 Characters
 		}
 
 		// Table Volume
 		$pdf->Ln(2);
 		$pdf->SetX($pdf->GetX() - 5);
-		$pdf->SetFont('THSarabunNew', 'B', 11);
+		$pdf->SetFont('THSarabunNew', 'B', 12);
 		$val = 'Volume Information :';
 		$width_val = $pdf->GetStringWidth($val);
-		$pdf->Cell($width_val, 5, $val);
+		$pdf->Cell($width_val, 5, $val, 0, 1);
 
-		$pdf->Ln(5);
-		$countYears = $this->db->select('idv_year, idv_qty')
-			->from('info_document_volume')
+		$pdf->Ln(1);
+		$itemInfo = $this->db->select('idi_id, idi_item_no')
+			->from('info_document_item')
 			->where('idc_id', $idc_id)
-			->where('idv_status', 1)
-			->order_by('idv_id', 'ASC')->get()->result();
+			->where('idi_status', 1)
+			->order_by('idi_id', 'ASC')->get()->result();
 
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 5, 'Year', 1, 0, 'R', true);
-		for ($i = 0; $i < 11; $i++) {
-			$year = isset($countYears[$i]->idv_year) ? $countYears[$i]->idv_year : '';
-			$pdf->Cell(16.35, 5, $year, 1, 0, 'C');
+		$idc_project_life = $this->input->get('idc_project_life');
+		$idc_project_start = $this->input->get('idc_project_start');
+
+		$years = [];
+		for ($i = 0; $i <= $idc_project_life; $i++) {
+			$years[] = strval($idc_project_start + $i);
 		}
+		$headerHeight = 5.5;
 
+		$pdf->SetFont('THSarabunNew', 'B', 14);
+		$pdf->SetFillColor(235, 235, 235);
+		$pdf->SetX($pdf->GetX() - 4);
+		$pdf->Cell(15, $headerHeight * 2, 'No', 1, 0, 'C', true); // rowspan 2
+		$pdf->Cell(35, $headerHeight * 2, 'PART NUMBER', 1, 0, 'C', true); // rowspan 2
+		$pdf->Cell(145, $headerHeight, 'YEAR / VOLUME', 1, 1, 'C', true); // colspan
+
+		$pdf->SetX($pdf->GetX() + 50 - 4);
+		for ($i = 0; $i < 10; $i++) {
+			$pdf->SetFont('THSarabunNew', 'B', 12);
+			$label = isset($years[$i]) ? $years[$i] : '';
+			$pdf->SetFillColor(218, 233, 248);
+			$pdf->Cell(14.5, $headerHeight, $label, 1, 0, 'C', true);
+		}
 		$pdf->Ln();
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 5, 'Volume', 1, 0, 'R', true);
-		for ($i = 0; $i < 11; $i++) {
-			$volume = isset($countYears[$i]->idv_qty) ? $countYears[$i]->idv_qty : '';
-			$pdf->Cell(16.35, 5, $volume, 1, 0, 'C');
-		}
 
+		for ($i = 0; $i < 10; $i++) {
+			$pdf->SetX($pdf->GetX() - 4);
+			$pdf->SetFont('THSarabunNew', 'B', 12);
+			$pdf->Cell(15, 5.5, $i + 1, 1, 0, "C");
+
+			$part_no = isset($itemInfo[$i]->idi_item_no) ? $itemInfo[$i]->idi_item_no : '';
+			$idi_id = isset($itemInfo[$i]->idi_id) ? $itemInfo[$i]->idi_id : 0;
+			$pdf->Cell(35, 5.5, $part_no, 1, 0, 'C');
+
+			$idv_qty = $this->db->select('idv_qty')
+				->from('info_document_volume')
+				->where('idi_id', $idi_id)
+				->where('idv_status', 1)
+				->order_by('idv_id', 'ASC')
+				->get()
+				->result();
+			for ($q = 0; $q < 10; $q++) {
+				$label = isset($idv_qty[$q]) ? $idv_qty[$q]->idv_qty : ''; // ต้องใช้ ->idv_qty
+				$pdf->Cell(14.5, 5.5, $label, 1, 0, 'C');
+			}
+			$pdf->Ln();
+		}
 		// Info
-		$pdf->Ln(7);
+		$pdf->Ln(3);
 		$pdf->SetX($pdf->GetX() - 5);
-		$pdf->SetFont('THSarabunNew', 'B', 11);
+		$pdf->SetFont('THSarabunNew', 'B', 12);
 		$info = 'Please be required to study the cost according above detail and be arranged necessary info upon below conditions.';
 		$width_val = $pdf->GetStringWidth($info);
 		$pdf->Cell($width_val, 5, $info);
 
-		// Purchase Cost
-		$pdf->Ln(10);
-
-		$count_mdpu = 0;
-		$get_mdpu = $this->input->get('idpu_item');
-		$mdpu_all = $this->db->select('mdpu_id, mdpu_name')->from('mst_document_purchase')->order_by('mdpu_id', 'asc')->get()->result();
-
-		$pdf->SetX($pdf->GetX() - 5);
-		$attn = 'Purchase Cost :';
-		$width_attn = $pdf->GetStringWidth($attn) + 2;
-		$pdf->Cell($width_attn, 0, $attn);
-
-		for ($i = 0; $i < count($mdpu_all); $i++) {
-			$box_bg = '255, 255, 255';
-
-			for ($j = 0; $j < count($get_mdpu); $j++) {
-				if ($get_mdpu[$j] == $mdpu_all[$i]->mdpu_id) {
-					$box_bg = '0, 0, 0';
-					break;
-				}
-			}
-
-			if ($count_mdpu == 0) {
-				$pdf->SetFillColor((int) $box_bg);
-				$pdf->SetY($pdf->GetY() - 3);
-				$pdf->SetX($pdf->GetX() + 30);
-				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-				$pu_dept = $mdpu_all[$i]->mdpu_name;
-				$pdf->Cell(30, 5, $pu_dept);
-			} else {
-				$pdf->SetFillColor((int)$box_bg);
-				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-				$pe_dept = $mdpu_all[$i]->mdpu_name;
-				$pdf->Cell(30, 5, $pe_dept);
-			}
-
-			$count_mdpu++;
-		}
-
-		// Purchase Cost
-		$pdf->Ln(10);
-		$count_mdpc = 0;
-		$get_mdpc = $this->input->get('idpc_item');
-		$mdpc_all = $this->db->select('mdpc_id, mdpc_name')->from('mst_document_process')->order_by('mdpc_id', 'asc')->get()->result();
-
-		$pdf->SetX($pdf->GetX() - 5);
-		$attn = 'Process Cost :';
-		$width_attn = $pdf->GetStringWidth($attn) + 2;
-		$pdf->Cell($width_attn, 0, $attn);
-
-		for ($i = 0; $i < count($mdpc_all); $i++) {
-			$box_bg = '255, 255, 255';
-
-			for ($j = 0; $j < count($get_mdpc); $j++) {
-				if ($get_mdpc[$j] == $mdpc_all[$i]->mdpc_id) {
-					$box_bg = '0, 0, 0';
-					break;
-				}
-			}
-
-			if ($count_mdpc == 0) {
-				$pdf->SetFillColor((int) $box_bg);
-				$pdf->SetY($pdf->GetY() - 3);
-				$pdf->SetX($pdf->GetX() + 30);
-				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-				$pu_dept = $mdpc_all[$i]->mdpc_name;
-				$pdf->Cell(30, 5, $pu_dept);
-			} else {
-				$pdf->SetFillColor((int)$box_bg);
-				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
-				$pe_dept = $mdpc_all[$i]->mdpc_name;
-				$pdf->Cell(30, 5, $pe_dept);
-			}
-
-			$count_mdpc++;
-		}
-
 		// Table Note
-		$pdf->Ln(10);
+		$pdf->Ln(7);
 		$idc_note1 = $this->input->get('idc_note1');
 		$idc_note1 .= "\n ";
 		$pdf->SetX($pdf->GetX() - 4);
@@ -455,7 +408,7 @@ class ViewPDF extends CI_Controller
 
 		$pdf->SetFont('THSarabunNew', 'B', 10);
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->MultiCell(73, 4, $idc_note1, 'LBR', 'L');
+		$pdf->MultiCell(73, 4, iconv('UTF-8', 'TIS-620//IGNORE', $idc_note1), 'LBR', 'L');
 		$endY = $pdf->GetY();
 
 		$idc_note2 = $this->input->get('idc_note2');
@@ -468,7 +421,7 @@ class ViewPDF extends CI_Controller
 
 		$pdf->SetFont('THSarabunNew', 'B', 10);
 		$pdf->SetX(88);
-		$pdf->MultiCell(113, 4, $idc_note2, 'LBR', 'L');
+		$pdf->MultiCell(113, 4, iconv('UTF-8', 'TIS-620//IGNORE', $idc_note2), 'LBR', 'L');
 		// $maxLength2 = 56;
 		// $lines2 = str_split($idc_note2, $maxLength2);
 		// foreach ($lines2 as $line) {
@@ -476,7 +429,7 @@ class ViewPDF extends CI_Controller
 		// }
 
 		// Table Sign
-		$pdf->Ln(5);
+		$pdf->Ln(8);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 11);
 		$pdf->SetFillColor(235, 235, 235);
@@ -487,7 +440,6 @@ class ViewPDF extends CI_Controller
 
 		$pdf->Ln();
 		$pdf->SetX($pdf->GetX() - 4);
-
 
 		$idc_id = $this->input->get('idc_id');
 		$sign1 = $this->db->select("su.su_sign_path, CONCAT(su.su_firstname, ' ', su.su_lastname) AS fullname")
@@ -500,9 +452,7 @@ class ViewPDF extends CI_Controller
 		$sign1[0]->su_sign_path = ($sign1[0]->su_sign_path == 'null' || !$sign1[0]->su_sign_path) ? 'assets/images/uploaded/signature/EmptySign.png' : $sign1[0]->su_sign_path;
 		$sign1[0]->fullname = $sign1[0]->fullname ?? '';
 
-		$sign_group = $this->db->select("
-				CASE WHEN ida.ida_status = 9 THEN su.su_sign_path ELSE 'null' END AS su_sign_path,
-				COALESCE(CONCAT(su.su_firstname, ' ', su.su_lastname), 'null') AS fullname")
+		$sign_group = $this->db->select("CASE WHEN ida.ida_status = 9 THEN su.su_sign_path ELSE 'null' END AS su_sign_path, COALESCE(CONCAT(su.su_firstname, ' ', su.su_lastname), 'null') AS fullname")
 			->from('info_document_control idc')
 			->join('info_document_approval ida', 'ida.idc_id = idc.idc_id', 'left')
 			->join('sys_users su', 'su.su_id = ida.su_id', 'left')
@@ -510,17 +460,25 @@ class ViewPDF extends CI_Controller
 			->where_in('ida.ida_status', [1, 9])
 			->get()
 			->result();
+		$default_sign = (object) [
+			"su_sign_path" => 'assets/images/uploaded/signature/EmptySign.png',
+			"fullname" => "Error signature"
+		];
 
-		if (count($sign_group) == 3) {
-			for ($i = 0; $i < count($sign_group); $i++) {
-				$sign_group[$i]->su_sign_path = ($sign_group[$i]->su_sign_path == 'null' || !$sign_group[$i]->su_sign_path) ? 'assets/images/uploaded/signature/EmptySign.png' : $sign_group[$i]->su_sign_path;
-				$sign_group[$i]->fullname = $sign_group[$i]->fullname ?? '';
+		foreach ($sign_group as $sign) {
+			if (empty($sign->su_sign_path) || !file_exists($sign->su_sign_path)) {
+				$sign->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
 			}
-		} else {
-			for ($i = 0; $i < count($sign_group); $i++) {
-				$sign_group[$i]->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
-				$sign_group[$i]->fullname = 'Error signature';
-			}
+
+			$sign->fullname = !empty($sign->fullname) ? $sign->fullname : "Error signature";
+		}
+
+		while (count($sign_group) < 3) {
+			$sign_group[] = clone $default_sign;
+		}
+
+		if (empty($sign_group)) {
+			$sign_group = [clone $default_sign, clone $default_sign, clone $default_sign];
 		}
 
 		$pdf->Cell(48.75, 20, $pdf->Image($sign1[0]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
@@ -541,9 +499,7 @@ class ViewPDF extends CI_Controller
 		$pdf->Cell(48.75, 5, 'Department Manager', 'LBR', 0, 'C');
 		$pdf->Cell(48.75, 5, 'General Manager', 'LBR', 0, 'C');
 
-
-
-		$pdf->Output();
+		$pdf->Output('I', $ir_doc_no . '.pdf');
 	}
 
 	public function createNbcPDF()
@@ -554,8 +510,8 @@ class ViewPDF extends CI_Controller
 		$pdf->AddFont('THSarabunNew', 'B', 'THSarabunNew-Bold.php');
 
 		$pdf->SetY(5);
-		$image_path = 'assets/images/logos/tbkk logo form.png';
-		$pdf->Image($image_path, 5, $pdf->GetY(), 20);
+		$image_path = 'assets/images/logos/logo-tbkk.png';
+		$pdf->Image($image_path, 2, $pdf->GetY() - 8, 27);
 		$pdf->SetFont('THSarabunNew', 'B', 25);
 		$pdf->SetX(28);
 		$pdf->Cell(40, 15, 'Confirmation Sheet for New Business');
@@ -565,7 +521,7 @@ class ViewPDF extends CI_Controller
 
 		$pdf->SetX($pdf->GetX() + 60);
 		$issue_date = 'Doc. No. :';
-		$run_no = $this->input->get('run_no');
+		$run_no = $this->input->get('idc_running_no');
 		$width_issue_date = $pdf->GetStringWidth($issue_date) + 2;
 		$pdf->SetX($pdf->GetX() + 5);
 		$pdf->Cell($width_issue_date, 5, $issue_date);
@@ -677,13 +633,13 @@ class ViewPDF extends CI_Controller
 		// Table Part No.
 		$pdf->Ln(4);
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->SetFont('THSarabunNew', 'B', 12);
+		$pdf->SetFont('THSarabunNew', 'B', 13);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 4, 'No', 1, 0, 'C', true);
-		$pdf->Cell(35, 4, 'PART NUMBER', 1, 0, 'C', true);
-		$pdf->Cell(55, 4, 'PART NAME', 1, 0, 'C', true);
-		$pdf->Cell(40, 4, 'MODEL', 1, 0, 'C', true);
-		$pdf->Cell(50, 4, 'Remark', 1, 1, 'C', true);
+		$pdf->Cell(15, 4.5, 'No', 1, 0, 'C', true);
+		$pdf->Cell(35, 4.5, 'PART NUMBER', 1, 0, 'C', true);
+		$pdf->Cell(55, 4.5, 'PART NAME', 1, 0, 'C', true);
+		$pdf->Cell(40, 4.5, 'MODEL', 1, 0, 'C', true);
+		$pdf->Cell(50, 4.5, 'Remark', 1, 1, 'C', true);
 
 		$idc_id = $this->input->get('idc_id');
 		$consern = $this->db->select('idi_item_no, idi_item_name, idi_model, idi_remark')
@@ -692,20 +648,20 @@ class ViewPDF extends CI_Controller
 			->where('idi_status', 1)
 			->order_by('idi_id', 'ASC')->get()->result();
 
-		for ($i = 0; $i < 20; $i++) {
+		for ($i = 0; $i < 10; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
-			$pdf->SetFont('THSarabunNew', 'B', 11);
-			$pdf->Cell(15, 4, $i + 1, 1, 0, "C");
+			$pdf->SetFont('THSarabunNew', 'B', 12);
+			$pdf->Cell(15, 4.5, $i + 1, 1, 0, "C");
 
 			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
 			$part_name = isset($consern[$i]->idi_item_name) ? $consern[$i]->idi_item_name : '';
 			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
 			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
-			$pdf->Cell(35, 4, $part_no, 1, 0, 'C');
-			$pdf->Cell(55, 4, $part_name, 1, 0, 'C');
-			$pdf->Cell(40, 4, $model, 1, 0, 'C');
-			$pdf->Cell(50, 4, $remark, 1, 1, 'C'); // 35 Characters
+			$pdf->Cell(35, 4.5, $part_no, 1, 0, 'C');
+			$pdf->Cell(55, 4.5, $part_name, 1, 0, 'C');
+			$pdf->Cell(40, 4.5, $model, 1, 0, 'C');
+			$pdf->Cell(50, 4.5, iconv('UTF-8', 'TIS-620//IGNORE', $remark), 1, 1, 'C'); // 35 Characters
 		}
 
 		// Table Volume
@@ -717,31 +673,62 @@ class ViewPDF extends CI_Controller
 		$pdf->Cell($width_val, 5, $val);
 
 		$pdf->Ln(5);
-		$countYears = $this->db->select('idv_year, idv_qty')
-			->from('info_document_volume')
+		$itemInfo = $this->db->select('idi_id, idi_item_no')
+			->from('info_document_item')
 			->where('idc_id', $idc_id)
-			->where('idv_status', 1)
-			->order_by('idv_id', 'ASC')->get()->result();
+			->where('idi_status', 1)
+			->order_by('idi_id', 'ASC')->get()->result();
 
-		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 5, 'Year', 1, 0, 'R', true);
-		for ($i = 0; $i < 11; $i++) {
-			$year = isset($countYears[$i]->idv_year) ? $countYears[$i]->idv_year : '';
-			$pdf->Cell(16.35, 5, $year, 1, 0, 'C');
+		$idc_project_life = $this->input->get('idc_project_life');
+		$idc_project_start = $this->input->get('idc_project_start');
+
+		$years = [];
+		for ($i = 0; $i <= $idc_project_life; $i++) {
+			$years[] = strval($idc_project_start + $i);
 		}
+		$headerHeight = 4.5;
 
-		$pdf->Ln();
-		$pdf->SetX($pdf->GetX() - 4);
+		$pdf->SetFont('THSarabunNew', 'B', 13);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 5, 'Volume', 1, 0, 'R', true);
-		for ($i = 0; $i < 11; $i++) {
-			$volume = isset($countYears[$i]->idv_qty) ? $countYears[$i]->idv_qty : '';
-			$pdf->Cell(16.35, 5, $volume, 1, 0, 'C');
+		$pdf->SetX($pdf->GetX() - 4);
+		$pdf->Cell(15, $headerHeight * 2, 'No', 1, 0, 'C', true); // rowspan 2
+		$pdf->Cell(35, $headerHeight * 2, 'PART NUMBER', 1, 0, 'C', true); // rowspan 2
+		$pdf->Cell(145, $headerHeight, 'YEAR / VOLUME', 1, 1, 'C', true); // colspan
+
+		$pdf->SetX($pdf->GetX() + 50 - 4);
+		for ($i = 0; $i < 10; $i++) {
+			$pdf->SetFont('THSarabunNew', 'B', 12);
+			$label = isset($years[$i]) ? $years[$i] : '';
+			$pdf->SetFillColor(218, 233, 248);
+			$pdf->Cell(14.5, $headerHeight, $label, 1, 0, 'C', true);
+		}
+		$pdf->Ln();
+
+		for ($i = 0; $i < 10; $i++) {
+			$pdf->SetX($pdf->GetX() - 4);
+			$pdf->SetFont('THSarabunNew', 'B', 11);
+			$pdf->Cell(15, 4.5, $i + 1, 1, 0, "C");
+
+			$part_no = isset($itemInfo[$i]->idi_item_no) ? $itemInfo[$i]->idi_item_no : '';
+			$idi_id = isset($itemInfo[$i]->idi_id) ? $itemInfo[$i]->idi_id : 0;
+			$pdf->Cell(35, 4.5, $part_no, 1, 0, 'C');
+
+			$idv_qty = $this->db->select('idv_qty')
+				->from('info_document_volume')
+				->where('idi_id', $idi_id)
+				->where('idv_status', 1)
+				->order_by('idv_id', 'ASC')
+				->get()
+				->result();
+			for ($q = 0; $q < 10; $q++) {
+				$label = isset($idv_qty[$q]) ? $idv_qty[$q]->idv_qty : ''; // ต้องใช้ ->idv_qty
+				$pdf->Cell(14.5, 4.5, $label, 1, 0, 'C');
+			}
+			$pdf->Ln();
 		}
 
 		// Table Note
-		$pdf->Ln(8);
+		$pdf->Ln(3);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 12);
 		$pdf->SetFillColor(235, 235, 235);
@@ -870,7 +857,7 @@ class ViewPDF extends CI_Controller
 		$pdf->Ln();
 		$pdf->SetX($pdf->GetX() - 4);
 		$idc_note2 = $this->input->get('idc_note2');
-		$pdf->Cell(195, 20, $idc_note2, 'LBR', 1, 'L',);
+		$pdf->Cell(195, 15, iconv('UTF-8', 'TIS-620//IGNORE', $idc_note2), 'LBR', 1, 'L',);
 
 		$pdf->Ln(3);
 		$arrow = 'assets/images/logos/arrow-right-removebg-preview.png';
@@ -911,7 +898,7 @@ class ViewPDF extends CI_Controller
 		$pdf->Cell(48.75, 5, '', 'LR', 0, 'L',);
 		$pdf->Cell(48.75, 5, '', 'R', 1, 'L',);
 
-		$sign_rnd = $this->db->select("
+		$sign_group = $this->db->select("
 				CASE WHEN ida.ida_status = 9 THEN su.su_sign_path ELSE 'null' END AS su_sign_path,
 				COALESCE(CONCAT(su.su_firstname, ' ', su.su_lastname), 'null') AS fullname")
 			->from('info_document_control idc')
@@ -922,31 +909,46 @@ class ViewPDF extends CI_Controller
 			->get()
 			->result();
 
-		if (count($sign_rnd) == 2) {
-			for ($i = 0; $i < count($sign_rnd); $i++) {
-				$sign_rnd[$i]->su_sign_path = ($sign_rnd[$i]->su_sign_path == 'null' || !$sign_rnd[$i]->su_sign_path) ? 'assets/images/uploaded/signature/EmptySign.png' : $sign_rnd[$i]->su_sign_path;
-				$sign_rnd[$i]->fullname = $sign_rnd[$i]->fullname ?? '';
+		$default_sign = (object) [
+			"su_sign_path" => 'assets/images/uploaded/signature/EmptySign.png',
+			"fullname" => "Error signature"
+		];
+
+		foreach ($sign_group as $sign) {
+			if (empty($sign->su_sign_path) || !file_exists($sign->su_sign_path)) {
+				$sign->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
 			}
-		} else {
-			for ($i = 0; $i < count($sign_rnd); $i++) {
-				$sign_rnd[$i]->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
-				$sign_rnd[$i]->fullname = 'Error signature';
-			}
+
+			$sign->fullname = !empty($sign->fullname) ? $sign->fullname : "Error signature";
 		}
+
+		while (count($sign_group) < 2) {
+			$sign_group[] = clone $default_sign;
+		}
+
+		if (empty($sign_group)) {
+			$sign_group = [clone $default_sign, clone $default_sign, clone $default_sign];
+		}
+
+		$pdf->SetX($pdf->GetX() - 4);
+		$pdf->Cell(48.75, 5, '', 0, 0, 'L');
+		$pdf->Cell(48.75, 5, '', 'L', 0, 'L',);
+		$pdf->Cell(48.75, 5, '', 'LR', 0, 'L',);
+		$pdf->Cell(48.75, 5, '', 'R', 1, 'L',);
 
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->Cell(48.75, 5, "CE/GDC", 0, 0, 'C');
 		$pdf->Cell(48.75, 5, $sign1[0]->fullname, 'LB', 0, 'C',);
-		$pdf->Cell(48.75, 5, $sign_rnd[0]->fullname, 'LBR', 0, 'C',);
-		$pdf->Cell(48.75, 5, $sign_rnd[1]->fullname, 'BR', 1, 'C',);
+		$pdf->Cell(48.75, 5, $sign_group[0]->fullname, 'LBR', 0, 'C',);
+		$pdf->Cell(48.75, 5, $sign_group[1]->fullname, 'BR', 1, 'C',);
 
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Sety($pdf->GetY() - 20);
+		$pdf->Sety($pdf->GetY() - 23);
 		$pdf->Cell(45, 5, "", 0, 0, 'C');
 
 		$pdf->Cell(48.75, 5, $pdf->Image($sign1[0]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
-		$pdf->Cell(48.75, 5, $pdf->Image($sign_rnd[0]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
-		$pdf->Cell(48.75, 5, $pdf->Image($sign_rnd[1]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 1, 'L');
+		$pdf->Cell(48.75, 5, $pdf->Image($sign_group[0]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 0, 'L');
+		$pdf->Cell(48.75, 5, $pdf->Image($sign_group[1]->su_sign_path, $pdf->GetX(), $pdf->GetY() + 1.5, 48.75, 15), '', 1, 'L');
 
 		$pdf->Output();
 	}
@@ -959,8 +961,8 @@ class ViewPDF extends CI_Controller
 		$pdf->AddFont('THSarabunNew', 'B', 'THSarabunNew-Bold.php');
 
 		$pdf->SetY(5);
-		$image_path = 'assets/images/logos/tbkk logo form.png';
-		$pdf->Image($image_path, 5, $pdf->GetY(), 20);
+		$image_path = 'assets/images/logos/logo-tbkk.png';
+		$pdf->Image($image_path, 2, $pdf->GetY() - 8, 27);
 		$pdf->SetFont('THSarabunNew', 'B', 28);
 		$pdf->SetX(28);
 		$pdf->Cell(40, 15, 'TEAM FEASIBILITY & RISK ANALYSIS');
@@ -1083,15 +1085,14 @@ class ViewPDF extends CI_Controller
 
 		// Table Part No.
 		$pdf->Ln(8);
-		// $pdf->SetLineWidth(1.3);
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->SetFont('THSarabunNew', 'B', 12);
+		$pdf->SetFont('THSarabunNew', 'B', 13);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 4, 'No', 1, 0, 'C', true);
-		$pdf->Cell(35, 4, 'PART NUMBER', 1, 0, 'C', true);
-		$pdf->Cell(55, 4, 'PART NAME', 1, 0, 'C', true);
-		$pdf->Cell(40, 4, 'MODEL', 1, 0, 'C', true);
-		$pdf->Cell(50, 4, 'Remark', 1, 1, 'C', true);
+		$pdf->Cell(15, 6, 'No', 1, 0, 'C', true);
+		$pdf->Cell(35, 6, 'PART NUMBER', 1, 0, 'C', true);
+		$pdf->Cell(55, 6, 'PART NAME', 1, 0, 'C', true);
+		$pdf->Cell(40, 6, 'MODEL', 1, 0, 'C', true);
+		$pdf->Cell(50, 6, 'Remark', 1, 1, 'C', true);
 
 		$idc_id = $this->input->get('idc_id');
 		$consern = $this->db->select('idi_item_no, idi_item_name, idi_model, idi_remark')
@@ -1100,20 +1101,20 @@ class ViewPDF extends CI_Controller
 			->where('idi_status', 1)
 			->order_by('idi_id', 'ASC')->get()->result();
 
-		for ($i = 0; $i < 20; $i++) {
+		for ($i = 0; $i < 10; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
 			$pdf->SetFont('THSarabunNew', 'B', 11);
-			$pdf->Cell(15, 4, $i + 1, 1, 0, "C");
+			$pdf->Cell(15, 5, $i + 1, 1, 0, "C");
 
 			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
 			$part_name = isset($consern[$i]->idi_item_name) ? $consern[$i]->idi_item_name : '';
 			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
 			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
-			$pdf->Cell(35, 4, $part_no, 1, 0, 'C');
-			$pdf->Cell(55, 4, $part_name, 1, 0, 'C');
-			$pdf->Cell(40, 4, $model, 1, 0, 'C');
-			$pdf->Cell(50, 4, $remark, 1, 1, 'C'); // 35 Characters
+			$pdf->Cell(35, 5, $part_no, 1, 0, 'C');
+			$pdf->Cell(55, 5, $part_name, 1, 0, 'C');
+			$pdf->Cell(40, 5, $model, 1, 0, 'C');
+			$pdf->Cell(50, 5, iconv('UTF-8', 'TIS-620//IGNORE', $remark), 1, 1, 'C'); // 35 Characters
 		}
 
 		$pdf->Ln(4);
@@ -1177,7 +1178,7 @@ class ViewPDF extends CI_Controller
 		$pdf->Cell(43, 16, $sum_total, 1, 1, 'C', true);
 
 		// Conclusion
-		$pdf->Ln(5);
+		$pdf->Ln(8);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 15);
 		$pdf->Cell(1, 1, 'Conclusion :');
@@ -1317,10 +1318,11 @@ class ViewPDF extends CI_Controller
 		$pdf->Cell(48.75, 5, $sign_group[7]->fullname, 'LBR', 0, 'C');
 		$pdf->Cell(48.75, 5, $sign_group[2]->fullname, 'LBR', 1, 'C');
 
+		////////////////////////// PAGE 2 ////////////////////////
 		$pdf->AddPage();
 		$pdf->SetY(5);
-		$image_path = 'assets/images/logos/tbkk logo form.png';
-		$pdf->Image($image_path, 5, $pdf->GetY(), 20);
+		$image_path = 'assets/images/logos/logo-tbkk.png';
+		$pdf->Image($image_path, 2, $pdf->GetY() - 8, 27);
 		$pdf->SetFont('THSarabunNew', 'B', 28);
 		$pdf->SetX(28);
 		$pdf->Cell(40, 15, 'TEAM FEASIBILITY & RISK ANALYSIS');
@@ -1394,7 +1396,7 @@ class ViewPDF extends CI_Controller
 				$pdf->Cell(15, $height_consern, (int)$consern[$i]->ifs_score, 1, 0, 'C');
 				$pdf->Cell(15, $height_consern, $consern[$i]->ifs_total, 1, 0, 'C');
 				$pdf->Cell(80, $height_consern_title, $title1, 'LR', 0, 'L');
-				$pdf->Cell(55, $height_consern, $consern[$i]->ifs_comment, 1, 0, 'C');
+				$pdf->Cell(55, $height_consern, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->ifs_comment), 1, 0, 'C');
 				$pdf->Cell(15, $height_consern, $consern[$i]->sd_dept_aname, 1, 1, 'C');
 
 				$pdf->SetY($pdf->GetY() - 4);
@@ -1411,11 +1413,11 @@ class ViewPDF extends CI_Controller
 				$pdf->Cell(15, 8, (int)$consern[$i]->ifs_score, 1, 0, 'C');
 				$pdf->Cell(15, 8, $consern[$i]->ifs_total, 1, 0, 'C');
 				$pdf->Cell(80, $height_consern_title, $title1, 'LBR', 0, 'L');
-				$pdf->Cell(55, 8, $consern[$i]->ifs_comment, 1, 0, 'C');
+				$pdf->Cell(55, 8, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->ifs_comment), 1, 0, 'C');
 				$pdf->Cell(15, 8, $consern[$i]->sd_dept_aname, 1, 1, 'C');
 			}
 		}
-
+		
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 13);
 		$pdf->SetFillColor(235, 235, 235);
