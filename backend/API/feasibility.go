@@ -935,6 +935,7 @@ func ListFeasibilityTableHistoryDate(c *gin.Context) {
 
 func SaveScore(c *gin.Context) {
 	type Score struct {
+		Idc_id           int    `json:"idc_id"`
 		Ifs_id           int    `json:"ifs_id"`
 		Mcip_weight      string `json:"mcip_weight"`
 		Ifs_score        string `json:"ifs_score"`
@@ -966,6 +967,21 @@ func SaveScore(c *gin.Context) {
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
+	}
+
+	var idcStautus int
+	err = db.QueryRow("SELECT idc_status FROM info_document_control WHERE idc_id = ?", objScore.Idc_id).Scan(&idcStautus)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	if idcStautus == 1 {
+		_, err = db.Exec("UPDATE info_document_control SET idc_status = 2, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", objScore.Ifs_Updated_date, objScore.Ifs_Updated_by, objScore.Idc_id)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			return
+		}
 	}
 
 	c.IndentedJSON(http.StatusOK, objResult)
@@ -1388,38 +1404,55 @@ func NewSubmitFeasibility(c *gin.Context) {
 			return
 		}
 
-		// Insert Approval
-		var sqlIda string = "INSERT INTO info_document_approval (swg_id, su_id, sat_id, ida_seq_no, idc_id, ifs_id, ida_created_date, ida_created_by, ida_updated_date, ida_updated_by) VALUES "
-		objListIda := []string{}
-		for _, consItem := range resultsCons {
-			objIda := fmt.Sprintf("(%d, %d, %d, %d, %d, %d, '%s', '%s', '%s', '%s')",
-				results.SwgId,
-				results.UserID,
-				results.SatID,
-				countSeqNo,
-				convertedId,
-				consItem.Ifs_id,
-				objData.Idc_created_date,
-				objData.Idc_created_by,
-				objData.Idc_created_date,
-				objData.Idc_created_by,
-			)
-			objListIda = append(objListIda, objIda)
-			countSeqNo++
-		}
-
-		if len(objListIda) == 0 {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+		var chkInfoIda int
+		err = db.QueryRow(`SELECT CASE WHEN COUNT(su_id) > 0 THEN 1 ELSE 0 END AS info_ida FROM info_document_approval WHERE su_id = ? AND idc_id = ?`, results.UserID, convertedId).Scan(&chkInfoIda)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query"})
 			return
 		}
 
-		sqlIda += strings.Join(objListIda, ",")
+		if chkInfoIda == 1 {
+			updateIdaBy := "UPDATE info_document_approval SET ida_status = 1, ida_action = 0, ida_route = 0, ida_reject_reason = ?, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND su_id = ?"
+			_, err = db.Exec(updateIdaBy, "", objData.Idc_created_date, objData.Idc_created_by, convertedId, results.UserID)
+			if err != nil {
+				c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+				return
+			}
+		} else {
+			// Insert Approval
+			var sqlIda string = "INSERT INTO info_document_approval (swg_id, su_id, sat_id, ida_seq_no, idc_id, ifs_id, ida_created_date, ida_created_by, ida_updated_date, ida_updated_by) VALUES "
+			objListIda := []string{}
+			for _, consItem := range resultsCons {
+				objIda := fmt.Sprintf("(%d, %d, %d, %d, %d, %d, '%s', '%s', '%s', '%s')",
+					results.SwgId,
+					results.UserID,
+					results.SatID,
+					countSeqNo,
+					convertedId,
+					consItem.Ifs_id,
+					objData.Idc_created_date,
+					objData.Idc_created_by,
+					objData.Idc_created_date,
+					objData.Idc_created_by,
+				)
+				objListIda = append(objListIda, objIda)
+				countSeqNo++
+			}
 
-		_, errIda := db.Exec(sqlIda)
-		if errIda != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error3": errIda.Error()})
-			return
+			if len(objListIda) == 0 {
+				c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+				return
+			}
+
+			sqlIda += strings.Join(objListIda, ",")
+
+			_, errIda := db.Exec(sqlIda)
+			if errIda != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error3": errIda.Error()})
+				return
+			}
 		}
+
 		type notiActive struct {
 			Ida_id       int    `json:"ida_id"`
 			Su_id        int    `json:"su_id"`
@@ -1470,7 +1503,7 @@ func NewSubmitFeasibility(c *gin.Context) {
 		}
 
 		if len(objListNoti) == 0 {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้"})
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลที่สามารถบันทึกได้2"})
 			return
 		}
 

@@ -1,0 +1,28 @@
+name: CMR to IIS (Self-hosted)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-frontend:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      
+
+      - name: Deploy to IIS folder
+        shell: cmd
+        run: |
+          set TARGET=C:\inetpub\wwwroot\CRM_DOCKER1
+
+          echo Cleaning old files...
+          if exist "%TARGET%" rmdir /s /q "%TARGET%"
+          mkdir "%TARGET%"
+
+          echo Copying built files to IIS...
+          xcopy dist "%TARGET%\" /E /I /Y

@@ -116,6 +116,8 @@
                             });
                         }
                     });
+                } else {
+                    window.close();
                 }
             });
             return;

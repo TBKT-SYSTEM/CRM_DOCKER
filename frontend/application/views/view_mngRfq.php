@@ -2317,11 +2317,11 @@
                 },
                 {
                     className: 'text-center',
-                    data: 'idc_updated_by',
+                    data: 'idc_created_by',
                     "render": function(data, type, row) {
                         if (type === 'display') {
                             if (row.create_by != "") {
-                                let emp_code = row.idc_updated_by.substring(2, 7);
+                                let emp_code = row.idc_created_by.substring(2, 7);
                                 let img_ok = 'http://192.168.161.207/tbkk_shopfloor_sys/asset/img_emp/' + emp_code + '.jpg';
                                 let img_error = '<?php echo base_url() ?>' + 'assets/images/logos/user-3.png';
                                 disp = '<div class="d-flex align-items-center justify-content-center">' +
@@ -2329,7 +2329,7 @@
                                     '<div class="ms-3">' +
                                     '<div class="user-meta-info">' +
                                     '<h6 class="user-name mb-0" data-name="' + row.su_firstname + ' ' + row.su_lastname + '">' + row.su_firstname + '</h6>' +
-                                    '<span class="user-work fs-3" data-occupation="' + row.idc_updated_by + '">' + row.idc_updated_by + '</span>' +
+                                    '<span class="user-work fs-3" data-occupation="' + row.idc_created_by + '">' + row.idc_created_by + '</span>' +
                                     '</div></div></div>';
 
                             } else {

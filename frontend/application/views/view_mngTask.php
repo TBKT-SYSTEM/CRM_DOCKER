@@ -124,7 +124,7 @@
 </div>
 
 <!-- Modal for View RFQ No-->
-<div class="modal fade" id="mdlReferRfq" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal fade" id="mdlReferRfq" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-xxl modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -266,7 +266,7 @@
                     "render": function(data, type, row) {
                         return `
                                 <div class="d-flex justify-content-evenly gap-1">
-                                    <button type="button" onclick="viewApproveModal('${row.idc_running_no}', '${row.idc_id}')" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
+                                    <button type="button" onclick="viewRfqPDF('${row.idc_running_no}', '${row.idc_id}')" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
                                         <i class="ti ti-zoom-exclamation" data-bs-target="#mdlApprove" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
                                     </button>
                                     <button id="btnPDF" onclick="viewPDF('${row.idc_running_no}', '${row.mdt_position1}')" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF">
@@ -284,6 +284,8 @@
                 new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
+
+        
     }
     async function ViewAll() {
         if ($.fn.DataTable.isDataTable('#tblMngTask')) {

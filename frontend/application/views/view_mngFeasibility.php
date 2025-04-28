@@ -1716,6 +1716,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var data_score = {
+                    "idc_id": idc_id,
                     "ifs_id": ifs_id,
                     "mcip_weight": inpWeight,
                     "ifs_score": inpScore,
@@ -1731,6 +1732,8 @@
                     data: JSON.stringify(data_score),
                     success: function(data) {
                         if (data != false) {
+                            var dataTable = $('#tblFS').DataTable();
+                            dataTable.ajax.reload(null, false);
                             $('#mdlScore').modal('hide');
                             Swal.fire({
                                 html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Save Score success!</p>",
@@ -1745,6 +1748,8 @@
                                 editScore(idc_id);
                             });
                         } else {
+                            var dataTable = $('#tblFS').DataTable();
+                            dataTable.ajax.reload(null, false);
                             $('#mdlScore').modal('hide');
                             Swal.fire({
                                 html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error Save Score!</p>",
@@ -1816,7 +1821,7 @@
                                                     type: 'GET',
                                                     url: API_URL + 'feasibility/totalScore/' + data.idc_id,
                                                 });
-                                                if (userDept == 41 || userDept == 47|| userDept == 20) {
+                                                if (userDept == 41 || userDept == 47 || userDept == 20) {
                                                     allStatusValid = false;
                                                 }
                                                 response.forEach(item => {
@@ -1829,15 +1834,18 @@
                                                     if (isMyDept) {
                                                         btnNone = '';
                                                         disabled = '';
-                                                        
+
                                                         if (item.ifs_status == 0) {
                                                             allStatusValid = false;
                                                         } else if (item.ifs_status == 2) {
                                                             btnNone = 'd-none';
                                                             bgTr = `style="background-color: #bfbfbf61;"`;
+                                                            allStatusValid = false;
                                                         } else if (item.ifs_status == 9) {
                                                             btnNone = 'd-none';
                                                             bgTr = `style="background-color: #9aff713d;"`;
+                                                        }else if (item.ifs_status == 6) {
+                                                            bgTr = `style="background-color:rgba(255, 113, 113, 0.24);"`;
                                                         }
                                                     }
                                                     const scoreClass = parseInt(item.ifs_score) > 0 ? 'bg-success-subtle border-success-subtle' : 'bg-warning-subtle border-warning-subtle';

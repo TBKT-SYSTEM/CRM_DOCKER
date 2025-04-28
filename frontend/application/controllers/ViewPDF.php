@@ -1237,7 +1237,7 @@ class ViewPDF extends CI_Controller
 		$pdf->SetFont('THSarabunNew', 'B', 15);
 		$pdf->Cell(1, 1, 'Sign Off :');
 
-		$sign_group = $this->db->select("
+		$sign_group_from_db = $this->db->select("
         CASE 
             WHEN ida.ida_status = 9 THEN su.su_sign_path 
             ELSE 'null' 
@@ -1259,20 +1259,31 @@ class ViewPDF extends CI_Controller
 			"fullname" => "Error signature"
 		];
 
-		foreach ($sign_group as $sign) {
-			if (empty($sign->su_sign_path) || !file_exists($sign->su_sign_path)) {
-				$sign->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
+		$sign_group = array_fill(0, 8, clone $default_sign);
+
+		$dept_mapping = [
+			'PE' => 0,
+			'CE' => 1,
+			'GDC' => 2,
+			'R&D' => 3,
+			'S&M' => 4,
+			'PU' => 5,
+			'SCM' => 6,
+			'PC&L' => 7,
+		];
+
+		foreach ($sign_group_from_db as $sign) {
+			$dept_name = trim($sign->dept ?? '');
+			if (!empty($dept_name)) {
+				if (isset($dept_mapping[$dept_name])) {
+					$index = $dept_mapping[$dept_name];
+					if (empty($sign->su_sign_path) || !file_exists($sign->su_sign_path)) {
+						$sign->su_sign_path = 'assets/images/uploaded/signature/EmptySign.png';
+					}
+					$sign->fullname = !empty($sign->fullname) ? $sign->fullname : "Error signature";
+					$sign_group[$index] = clone $sign;
+				}
 			}
-
-			$sign->fullname = !empty($sign->fullname) ? $sign->fullname : "Error signature";
-		}
-
-		while (count($sign_group) < 8) {
-			$sign_group[] = clone $default_sign;
-		}
-
-		if (empty($sign_group)) {
-			$sign_group = [clone $default_sign, clone $default_sign, clone $default_sign];
 		}
 
 		$pdf->Ln(6);
@@ -1286,16 +1297,16 @@ class ViewPDF extends CI_Controller
 
 		$pdf->SetX($pdf->GetX() - 4);
 
-		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[3]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
 		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[0]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
 		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[1]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
-		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[5]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 1, 'C');
+		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[2]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
+		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[3]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 1, 'C');
 
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(48.75, 5, $sign_group[3]->fullname, 'LBR', 0, 'C');
 		$pdf->Cell(48.75, 5, $sign_group[0]->fullname, 'LBR', 0, 'C');
 		$pdf->Cell(48.75, 5, $sign_group[1]->fullname, 'LBR', 0, 'C');
-		$pdf->Cell(48.75, 5, $sign_group[5]->fullname, 'LBR', 1, 'C');
+		$pdf->Cell(48.75, 5, $sign_group[2]->fullname, 'LBR', 0, 'C');
+		$pdf->Cell(48.75, 5, $sign_group[3]->fullname, 'LBR', 1, 'C');
 
 		$pdf->Ln(6);
 		$pdf->SetX($pdf->GetX() - 4);
@@ -1307,16 +1318,16 @@ class ViewPDF extends CI_Controller
 		$pdf->Cell(48.75, 4, 'Project Control', 1, 1, 'C', true);
 
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[6]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
 		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[4]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
-		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[7]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
-		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[2]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 1, 'C');
+		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[5]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
+		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[6]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 0, 'C');
+		$pdf->Cell(48.75, 20, $pdf->Image($sign_group[7]->su_sign_path, $pdf->GetX(), $pdf->GetY(), 48.75, 20), 'LR', 1, 'C');
 
 		$pdf->SetX($pdf->GetX() - 4);
-		$pdf->Cell(48.75, 5, $sign_group[6]->fullname, 'LBR', 0, 'C');
 		$pdf->Cell(48.75, 5, $sign_group[4]->fullname, 'LBR', 0, 'C');
-		$pdf->Cell(48.75, 5, $sign_group[7]->fullname, 'LBR', 0, 'C');
-		$pdf->Cell(48.75, 5, $sign_group[2]->fullname, 'LBR', 1, 'C');
+		$pdf->Cell(48.75, 5, $sign_group[5]->fullname, 'LBR', 0, 'C');
+		$pdf->Cell(48.75, 5, $sign_group[6]->fullname, 'LBR', 0, 'C');
+		$pdf->Cell(48.75, 5, $sign_group[7]->fullname, 'LBR', 1, 'C');
 
 		////////////////////////// PAGE 2 ////////////////////////
 		$pdf->AddPage();
@@ -1377,48 +1388,76 @@ class ViewPDF extends CI_Controller
 		$pdf->Cell(55, 5, 'Comment', 1, 0, 'C', true);
 		$pdf->Cell(15, 5, 'P.I.C', 1, 1, 'C', true);
 
+		$pdf->SetX($pdf->GetX() - 4);
 		for ($i = 0; $i < count($consern); $i++) {
 			if ($consern[$i]->ifs_score == 0) {
 				$consern[$i]->ifs_score = "";
 				$consern[$i]->ifs_total = "-";
 			}
-			$count_title = strlen($consern[$i]->mci_name);
 
-			if ($count_title > 66) {
-				$title1 = substr($consern[$i]->mci_name, 0, 66);
-				$title2 = substr($consern[$i]->mci_name, 66);
-				$height_consern = 8;
-				$height_consern_title = 4;
-				$pdf->SetX($pdf->GetX() - 4);
-				$pdf->SetFont('THSarabunNew', 'B', 10);
-				$pdf->SetFillColor(255, 255, 255);
-				$pdf->Cell(15, $height_consern, $consern[$i]->mcip_weight, 1, 0, 'C');
-				$pdf->Cell(15, $height_consern, (int)$consern[$i]->ifs_score, 1, 0, 'C');
-				$pdf->Cell(15, $height_consern, $consern[$i]->ifs_total, 1, 0, 'C');
-				$pdf->Cell(80, $height_consern_title, $title1, 'LR', 0, 'L');
-				$pdf->Cell(55, $height_consern, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->ifs_comment), 1, 0, 'C');
-				$pdf->Cell(15, $height_consern, $consern[$i]->sd_dept_aname, 1, 1, 'C');
+			$lineHeight = 5;
+			$fontFamily = 'THSarabunNew';
+			$x = $pdf->GetX();
+			$y = $pdf->GetY();
 
-				$pdf->SetY($pdf->GetY() - 4);
-				$pdf->SetX($pdf->GetX() + 41);
-				$pdf->Cell(80, $height_consern_title, $title2, 'B', 1, 'L');
-			} else {
-				$title1 = $consern[$i]->mci_name;
-				$height_consern_title = 8;
+			$pdf->SetFont($fontFamily, 'B', 10);
+			$pdf->SetFillColor(255, 255, 255);
 
-				$pdf->SetX($pdf->GetX() - 4);
-				$pdf->SetFont('THSarabunNew', 'B', 10);
-				$pdf->SetFillColor(255, 255, 255);
-				$pdf->Cell(15, 8, $consern[$i]->mcip_weight, 1, 0, 'C');
-				$pdf->Cell(15, 8, (int)$consern[$i]->ifs_score, 1, 0, 'C');
-				$pdf->Cell(15, 8, $consern[$i]->ifs_total, 1, 0, 'C');
-				$pdf->Cell(80, $height_consern_title, $title1, 'LBR', 0, 'L');
-				$pdf->Cell(55, 8, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->ifs_comment), 1, 0, 'C');
-				$pdf->Cell(15, 8, $consern[$i]->sd_dept_aname, 1, 1, 'C');
-			}
+			// 1. วัดความสูงจริงเฉพาะช่องที่ยาว
+			$pdf->SetXY($x + 45, $y);
+			$pdf->MultiCell(80, $lineHeight, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->mci_name), 0, 'L');
+			$h1 = $pdf->GetY() - $y;
+
+			$pdf->SetXY($x + 125, $y);
+			$pdf->MultiCell(55, $lineHeight, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->ifs_comment), 0, 'L');
+			$h2 = $pdf->GetY() - $y;
+
+			// $pdf->SetXY($x + 180, $y);
+			// $pdf->Cell(15, $lineHeight, $consern[$i]->sd_dept_aname, 0, 0, 'C');
+			$h3 = $pdf->GetY() - $y;
+
+			// หาความสูงมากที่สุดของแถวนี้
+			$maxHeight = max($h1, $h2, $h3, 8);
+
+			// 2. วาด Cell เส้นเต็มของทั้งแถว
+			$pdf->SetXY($x, $y);
+			$pdf->Cell(15, $maxHeight, '', 1, 0, 'C');
+			$pdf->Cell(15, $maxHeight, '', 1, 0, 'C');
+			$pdf->Cell(15, $maxHeight, '', 1, 0, 'C');
+			$pdf->Cell(80, $maxHeight, '', 1, 0, 'L');
+			$pdf->Cell(55, $maxHeight, '', 1, 0, 'L');
+			$pdf->Cell(15, $maxHeight, '', 1, 1, 'C');
+
+			// 3. วาดข้อความ
+
+			// Weight
+			$pdf->SetXY($x, $y);
+			$pdf->Cell(15, $maxHeight, $consern[$i]->mcip_weight, 0, 0, 'C');
+
+			// Score
+			$pdf->SetXY($x + 15, $y);
+			$pdf->Cell(15, $maxHeight, (int)$consern[$i]->ifs_score, 0, 0, 'C');
+
+			// Total
+			$pdf->SetXY($x + 30, $y);
+			$pdf->Cell(15, $maxHeight, $consern[$i]->ifs_total, 0, 0, 'C');
+
+			// Consideration
+			$pdf->SetXY($x + 45, $y);
+			$pdf->MultiCell(80, $lineHeight, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->mci_name), 0, 'L');
+
+			// Comment
+			$pdf->SetXY($x + 125, $y);
+			$pdf->MultiCell(55, $lineHeight, iconv('UTF-8', 'TIS-620//IGNORE', $consern[$i]->ifs_comment), 0, 'L');
+
+			// P.I.C
+			$pdf->SetXY($x + 180, $y);
+			$pdf->Cell(15, $maxHeight, $consern[$i]->sd_dept_aname, 0, 0, 'C');
+
+			// 4. ลงมาแถวใหม่
+			$pdf->SetXY($x, $y + $maxHeight);
 		}
-		
-		$pdf->SetX($pdf->GetX() - 4);
+
 		$pdf->SetFont('THSarabunNew', 'B', 13);
 		$pdf->SetFillColor(235, 235, 235);
 		$pdf->Cell(15, 8, '', '', 0, 'C');

@@ -557,7 +557,7 @@
         let proLife = document.getElementById('inpProjectLife');
         let proTim = document.getElementById('inpProTim');
 
-        if (groupPartData.length > 10) {
+        if (groupPartData.length > 9) {
             Swal.fire({
                 html: "<h3>Cannot add more than 10 items. !</h3>",
                 icon: 'warning',
