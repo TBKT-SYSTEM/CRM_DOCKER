@@ -18,7 +18,7 @@ jobs:
       - name: Deploy to IIS folder
         shell: cmd
         run: |
-          set TARGET=C:\inetpub\wwwroot\CRM_DOCKER1
+          set TARGET=C:\inetpub\wwwroot\CRM_DOCKER
 
           echo Cleaning old files...
           if exist "%TARGET%" rmdir /s /q "%TARGET%"
