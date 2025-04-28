@@ -25,4 +25,4 @@ jobs:
           mkdir "%TARGET%"
 
           echo Copying built files to IIS...
-          xcopy dist "%TARGET%\" /E /I /Y
+          xcopy * "%TARGET%\" /E /I /Y /H
