@@ -26,10 +26,33 @@ jobs:
           set SOURCE=%GITHUB_WORKSPACE%
           set TARGET=C:\inetpub\wwwroot\CRM_DOCKER
 
-          echo Cleaning old files...
-          if exist "%TARGET%" rmdir /s /q "%TARGET%"
-          mkdir "%TARGET%"
+          echo Cleaning files inside target folder but skipping 'frontend\assets\images\uploaded'...
+
+          for /d %%i in ("%TARGET%\*") do (
+              if /i not "%%~nxi"=="frontend" (
+                  rmdir /s /q "%%i"
+              ) else (
+                  for /d %%j in ("%%i\*") do (
+                      if /i not "%%~nxj"=="assets" (
+                          rmdir /s /q "%%j"
+                      ) else (
+                          for /d %%k in ("%%j\*") do (
+                              if /i not "%%~nxk"=="images" (
+                                  rmdir /s /q "%%k"
+                              ) else (
+                                  for /d %%l in ("%%k\*") do (
+                                      if /i not "%%~nxl"=="uploaded" (
+                                          rmdir /s /q "%%l"
+                                      )
+                                  )
+                              )
+                          )
+                      )
+                  )
+              )
+          )
+
+          for %%i in ("%TARGET%\*.*") do del /f /q "%%i"
 
           echo Copying all files but excluding frontend\assets\images\uploaded...
           robocopy "%SOURCE%" "%TARGET%" /E /Z /XD "%SOURCE%\frontend\assets\images\uploaded" || exit 0
-
