@@ -18,7 +18,7 @@ jobs:
         run: |
           echo Installing Composer dependencies...
           cd %GITHUB_WORKSPACE%\frontend
-          "C:\Program Files\PHP\v7.4\php.exe" "%ProgramFiles%\Composer\composer.phar" install --no-interaction --prefer-dist --optimize-autoloader
+          composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Deploy to IIS folder
         shell: cmd
