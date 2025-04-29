@@ -18,7 +18,8 @@ jobs:
         run: |
           echo Installing Composer dependencies...
           cd %GITHUB_WORKSPACE%\frontend
-          composer install --no-interaction --prefer-dist --optimize-autoloader
+          composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+
 
       - name: Deploy to IIS folder
         shell: cmd
