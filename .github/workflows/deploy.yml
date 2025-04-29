@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  deploy-frontend:
+  deploy-project:
     runs-on: self-hosted
 
     steps:
@@ -20,15 +20,15 @@ jobs:
           cd %GITHUB_WORKSPACE%\frontend
           composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
-
-      - name: Deploy to IIS folder
+      - name: Deploy project to IIS
         shell: cmd
         run: |
+          set SOURCE=%GITHUB_WORKSPACE%
           set TARGET=C:\inetpub\wwwroot\CRM_DOCKER
 
           echo Cleaning old files...
           if exist "%TARGET%" rmdir /s /q "%TARGET%"
           mkdir "%TARGET%"
 
-          echo Copying built files to IIS...
-          xcopy * "%TARGET%\" /E /I /Y /H
+          echo Copying all files but excluding frontend\assets\images\uploaded...
+          robocopy "%SOURCE%" "%TARGET%" /E /Z /XD "%SOURCE%\frontend\assets\images\uploaded"
