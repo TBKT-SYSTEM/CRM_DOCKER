@@ -13,7 +13,12 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      
+      - name: Install Composer dependencies
+        shell: cmd
+        run: |
+          echo Installing Composer dependencies...
+          cd %GITHUB_WORKSPACE%\frontend
+          composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Deploy to IIS folder
         shell: cmd
