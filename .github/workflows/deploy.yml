@@ -31,4 +31,5 @@ jobs:
           mkdir "%TARGET%"
 
           echo Copying all files but excluding frontend\assets\images\uploaded...
-          robocopy "%SOURCE%" "%TARGET%" /E /Z /XD "%SOURCE%\frontend\assets\images\uploaded"
+          robocopy "%SOURCE%" "%TARGET%" /E /Z /XD "%SOURCE%\frontend\assets\images\uploaded" || exit 0
+
