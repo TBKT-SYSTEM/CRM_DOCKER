@@ -548,11 +548,20 @@ func SmdIsUnique(c *gin.Context) {
 }
 func InsertSmd(c *gin.Context) {
 	var objMenuDetail MenuDetail
+	var order int
 	if err := c.BindJSON(&objMenuDetail); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("INSERT INTO sys_menu_detail(smd_name, smd_link, smg_id, smd_created_date, smd_created_by, smd_updated_date, smd_updated_by) VALUES(?,?,?,?,?,?,?)", objMenuDetail.Smd_name, objMenuDetail.Smd_link, objMenuDetail.Smg_id, objMenuDetail.Create_date, objMenuDetail.Create_by, objMenuDetail.Create_date, objMenuDetail.Create_by)
+
+	query := `SELECT IFNULL(MAX(smd_order_no) + 1 , 0 + 1) AS max_order FROM sys_menu_detail WHERE smg_id = ?`
+	err := db.QueryRow(query, objMenuDetail.Smg_id).Scan(&order)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		return
+	}
+
+	objResult, err := db.Exec("INSERT INTO sys_menu_detail(smd_name, smd_link, smd_order_no, smg_id, smd_created_date, smd_created_by, smd_updated_date, smd_updated_by) VALUES(?,?,?,?,?,?,?,?)", objMenuDetail.Smd_name, objMenuDetail.Smd_link, order, objMenuDetail.Smg_id, objMenuDetail.Create_date, objMenuDetail.Create_by, objMenuDetail.Create_date, objMenuDetail.Create_by)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
 		return
@@ -1387,13 +1396,19 @@ func NotifyUpdate(c *gin.Context) {
 
 func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail string, caseType string) error {
 	type EmailApprove struct {
-		DocId        int
-		Username     string
-		Detail       string
-		detailReject string
-		LinkApporve  string
-		LinkReject   string
-		LinkPreview  string
+		DocId             int
+		Username          string
+		Detail            string
+		ReferenceDocument string
+		Customer          string
+		Subject           string
+		ProjectLife       int
+		ProjectStart      string
+		TableDetail       template.HTML
+		detailReject      string
+		LinkApporve       string
+		LinkReject        string
+		LinkPreview       string
 	}
 	type Document struct {
 		Idc_id         int    `json:"idc_id"`
@@ -1403,6 +1418,8 @@ func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail s
 	var templateMail string
 	var detail string
 	var detailReject string
+	var tableBody string
+	var tableDetail string
 
 	MAILER_HOST := "smtp.office365.com"
 	MAILER_PORT := 25
@@ -1454,14 +1471,120 @@ func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail s
 		detail = `Your document "` + objDocument.Idc_running_no + `" has been rejected by ` + Fullname
 	}
 
+	var DatareferenceDocument string
+	var Datacustomer string
+	var Datasubject string
+	var DataprojectLife int
+	var DataprojectStart string
+	otherDetailQuery := "SELECT IFNULL(( SELECT tb2.idc_running_no FROM info_document_control tb2 WHERE tb2.idc_id = idc.idc_refer_doc ), '-') AS refer_doc, idc.idc_customer_name, CASE WHEN idc.mds_id = 4 THEN idc.idc_subject_note ELSE mds.mds_name END AS subject_name, idc.idc_project_life, idc.idc_project_start FROM info_document_control idc LEFT JOIN mst_document_subject mds ON mds.mds_id = idc.mds_id WHERE idc.idc_id = ?"
+	err = db.QueryRow(otherDetailQuery, docId).Scan(&DatareferenceDocument, &Datacustomer, &Datasubject, &DataprojectLife, &DataprojectStart)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": "No data found"})
+		} else {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		}
+		return err
+	}
+
+	var docType int
+	docTypeQuery := "SELECT mdt_id FROM info_document_control WHERE idc_id = ?"
+	err = db.QueryRow(docTypeQuery, docId).Scan(&docType)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.IndentedJSON(http.StatusOK, gin.H{"Error": "No data found"})
+		} else {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		}
+		return err
+	}
+
+	if docType == 1 {
+		type ConsernDetail struct {
+			Mcip_weight string  `json:"mcip_weight"`
+			Ifs_score   float64 `json:"ifs_score"`
+			Ifs_total   float64 `json:"ifs_total"`
+			Mci_name    string  `json:"mci_name"`
+			Ifs_comment string  `json:"ifs_comment"`
+		}
+
+		var ojbScoreDetail []ConsernDetail
+		queryScoreDetail := "SELECT mcip.mcip_weight, ifs.ifs_score, ifs.ifs_total, mci.mci_name, CASE WHEN ifs.ifs_comment IS NULL OR ifs.ifs_comment = '' THEN '-' ELSE ifs.ifs_comment END AS ifs_comment FROM info_feasibility_score ifs LEFT JOIN mst_consideration_item_pic mcip ON mcip.mcip_id = ifs.mcip_id LEFT JOIN mst_consideration_item mci ON mci.mci_id = mcip.mci_id WHERE ifs.idc_id = (SELECT idc_id FROM info_document_approval WHERE ida_id = ?) AND mcip.sd_id = (SELECT swg.sd_id FROM info_document_approval ida LEFT JOIN sys_workflow_group swg ON swg.swg_id = ida.swg_id WHERE ida_id = ?)"
+		rows, err := db.Query(queryScoreDetail, idaId, idaId)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.IndentedJSON(http.StatusOK, gin.H{"Error": "No data found"})
+			} else {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+			}
+			return err
+		}
+		for rows.Next() {
+			var objScoreDetail ConsernDetail
+			if err := rows.Scan(&objScoreDetail.Mcip_weight, &objScoreDetail.Ifs_score, &objScoreDetail.Ifs_total, &objScoreDetail.Mci_name, &objScoreDetail.Ifs_comment); err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan row data"})
+				return err
+			}
+			ojbScoreDetail = append(ojbScoreDetail, objScoreDetail)
+		}
+
+		if err := rows.Err(); err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while reading rows"})
+			return err
+		}
+
+		for i := range ojbScoreDetail {
+			tableDetail += `<tr>
+								<td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">` + ojbScoreDetail[i].Mcip_weight + `</td>
+								<td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">` + strconv.FormatFloat(ojbScoreDetail[i].Ifs_score, 'f', -1, 64) + `</td>
+								<td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">` + strconv.FormatFloat(ojbScoreDetail[i].Ifs_total, 'f', -1, 64) + `</td>
+								<td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">` + ojbScoreDetail[i].Mci_name + `</td>	
+								<td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">` + ojbScoreDetail[i].Ifs_comment + `</td>
+							</tr>`
+
+			tableBody = `<tr>
+                        <td style="padding: 20px 0;">
+                            <table role="presentation" cellspacing="0" cellpadding="10" border="0" align="center"
+                                style="margin: 0 auto; border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 14px; color: #333; border: 1px solid #b0d4f1;">
+                                <thead>
+                                    <tr style="background-color: #e1f0fb;">
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">
+                                            Weight</th>
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">
+                                            Score</th>
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">
+                                            Total</th>
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">
+                                            Consideration</th>
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">
+                                            Comment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+									` + tableDetail + `
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>`
+		}
+	} else {
+		tableBody = ``
+	}
+
 	data := EmailApprove{
-		DocId:        docId,
-		Username:     userName,
-		Detail:       detail,
-		detailReject: detailReject,
-		LinkApporve:  approveURL,
-		LinkReject:   rejectURL,
-		LinkPreview:  previewURL,
+		DocId:             docId,
+		Username:          userName,
+		Detail:            detail,
+		ReferenceDocument: DatareferenceDocument,
+		Customer:          Datacustomer,
+		Subject:           Datasubject,
+		ProjectLife:       DataprojectLife,
+		ProjectStart:      DataprojectStart,
+		TableDetail:       template.HTML(tableBody),
+		detailReject:      detailReject,
+		LinkApporve:       approveURL,
+		LinkReject:        rejectURL,
+		LinkPreview:       previewURL,
 	}
 
 	tmpl, err := template.ParseFiles(templateMail)
@@ -1889,6 +2012,12 @@ func ApproveByEmail(c *gin.Context) {
 					return
 				}
 
+				IdaID, err := strconv.Atoi(idaID)
+				if err != nil {
+					fmt.Println("Error3.3e converting to int:", err)
+					return
+				}
+
 				if objNotiActive.Ida_count == "0" || objNotiActive.Ida_count == "" {
 					err = InsertReferDoc(c, idcId)
 					if err != nil {
@@ -1896,7 +2025,7 @@ func ApproveByEmail(c *gin.Context) {
 						return
 					}
 
-					err = SendMail(c, idcId, objNotiActive.Ida_id, objUserCreate.Su_firstname, objUserCreate.Su_email, "approve")
+					err = SendMail(c, idcId, IdaID, objUserCreate.Su_firstname, objUserCreate.Su_email, "approve")
 					if err != nil {
 						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error5e": err.Error()})
 						return

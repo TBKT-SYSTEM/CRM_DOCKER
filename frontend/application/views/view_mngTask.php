@@ -4,7 +4,7 @@
         <div class="card-body px-4 py-3">
             <div class="row align-items-center">
                 <div class="col-9">
-                    <h4 class="fw-semibold mb-8">Task Control</h4>
+                    <h4 class="fw-semibold mb-8">Manage Task</h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
@@ -266,8 +266,8 @@
                     "render": function(data, type, row) {
                         return `
                                 <div class="d-flex justify-content-evenly gap-1">
-                                    <button type="button" onclick="viewRfqPDF('${row.idc_running_no}', '${row.idc_id}')" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
-                                        <i class="ti ti-zoom-exclamation" data-bs-target="#mdlApprove" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
+                                    <button type="button" onclick="viewRfqPDF('${row.idc_running_no}', '${row.mdt_position1}')" class="btn bg-warning-subtle text-warning rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="See">
+                                        <i class="ti ti-zoom-exclamation" data-bs-target="#mdlReferRfq" data-bs-toggle="modal" style="font-size: 1.5rem !important;"></i>
                                     </button>
                                     <button id="btnPDF" onclick="viewPDF('${row.idc_running_no}', '${row.mdt_position1}')" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF">
                                         <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>

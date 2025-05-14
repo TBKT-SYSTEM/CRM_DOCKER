@@ -7,6 +7,7 @@ class RfqForm extends CI_Controller
 {
 	private $another_css;
 	public $another_js;
+	public $another_chart_js;
 	private $data;
 
 	public function __construct()
@@ -33,6 +34,7 @@ class RfqForm extends CI_Controller
 
 	protected function render_view($path)
 	{
+		$this->data['another_chart_js'] = $this->another_chart_js;
 		$this->data['another_css'] = $this->another_css;
 		$this->data['another_js'] = $this->another_js;
 		$this->data['topbar'] = $this->parser->parse('page/top_navbar', $this->top_navbar_data, TRUE);
@@ -43,6 +45,7 @@ class RfqForm extends CI_Controller
 	}
 	public function index()
 	{
+		$this->another_chart_js = "";
 		$this->another_js = "<script src='" . base_url() . "assets/libs/datatables.net/js/jquery.dataTables.min.js'></script>";
 		$this->another_js .= "<script src='" . base_url() . "assets/js/datatable/datatable-basic.init.js'></script>";
 		$this->render_view('view_issuerfq');
@@ -252,6 +255,7 @@ class RfqForm extends CI_Controller
 			if ($mds_all[$i]->mds_name == 'Other') {
 				if ($get_mds == $mds_all[$i]->mds_id) {
 					$subject_note = $this->input->get('idc_subject_note');
+					$subject_note = iconv('UTF-8', 'TIS-620//IGNORE', $subject_note);
 					$pdf->Cell(30, 5, $subject_note, 'B', 0, 'C');
 				} else {
 					$pdf->Cell(30, 5, $subject_note, 'B', 0, 'C');
@@ -358,9 +362,21 @@ class RfqForm extends CI_Controller
 			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
 			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
+			$part_no = iconv('UTF-8', 'TIS-620//IGNORE', $part_no);
+			$part_name = iconv('UTF-8', 'TIS-620//IGNORE', $part_name);
+			$model = iconv('UTF-8', 'TIS-620//IGNORE', $model);
+			$remark = iconv('UTF-8', 'TIS-620//IGNORE', $remark);
+
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_no) > 20) ? 9.5 : 13);
 			$pdf->Cell(35, 5.5, $part_no, 1, 0, 'C');
+
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_name) > 30) ? 9.5 : 13);
 			$pdf->Cell(55, 5.5, $part_name, 1, 0, 'C');
+
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($model) > 20) ? 9.5 : 13);
 			$pdf->Cell(40, 5.5, $model, 1, 0, 'C');
+			
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($remark) > 30) ? 9.5 : 13);
 			$pdf->Cell(50, 5.5, iconv('UTF-8', 'TIS-620//IGNORE', $remark), 1, 1, 'C'); // 35 Characters
 		}
 

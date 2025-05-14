@@ -221,7 +221,7 @@
 
 
 <!-- Modal for edit Incharge -->
-<div class="modal fade" id="mdlEditIncharge" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal fade modal-lg" id="mdlEditIncharge" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -232,7 +232,7 @@
             </div>
             <div class="modal-body">
                 <form id="frmEditConsideration" name="frmEditConsideration">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtMci" class="form-label fw-semibold col-sm-3 col-form-label">Topic</label>
                             <div class="col-sm-9">
@@ -270,7 +270,7 @@
     </div>
 </div>
 <!-- Modal for edit Consideration -->
-<div class="modal fade" id="mdlEditConsideration" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal fade modal-lg" id="mdlEditConsideration" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -281,7 +281,7 @@
             </div>
             <div class="modal-body">
                 <form id="edit_formConsider" name="edit_formConsider">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtName" class="form-label fw-semibold col-sm-3 col-form-label">Consideration Name</label>
                             <div class="col-sm-9">

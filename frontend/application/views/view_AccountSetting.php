@@ -211,9 +211,9 @@
 
         if (file) {
             const reader = new FileReader();
-            reader.addEventListener('load', function() {
+            reader.onload = function() {
                 const img = new Image();
-                img.src = this.result;
+                img.src = reader.result;
 
                 img.onload = function() {
                     canvas.width = img.width;
@@ -223,13 +223,19 @@
                     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     const data = imageData.data;
 
+                    // ฟังก์ชันคำนวณความสว่าง
+                    const getBrightness = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
+                    const brightnessThreshold = 70;
+
+                    // ลบ pixel ที่สว่างเกิน threshold (ถือว่าเป็นพื้นหลัง)
                     for (let i = 0; i < data.length; i += 4) {
                         const r = data[i];
                         const g = data[i + 1];
                         const b = data[i + 2];
+                        const brightness = getBrightness(r, g, b);
 
-                        if (r > 200 && g > 200 && b > 200) {
-                            data[i + 3] = 0;
+                        if (brightness > brightnessThreshold) {
+                            data[i + 3] = 0; // โปร่งใส
                         }
                     }
 
@@ -243,11 +249,11 @@
                     downloadBtn.style.display = "block";
                     downloadBtn.href = pngUrl;
                 };
-            });
-
+            };
             reader.readAsDataURL(file);
         }
     }
+
     async function saveSignature() {
         var data = {};
         data['su_id'] = $('#su_id').val();
@@ -289,8 +295,9 @@
                                         showClass: {
                                             popup: 'animate__animated animate__fadeInDown'
                                         }
+                                    }).then((result) => {
+                                        window.location.href = '<?= base_url() ?>' + 'Dashboard';
                                     })
-                                    window.location.reload();
                                 } else {
                                     Swal.fire({
                                         html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit personal detail!</p>",
@@ -298,8 +305,9 @@
                                         showClass: {
                                             popup: 'animate__animated animate__fadeInDown'
                                         }
+                                    }).then((result) => {
+                                        window.location.href = '<?= base_url() ?>' + 'Dashboard';
                                     })
-                                    window.location.reload();
                                 }
                             },
                             error: function(err) {

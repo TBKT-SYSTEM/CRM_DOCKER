@@ -859,17 +859,19 @@ async function swd_validate(formType) {
                         "swd_id": id,
                         "su_id": parseInt(userid.value),
                     }
-                    try {
-                        var chk_unique = await is_unique(unique_data, url);
-                        if (chk_unique) {
-                            form_err(userid, "*Users is already exist");
-                            return false;
-                        } else {
-                            form_ok(userid);
-                            return true;
+                    if (formType == "add") {
+                        try {
+                            var chk_unique = await is_unique(unique_data, url);
+                            if (chk_unique) {
+                                form_err(userid, "*Users is already exist");
+                                return false;
+                            } else {
+                                form_ok(userid);
+                                return true;
+                            }
+                        } catch (err) {
+                            console.log(err); // Handle error
                         }
-                    } catch (err) {
-                        console.log(err); // Handle error
                     }
                     form_ok(appLv);
                     return true;

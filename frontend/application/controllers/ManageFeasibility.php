@@ -206,9 +206,21 @@ class ManageFeasibility extends CI_Controller
 			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
 			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
+			$part_no = iconv('UTF-8', 'TIS-620//IGNORE', $part_no);
+			$part_name = iconv('UTF-8', 'TIS-620//IGNORE', $part_name);
+			$model = iconv('UTF-8', 'TIS-620//IGNORE', $model);
+			$remark = iconv('UTF-8', 'TIS-620//IGNORE', $remark);
+
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_no) > 20) ? 9.5 : 11);
 			$pdf->Cell(35, 5, $part_no, 1, 0, 'C');
+
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_name) > 30) ? 9.5 : 11);
 			$pdf->Cell(55, 5, $part_name, 1, 0, 'C');
+
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($model) > 20) ? 9.5 : 11);
 			$pdf->Cell(40, 5, $model, 1, 0, 'C');
+
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($remark) > 30) ? 9.5 : 11);
 			$pdf->Cell(50, 5, iconv('UTF-8', 'TIS-620//IGNORE', $remark), 1, 1, 'C'); // 35 Characters
 		}
 
@@ -484,6 +496,7 @@ class ManageFeasibility extends CI_Controller
 		$pdf->Cell(15, 5, 'P.I.C', 1, 1, 'C', true);
 
 		$pdf->SetX($pdf->GetX() - 4);
+
 		for ($i = 0; $i < count($consern); $i++) {
 			if ($consern[$i]->ifs_score == 0) {
 				$consern[$i]->ifs_score = "";

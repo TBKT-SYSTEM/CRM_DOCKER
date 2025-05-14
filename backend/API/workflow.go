@@ -138,18 +138,37 @@ func InsertSwg(c *gin.Context) {
 }
 func UpdateSwg(c *gin.Context) {
 	var objWorkflowGroupData WorkflowGroup
+	var Sd_id int
+
 	if err := c.BindJSON(&objWorkflowGroupData); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update sys_workflow_group SET sd_id = ?, swg_max_level = ?, swg_updated_date = ?, swg_updated_by = ? WHERE swg_id = ?", objWorkflowGroupData.Sd_id, objWorkflowGroupData.Swg_max_lv, objWorkflowGroupData.Update_date, objWorkflowGroupData.Update_by, objWorkflowGroupData.Swg_id)
+
+	err := db.QueryRow("SELECT sd_id FROM sys_workflow_group WHERE swg_id = ?", objWorkflowGroupData.Swg_id).Scan(&Sd_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
 		})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+
+	if Sd_id == objWorkflowGroupData.Sd_id {
+		objResult, err := db.Exec("Update sys_workflow_group SET sd_id = ?, swg_max_level = ?, swg_updated_date = ?, swg_updated_by = ? WHERE swg_id = ?", objWorkflowGroupData.Sd_id, objWorkflowGroupData.Swg_max_lv, objWorkflowGroupData.Update_date, objWorkflowGroupData.Update_by, objWorkflowGroupData.Swg_id)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+		c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+	} else {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": "Workflow group already exist. !!",
+		})
+		return
+	}
+
 }
 func ChangeSwgStatus(c *gin.Context) {
 	var objWorkflowGroupData WorkflowGroup
@@ -269,19 +288,36 @@ func InsertSwd(c *gin.Context) {
 }
 func UpdateSwd(c *gin.Context) {
 	var objWorkflowDetail WorkflowDetail
+	var Su_id int
 	if err := c.BindJSON(&objWorkflowDetail); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	objResult, err := db.Exec("Update sys_workflow_detail SET swd_level_no = ?, su_id = ?, sat_id = ?, swd_updated_date = ?, swd_updated_by = ? WHERE swd_id = ?", objWorkflowDetail.Swd_level_no, objWorkflowDetail.Su_id, objWorkflowDetail.Sat_id, objWorkflowDetail.Update_date, objWorkflowDetail.Update_by, objWorkflowDetail.Swd_id)
+
+	err := db.QueryRow("SELECT su_id FROM sys_workflow_detail WHERE swd_id = ?", objWorkflowDetail.Swd_id).Scan(&Su_id)
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),
 		})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+	if Su_id == objWorkflowDetail.Su_id {
+		objResult, err := db.Exec("Update sys_workflow_detail SET swd_level_no = ?, su_id = ?, sat_id = ?, swd_updated_date = ?, swd_updated_by = ? WHERE swd_id = ?", objWorkflowDetail.Swd_level_no, objWorkflowDetail.Su_id, objWorkflowDetail.Sat_id, objWorkflowDetail.Update_date, objWorkflowDetail.Update_by, objWorkflowDetail.Swd_id)
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, gin.H{
+				"Error": err.Error(),
+			})
+			return
+		}
+		c.IndentedJSON(http.StatusOK, gin.H{"Update": objResult})
+	} else {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": "Users already exist. !!",
+		})
+		return
+	}
 }
+
 func ChangeSwdStatus(c *gin.Context) {
 	var objWorkflowDetail WorkflowDetail
 	if err := c.BindJSON(&objWorkflowDetail); err != nil {

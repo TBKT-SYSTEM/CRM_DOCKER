@@ -241,7 +241,7 @@
 
 
 <!-- Modal for edit Workflow detail -->
-<div class="modal fade" id="mdlEditWorkflowDetail" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal modal-lg fade" id="mdlEditWorkflowDetail" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -252,7 +252,7 @@
             </div>
             <div class="modal-body">
                 <form id="frmEditWorkflow" name="frmEditWorkflow">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="editAppLv" class="form-label fw-semibold col-sm-3 col-form-label">Approve Level</label>
                             <div class="col-sm-8">
@@ -291,7 +291,7 @@
 </div>
 
 <!-- Modal for edit Workflow group -->
-<div class="modal fade" id="mdlEditWorkflowGroup" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal modal-lg fade" id="mdlEditWorkflowGroup" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -302,7 +302,7 @@
             </div>
             <div class="modal-body">
                 <form id="edit_formWorkflowGroup" name="edit_formWorkflowGroup">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtWorkflowGroup" class="form-label fw-semibold col-sm-3 col-form-label">Department</label>
                             <div class="col-sm-9">
@@ -437,7 +437,7 @@
                         url: API_URL + 'workflow_group/update',
                         data: JSON.stringify(edit_form),
                         success: function(data) {
-                            if (data != false) {
+                            if (data.Update) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Workflow group success!</p>",
                                     icon: 'success',
@@ -450,7 +450,7 @@
                                 dataTable.ajax.reload(null, false);
                             } else {
                                 Swal.fire({
-                                    html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Workflow group!</p>",
+                                    html: `<p>เกิดข้อผิดพลาดในระบบ !</p><p>${data.Error}</p>`,
                                     icon: 'error',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
@@ -631,7 +631,7 @@
                         url: API_URL + 'workflow_detail/update',
                         data: JSON.stringify(edit_form),
                         success: function(data) {
-                            if (data != false) {
+                            if (data.Update) {
                                 Swal.fire({
                                     html: "<p>บันทึกข้อมูลเสร็จสิ้น !</p><p>Edit Workflow detail success!</p>",
                                     icon: 'success',
@@ -644,7 +644,7 @@
                                 dataTable.ajax.reload(null, false);
                             } else {
                                 Swal.fire({
-                                    html: "<p>เกิดข้อผิดพลาดในระบบ !</p><p>Error edit Workflow detail!</p>",
+                                    html: `<p>เกิดข้อผิดพลาดในระบบ !</p><p>${data.Error}</p>`,
                                     icon: 'error',
                                     showClass: {
                                         popup: 'animate__animated animate__fadeInDown'
@@ -770,7 +770,7 @@
     function editUserOption(id) {
         $.ajax({
             type: 'get',
-            url: API_URL + 'option/list_user',
+            url: API_URL + 'option/list_user_by_dept/' + $('#selWorkflowGroup option:selected').data('sd_id'),
             success: function(result) {
                 var option_text = '<option value="" selected disabled>Choose user</option>';
                 $.each(result, function(key, value) {

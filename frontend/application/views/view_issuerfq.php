@@ -329,7 +329,6 @@
         </form>
     </div>
 
-
 </div>
 
 
@@ -692,7 +691,7 @@
 
         if (proLife.value > 4) {
             $('#tblProjectLife').css('min-width', '1800px');
-        }else {
+        } else {
             $('#tblProjectLife').css('min-width', 'auto');
         }
 

@@ -46,15 +46,15 @@
                                         <a class="text-primary fw-bold ms-2" href="./authentication-register.html">Create an account</a>
                                     </div> -->
                                 </form>
-                                <div class="d-flex align-items-center justify-content-center mb-2">
-                                    <!-- <div class="form-check">
+                                <!-- <div class="d-flex align-items-center justify-content-center mb-2">
+                                    <div class="form-check">
                                         <input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked" checked>
                                         <label class="form-check-label text-dark" for="flexCheckChecked">
                                             Remeber this Device
                                         </label>
-                                    </div> -->
+                                    </div>
                                     <a class="text-primary fw-bold" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#forgotPass">Forgot Password ?</a>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="forgotPass" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+    <!-- <div class="modal fade" id="forgotPass" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header d-flex align-items-center">
@@ -91,7 +91,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>

@@ -223,7 +223,7 @@ class ManageNbc extends CI_Controller
 
 		$pdf->SetX($pdf->GetX() + 15);
 		$attn = 'Ref. No. :';
-		$idc_running_no = $this->input->get('idc_running_no');
+		$idc_running_no = $this->input->get('run_no');
 		$width_attn = $pdf->GetStringWidth($attn) + 2;
 		$pdf->Cell($width_attn, 5, $attn);
 		$pdf->Cell(36.5, 5, $idc_running_no, 'B', 0, 'C');
@@ -284,6 +284,7 @@ class ManageNbc extends CI_Controller
 			if ($mde_all[$i]->mde_name == 'Other') {
 				if ($get_mde == $mde_all[$i]->mde_id) {
 					$enclosures_note = $this->input->get('idc_enclosures_note');
+					$enclosures_note = iconv('UTF-8', 'TIS-620//IGNORE', $enclosures_note);
 					$pdf->Cell(55, 5, $enclosures_note, 'B', 0, 'L');
 				} else {
 					$pdf->Cell(55, 5, $enclosures_note, 'B', 0, 'C');
@@ -320,9 +321,11 @@ class ManageNbc extends CI_Controller
 			->where('idi_status', 1)
 			->order_by('idi_id', 'ASC')->get()->result();
 
+
 		for ($i = 0; $i < 10; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
-			$pdf->SetFont('THSarabunNew', 'B', 12);
+
+			$pdf->SetFont('THSarabunNew', 'B', 11);
 			$pdf->Cell(15, 4.5, $i + 1, 1, 0, "C");
 
 			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
@@ -330,10 +333,27 @@ class ManageNbc extends CI_Controller
 			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
 			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
+			// แปลง encoding
+			$part_no = iconv('UTF-8', 'TIS-620//IGNORE', $part_no);
+			$part_name = iconv('UTF-8', 'TIS-620//IGNORE', $part_name);
+			$model = iconv('UTF-8', 'TIS-620//IGNORE', $model);
+			$remark = iconv('UTF-8', 'TIS-620//IGNORE', $remark);
+
+			// Part No
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_no) > 20) ? 8.5 : 11);
 			$pdf->Cell(35, 4.5, $part_no, 1, 0, 'C');
+
+			// Part Name
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_name) > 30) ? 8.5 : 11);
 			$pdf->Cell(55, 4.5, $part_name, 1, 0, 'C');
+
+			// Model
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($model) > 20) ? 8.5 : 11);
 			$pdf->Cell(40, 4.5, $model, 1, 0, 'C');
-			$pdf->Cell(50, 4.5, iconv('UTF-8', 'TIS-620//IGNORE', $remark), 1, 1, 'C'); // 35 Characters
+
+			// Remark
+			$pdf->SetFont('THSarabunNew', 'B', (strlen($remark) > 30) ? 8.5 : 11);
+			$pdf->Cell(50, 4.5, $remark, 1, 1, 'C');
 		}
 
 		// Table Volume

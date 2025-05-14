@@ -203,7 +203,7 @@
 
 
 <!-- Modal for edit permission detail -->
-<div class="modal fade" id="mdlEditPermissionDetail" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal fade modal-lg" id="mdlEditPermissionDetail" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -214,7 +214,7 @@
             </div>
             <div class="modal-body">
                 <form id="frmEditPermission" name="frmEditPermission">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtMainMenu" class="form-label fw-semibold col-sm-3 col-form-label">Main Menu</label>
                             <div class="col-sm-9">
@@ -245,7 +245,7 @@
     </div>
 </div>
 <!-- Modal for edit permission group -->
-<div class="modal fade" id="mdlEditPermissionGroup" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal fade modal-lg" id="mdlEditPermissionGroup" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -256,7 +256,7 @@
             </div>
             <div class="modal-body">
                 <form id="edit_formPerg" name="edit_formPerg">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtPermissionGroup" class="form-label fw-semibold col-sm-3 col-form-label">Permission Group</label>
                             <div class="col-sm-9">
@@ -493,7 +493,7 @@
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
-                        contentType: 'application/json', 
+                        contentType: 'application/json',
                         url: API_URL + 'spd_table/insert',
                         data: JSON.stringify(add_form),
                         success: function(data) {
@@ -931,5 +931,3 @@
         }, 600000);
     });
 </script>
-
-

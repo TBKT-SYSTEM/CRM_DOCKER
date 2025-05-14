@@ -211,7 +211,7 @@
 </div>
 
 <!-- Modal for edit sub menu -->
-<div class="modal fade" id="mdlEditSubMenu" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal fade modal-lg" id="mdlEditSubMenu" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -222,7 +222,7 @@
             </div>
             <div class="modal-body">
                 <form id="frmEditSubMenu" name="frmEditSubMenu">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtSubMenu" class="form-label fw-semibold col-sm-3 col-form-label">Sub Menu</label>
                             <div class="col-sm-9">
@@ -253,7 +253,7 @@
     </div>
 </div>
 <!-- Modal for edit main menu -->
-<div class="modal fade" id="mdlEditMainMenu" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal fade modal-lg" id="mdlEditMainMenu" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -264,7 +264,7 @@
             </div>
             <div class="modal-body">
                 <form id="frmEditMainMenu" name="frmEditMainMenu">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtMainMenu" class="form-label fw-semibold col-sm-3 col-form-label">Main Menu</label>
                             <div class="col-sm-9">

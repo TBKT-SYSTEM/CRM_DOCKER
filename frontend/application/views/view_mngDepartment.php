@@ -74,7 +74,7 @@
     </div>
 </div>
 <!-- Modal for register department -->
-<div class="modal fade" id="mdlRegister" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal modal-lg fade" id="mdlRegister" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -85,7 +85,7 @@
             </div>
             <div class="modal-body">
                 <form id="add_form" name="add_form">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="inpDepartment" class="form-label fw-semibold col-sm-4 col-form-label">Department Name</label>
                             <div class="col-sm-8 mb-3">
@@ -127,7 +127,7 @@
 </div>
 
 <!-- Modal for edit department -->
-<div class="modal fade" id="mdlEdits" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal modal-lg fade" id="mdlEdits" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -138,7 +138,7 @@
             </div>
             <div class="modal-body">
                 <form id="edit_form" name="edit_form">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtDepartment" class="form-label fw-semibold col-sm-4 col-form-label mb-3">Department Name</label>
                             <div class="col-sm-8 mb-3">
@@ -297,6 +297,7 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 })
+                                $('#edit_form')[0].reset();
                                 var dataTable = $('#tblDepartment').DataTable();
                                 dataTable.ajax.reload(null, false);
                                 $('#mdlEdits').modal('hide');
@@ -308,6 +309,7 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 })
+                                $('#edit_form')[0].reset();
                                 var dataTable = $('#tblDepartment').DataTable();
                                 dataTable.ajax.reload(null, false);
                                 $('#mdlEdits').modal('hide');

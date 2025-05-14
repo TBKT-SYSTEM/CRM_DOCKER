@@ -193,6 +193,18 @@ async function genChartTest() {
       type: 'category',
       categories: ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'],
     },
+    yaxis: {
+      title: {
+        text: 'Quantity',
+        offsetX: -5,
+        offsetY: 0,
+        style: {
+          fontSize: '12px',
+          fontWeight: 400,
+          cssClass: 'apexcharts-yaxis-title',
+        }
+      },
+    },
     legend: {
       position: 'top'
     },
@@ -390,6 +402,18 @@ function newChartMonth(paraDone, paraPending, paraDeleyed, paraCancelled) {
       type: 'category',
       categories: ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'],
     },
+    yaxis: {
+      title: {
+        text: 'Quantity',
+        offsetX: -5,
+        offsetY: 0,
+        style: {
+          fontSize: '12px',
+          fontWeight: 400,
+          cssClass: 'apexcharts-yaxis-title',
+        }
+      },
+    },
     legend: {
       position: 'top'
     },
@@ -563,6 +587,18 @@ function newChartCus(paraDone, paraPending, paraDeleyed, paraCancelled, custName
     xaxis: {
       type: 'category',
       categories: custName,
+    },
+    yaxis: {
+      title: {
+        text: 'Quantity',
+        offsetX: -5,
+        offsetY: 0,
+        style: {
+          fontSize: '12px',
+          fontWeight: 400,
+          cssClass: 'apexcharts-yaxis-title',
+        }
+      },
     },
     legend: {
       position: 'top'

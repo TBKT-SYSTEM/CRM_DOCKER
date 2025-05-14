@@ -72,7 +72,7 @@
     </div>
 </div>
 <!-- Modal for register user -->
-<div class="modal fade" id="mdlRegister" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal modal-lg fade" id="mdlRegister" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -83,7 +83,7 @@
             </div>
             <div class="modal-body">
                 <form id="add_form" name="add_form">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="inpEmployeeCode" class="form-label fw-semibold col-sm-3 col-form-label">Code</label>
                             <div class="col-sm-9">
@@ -158,7 +158,7 @@
 </div>
 
 <!-- Modal for edit user -->
-<div class="modal fade" id="mdlEdits" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal modal-lg fade" id="mdlEdits" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -169,7 +169,7 @@
             </div>
             <div class="modal-body">
                 <form id="edit_form" name="edit_form">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtEmployeeCode" class="form-label fw-semibold col-sm-3 col-form-label">Code</label>
                             <div class="col-sm-9">
@@ -284,6 +284,7 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 }).then((result) => {
+                                    $('#add_form')[0].reset();
                                     $('#mdlRegister').modal('hide');
                                     var dataTable = $('#tblUsers').DataTable();
                                     dataTable.ajax.reload(null, false);
@@ -299,6 +300,7 @@
                                         popup: 'animate__animated animate__fadeOutUp'
                                     }
                                 }).then((result) => {
+                                    $('#add_form')[0].reset();
                                     $('#mdlRegister').modal('hide');
                                     var dataTable = $('#tblUsers').DataTable();
                                     dataTable.ajax.reload(null, false);
@@ -353,6 +355,7 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 }).then((result) => {
+                                    $('#edit_form')[0].reset();
                                     $('#mdlEdits').modal('hide');
                                     var dataTable = $('#tblUsers').DataTable();
                                     dataTable.ajax.reload(null, false);
@@ -365,6 +368,7 @@
                                         popup: 'animate__animated animate__fadeInDown'
                                     }
                                 }).then((result) => {
+                                    $('#edit_form')[0].reset();
                                     $('#mdlEdits').modal('hide');
                                     var dataTable = $('#tblUsers').DataTable();
                                     dataTable.ajax.reload(null, false);

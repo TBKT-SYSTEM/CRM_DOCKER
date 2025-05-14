@@ -9,13 +9,14 @@
 
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%"
-        style="background-color: #f4f4f4; padding: 20px;">
+        style="background-color: #f4f4f4; padding: 10px;">
         <tr>
             <td align="center">
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"
                     style="background-color: #ffffff; border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center;">
                     <tr>
-                        <td style="padding: 10px 0; font-size: 18px; font-weight: bold; color: #333;">Dear, K.{{.Username}}
+                        <td style="padding: 10px 0; font-size: 18px; font-weight: bold; color: #333;">Dear,
+                            K.{{.Username}}
                         </td>
                     </tr>
                     <tr>
@@ -23,22 +24,51 @@
                     </tr>
                     <tr>
                         <td style="padding: 20px 0;">
+                            <table role="presentation" cellspacing="0" cellpadding="10" border="0" align="center"
+                                style="margin: 0 auto; border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 14px; color: #333; border: 1px solid #b0d4f1;">
+                                <thead>
+                                    <tr style="background-color: #e1f0fb;">
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">Reference Document</th>
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">Customer</th>
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">Subject</th>
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">Project Life</th>
+                                        <th style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">Project Start</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">{{.ReferenceDocument}}</td>
+                                        <td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">{{.Customer}}</td>
+                                        <td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">{{.Subject}}</td>
+                                        <td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">{{.ProjectLife}}</td>
+                                        <td style="border: 1px solid #b0d4f1; padding: 8px 12px; text-align: center;">{{.ProjectStart}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    {{.TableDetail}}
+                    <tr>
+                        <td style="padding: 20px 0;">
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center"
                                 style="margin: 0 auto;">
                                 <tr>
                                     <td>
                                         <a href="{{.LinkApporve}}"
-                                            style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;" target="_blank">Approve</a>
+                                            style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;"
+                                            target="_blank">Approve</a>
                                     </td>
                                     <td style="width: 10px;">&nbsp;</td>
                                     <td>
                                         <a href="{{.LinkReject}}"
-                                            style="display: inline-block; padding: 10px 20px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;" target="_blank">Reject</a>
+                                            style="display: inline-block; padding: 10px 20px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;"
+                                            target="_blank">Reject</a>
                                     </td>
                                     <td style="width: 10px;">&nbsp;</td>
                                     <td>
                                         <a href="{{.LinkPreview}}"
-                                            style="display: inline-block; padding: 10px 20px; background-color: #ffc107; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;" target="_blank">Review</a>
+                                            style="display: inline-block; padding: 10px 20px; background-color: #ffc107; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;"
+                                            target="_blank">Review</a>
                                     </td>
                                 </tr>
                             </table>
