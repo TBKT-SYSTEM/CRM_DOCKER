@@ -1549,3 +1549,17 @@ func InsertReferDoc(c *gin.Context, docId int) error {
 	}
 	return nil
 }
+
+func GetDocType(c *gin.Context) {
+	Idc_id := c.Param("docId")
+	var DocType string
+	err := db.QueryRow("SELECT mdt.mdt_position1 FROM info_document_control idc LEFT JOIN mst_document_type mdt ON mdt.mdt_id = idc.mdt_id WHERE idc.idc_id = ?", Idc_id).Scan(&DocType)
+	if err == sql.ErrNoRows {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, DocType)
+}

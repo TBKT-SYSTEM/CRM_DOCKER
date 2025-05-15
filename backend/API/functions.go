@@ -1619,6 +1619,9 @@ func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail s
 }
 
 func ApproveByEmail(c *gin.Context) {
+	type InputData struct {
+		Idc_result_confirm int `json:"idc_result_confirm"`
+	}
 	type notiActive struct {
 		Ida_id    int    `json:"ida_id"`
 		Su_id     int    `json:"su_id"`
@@ -1636,6 +1639,12 @@ func ApproveByEmail(c *gin.Context) {
 		Su_id        int    `json:"su_id"`
 		Su_firstname string `json:"su_firstname"`
 		Su_email     string `json:"su_email"`
+	}
+
+	var idcResult InputData
+	if err := c.BindJSON(&idcResult); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	docID := c.Param("documentId")
@@ -2037,7 +2046,7 @@ func ApproveByEmail(c *gin.Context) {
 						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error1": getUser.Error()})
 						return
 					}
-					_, err = db.Exec("UPDATE info_document_control SET idc_status = 9, idc_issue_date= ?, idc_updated_date = ?, idc_updated_by = ? WHERE idc_Id = ?", strCreateDate, strCreateDate, strUpdatedByEmp, idcId)
+					_, err = db.Exec("UPDATE info_document_control SET idc_status = 9, idc_issue_date = ?, idc_result_confirm = ?, idc_updated_date = ?, idc_updated_by = ? WHERE idc_Id = ?", strCreateDate, idcResult.Idc_result_confirm, strCreateDate, strUpdatedByEmp, idcId)
 					if err != nil {
 						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error6e": err.Error()})
 						return
@@ -2047,6 +2056,12 @@ func ApproveByEmail(c *gin.Context) {
 					_, err = db.Exec("INSERT INTO sys_notification_ctrl(snc_type, ida_id, snc_show_users, snc_read_status, snc_created_date, snc_updated_date) VALUES(?, ?, ?, ?, ?, ?)", 1, objNotiActive.Ida_id, strShowUsers, 0, strCreateDate, strCreateDate)
 					if err != nil {
 						c.IndentedJSON(http.StatusOK, gin.H{"Error7e": err.Error()})
+					}
+
+					_, err = db.Exec("UPDATE info_document_control SET idc_result_confirm = ? WHERE idc_Id = ?", idcResult.Idc_result_confirm, idcId)
+					if err != nil {
+						c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error6e": err.Error()})
+						return
 					}
 
 					var objEmail userEmail

@@ -204,6 +204,8 @@ func Routy() {
 	router.GET("/dashboard/getCsutomer/:year", GetCustomer)
 	router.GET("/dashboard/getDate/:docNo", GetDate)
 
+	router.GET("/getDocType/:docId", GetDocType)
+
 	router.PUT("/email/approve_email/:documentId/:idaId/:caseType", ApproveByEmail)
 	router.PUT("/email/reject_email/:documentId/:idaId/:reason/:caseType", RejectByEmail)
 

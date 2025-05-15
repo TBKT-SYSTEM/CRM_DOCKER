@@ -115,7 +115,7 @@
                         <input type="hidden" name="ida_id" id="inpIda">
                         <label class="col-auto fs-5 text-dark fw-semibold me-2">R&D Dept. confirm project's possibility result:</label>
                         <div class="d-flex flex-wrap gap-6">
-                            <input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" disabled>
+                            <input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" checked>
                             <label class="btn btn-outline-success " for="option1">OK</label>
 
                             <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off" disabled>
@@ -134,10 +134,10 @@
 </div>
 
 <script>
+    var mdt;
     async function approve() {
         let idc_id = $('#inpIdc').val();
         let ida_id = $('#inpIda').val();
-        $('#mdlApprove').modal('hide');
 
         await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -160,10 +160,20 @@
                     }
                 });
                 let url_api = API_URL + 'email/approve_email/' + idc_id + '/' + ida_id + '/website';
+                let idc_result_confirm = 0;
+                if (mdt == 'NBC') {
+                    const checkedOption = document.querySelector('input[name="options"]:checked');
+                    if (checkedOption.id == 'option1') {
+                        idc_result_confirm = 9;
+                    } else {
+                        idc_result_confirm = 1;
+                    }
+                }
                 $.ajax({
                     type: 'PUT',
                     dataType: 'json',
                     contentType: 'application/json',
+                    data: JSON.stringify({ "idc_result_confirm": idc_result_confirm }),
                     url: url_api,
                     success: function(result) {
                         Swal.close();
@@ -429,12 +439,15 @@
         var url_pdf;
         var run_no = doc_no;
         if (doc_type == 'RFQ') {
+            mdt = 'RFQ';
             url_pdf = 'RfqForm/createPDF?';
             $('#chkNBC').addClass('d-none').find('input').prop('disabled', true);
         } else if (doc_type == 'NBC') {
+            mdt = 'NBC';
             url_pdf = 'ManageNbc/createNbcPDF?';
             $('#chkNBC').removeClass('d-none').find('input').prop('disabled', false);
         } else if (doc_type == 'FS') {
+            mdt = 'FS';
             url_pdf = 'ManageFeasibility/createFeasibilityPDF?';
             $('#chkNBC').addClass('d-none').find('input').prop('disabled', true);
         } else {

@@ -46,17 +46,139 @@
 
         let dataType = window.atob(typeParam);
         let url_api = '';
-
+        let idc_result_confirm = 0;
         if (dataType == 'waiting') {
-            Swal.fire({
-                title: 'Processing...',
-                text: 'Please wait...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
+            $.ajax({
+                type: 'GET',
+                url: API_URL + 'getDocType/' + atob(documentParam),
+                success: function(result) {
+                    const mdt = result;
+                    if (mdt == 'NBC') {
+                        Swal.fire({
+                            title: 'Confirm projects possibility result',
+                            html: `
+                        <div style="text-align: center; display: flex; justify-content: center; gap: 20px; align-items: center;">
+                            <label style="font-size: 18px;">
+                                <input type="radio" name="reject_reason" value="1" style="transform: scale(1.5); margin-right: 8px;"> NG
+                            </label>
+                            <label style="font-size: 18px;">
+                                <input type="radio" name="reject_reason" value="9" style="transform: scale(1.5); margin-right: 8px;"> OK
+                            </label>
+                        </div>
+                    `,
+                            showCancelButton: true,
+                            confirmButtonText: 'Submit',
+                            cancelButtonText: 'Cancel',
+                            allowOutsideClick: true,
+                            allowEscapeKey: true,
+                            preConfirm: () => {
+                                const selected = document.querySelector('input[name="reject_reason"]:checked');
+                                if (!selected) {
+                                    Swal.showValidationMessage('Please select a reason (NG or OK)');
+                                    return false;
+                                }
+                                return selected.value;
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const idc_result_confirm = result.value;
+                                const url_api = API_URL + 'email/approve_email/' + atob(documentParam) + '/' + atob(idaParam) + '/email';
+
+                                Swal.fire({
+                                    title: 'Processing...',
+                                    text: 'Please wait...',
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    }
+                                });
+
+                                $.ajax({
+                                    type: 'PUT',
+                                    dataType: 'json',
+                                    contentType: 'application/json',
+                                    url: url_api,
+                                    data: JSON.stringify({
+                                        "idc_result_confirm": parseInt(idc_result_confirm)
+                                    }),
+                                    success: function(res) {
+                                        if (typeof res === "string") {
+                                            Swal.fire({
+                                                html: '<h4>' + res + '</h4>',
+                                                icon: 'error',
+                                                showClass: {
+                                                    popup: 'animate__animated animate__fadeInDown'
+                                                }
+                                            }).then(() => window.close());
+                                        } else {
+                                            Swal.fire({
+                                                html: '<p>Approve เอกสารสำเร็จ</p>',
+                                                icon: 'success',
+                                                showClass: {
+                                                    popup: 'animate__animated animate__fadeInDown'
+                                                },
+                                                showConfirmButton: true,
+                                            }).then(() => window.close());
+                                        }
+                                    },
+                                    error: function(err) {
+                                        Swal.fire('Error!', 'Cannot submit data', 'error');
+                                    }
+                                });
+
+                            } else if (result.isDismissed) {
+                                window.close();
+                            }
+                        });
+
+                    } else {
+                        const idc_result_confirm = 0;
+                        const url_api = API_URL + 'email/approve_email/' + atob(documentParam) + '/' + atob(idaParam) + '/email';
+
+                        Swal.fire({
+                            title: 'Processing...',
+                            text: 'Please wait...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $.ajax({
+                            type: 'PUT',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            url: url_api,
+                            data: JSON.stringify({
+                                "idc_result_confirm": parseInt(idc_result_confirm)
+                            }),
+                            success: function(res) {
+                                if (typeof res === "string") {
+                                    Swal.fire({
+                                        html: '<h4>' + res + '</h4>',
+                                        icon: 'error',
+                                        showClass: {
+                                            popup: 'animate__animated animate__fadeInDown'
+                                        }
+                                    }).then(() => window.close());
+                                } else {
+                                    Swal.fire({
+                                        html: '<p>Approve เอกสารสำเร็จ</p>',
+                                        icon: 'success',
+                                        showClass: {
+                                            popup: 'animate__animated animate__fadeInDown'
+                                        },
+                                        showConfirmButton: true,
+                                    }).then(() => window.close());
+                                }
+                            },
+                            error: function(err) {
+                                Swal.fire('Error!', 'Cannot submit data', 'error');
+                            }
+                        });
+                    }
                 }
             });
-            url_api = API_URL + 'email/approve_email/' + atob(documentParam) + '/' + atob(idaParam) + '/email';
         } else if (dataType == 'reject') {
             Swal.fire({
                 title: 'Enter reject message',
@@ -195,46 +317,6 @@
             });
             return;
         }
-
-        $.ajax({
-            type: 'PUT',
-            dataType: 'json',
-            contentType: 'application/json',
-            url: url_api,
-            success: function(result) {
-                if (typeof result == "string") {
-                    Swal.fire({
-                        html: '<h4>' + result + '</h4>',
-                        icon: 'error',
-                        showClass: {
-                            popup: 'animate__animated animate__fadeInDown'
-                        }
-                    }).then((result) => {
-                        window.close();
-                    })
-                } else {
-                    Swal.fire({
-                        html: '<p>Approve เอกสารสำเร็จ</p>',
-                        icon: 'success',
-                        showClass: {
-                            popup: 'animate__animated animate__fadeInDown'
-                        },
-                        showConfirmButton: true,
-                    }).then((result) => {
-                        window.close();
-                    })
-                }
-            },
-            error: function(xhr, status, error) {
-                Swal.fire({
-                    html: `<p>เกิดข้อผิดพลาด: ${error}</p>`,
-                    icon: 'error',
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                    }
-                });
-            }
-        });
 
     });
 </script>
