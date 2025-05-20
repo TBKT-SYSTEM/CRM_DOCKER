@@ -1071,7 +1071,7 @@ func ListDocRfq(c *gin.Context) {
 		Idc_running_no string `json:"idc_running_no"`
 	}
 	var objRfqNoGroupList []RfqNo
-	objListRfqNo, err := db.Query("SELECT idc_id, idc_running_no FROM `info_document_control` WHERE mdt_id = 3 ORDER BY idc_id")
+	objListRfqNo, err := db.Query("SELECT idc_id, idc_running_no FROM `info_document_control` WHERE mdt_id = 3 AND idc_status = 9 ORDER BY idc_id")
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{
 			"Error": err.Error(),

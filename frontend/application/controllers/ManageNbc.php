@@ -178,6 +178,7 @@ class ManageNbc extends CI_Controller
 	{
 		$pdf = new FPDF();
 		$pdf->AddPage();
+		$pdf->SetAutoPageBreak(false);
 		$pdf->AddFont('THSarabunNew', '', 'THSarabunNew.php');
 		$pdf->AddFont('THSarabunNew', 'B', 'THSarabunNew-Bold.php');
 
@@ -296,8 +297,6 @@ class ManageNbc extends CI_Controller
 		}
 
 		$pdf->Ln(10);
-		$ir_pro_life = $this->input->get('ir_pro_life');
-		$ir_sop_tim = $this->input->get('ir_sop_tim');
 		$pdf->SetX($pdf->GetX() - 5);
 		$note = 'Please kindly investigate part with customer requirement condition in details as below.';
 		$width_note = $pdf->GetStringWidth($note) + 2;
@@ -324,9 +323,10 @@ class ManageNbc extends CI_Controller
 
 		for ($i = 0; $i < 10; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
+			$pdf->SetFont('THSarabunNew', 'B', 13);
 
-			$pdf->SetFont('THSarabunNew', 'B', 11);
-			$pdf->Cell(15, 4.5, $i + 1, 1, 0, "C");
+			$x = $pdf->GetX();
+			$y = $pdf->GetY();
 
 			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
 			$part_name = isset($consern[$i]->idi_item_name) ? $consern[$i]->idi_item_name : '';
@@ -339,21 +339,22 @@ class ManageNbc extends CI_Controller
 			$model = iconv('UTF-8', 'TIS-620//IGNORE', $model);
 			$remark = iconv('UTF-8', 'TIS-620//IGNORE', $remark);
 
-			// Part No
-			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_no) > 20) ? 8.5 : 11);
-			$pdf->Cell(35, 4.5, $part_no, 1, 0, 'C');
+			$pdf->SetFont('THSarabunNew', 'B', 11);
+			$pdf->MultiCell(15, 8, $i + 1, 1, 'C');    // ลำดับ
+			$pdf->SetXY($x + 15, $y);                           // ตำแหน่งถัดไป
 
-			// Part Name
-			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_name) > 30) ? 8.5 : 11);
-			$pdf->Cell(55, 4.5, $part_name, 1, 0, 'C');
+			$pdf->MultiCell(35, 8, $part_no, 1, 'C');  // Part No
+			$pdf->SetXY($x + 15 + 35, $y);
 
-			// Model
-			$pdf->SetFont('THSarabunNew', 'B', (strlen($model) > 20) ? 8.5 : 11);
-			$pdf->Cell(40, 4.5, $model, 1, 0, 'C');
+			$pdf->MultiCell(55, (strlen($part_name) > 30) ? 4 : 8, $part_name, 1, 'C'); // Part Name
+			$pdf->SetXY($x + 15 + 35 + 55, $y);
 
-			// Remark
-			$pdf->SetFont('THSarabunNew', 'B', (strlen($remark) > 30) ? 8.5 : 11);
-			$pdf->Cell(50, 4.5, $remark, 1, 1, 'C');
+			$pdf->MultiCell(40, 8, $model, 1, 'C');     // Model
+			$pdf->SetXY($x + 15 + 35 + 55 + 40, $y);
+
+			$pdf->MultiCell(50, 8, $remark, 1, 'C');    // Remark
+
+			$pdf->SetY($y + 8);
 		}
 
 		// Table Volume
@@ -420,7 +421,7 @@ class ManageNbc extends CI_Controller
 		}
 
 		// Table Note
-		$pdf->Ln(3);
+		$pdf->Ln(2);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 12);
 		$pdf->SetFillColor(235, 235, 235);
@@ -449,7 +450,7 @@ class ManageNbc extends CI_Controller
 		$pdf->Cell(195, 4, '', 'LBR', 0, 'L',);
 
 		// Table Sign
-		$pdf->Ln(7);
+		$pdf->Ln(6);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 11);
 		$pdf->SetFillColor(235, 235, 235);
@@ -505,7 +506,7 @@ class ManageNbc extends CI_Controller
 		$pdf->Cell(48.75, 5, $sign_group[1]->fullname, 'LBR', 0, 'C');
 		$pdf->Cell(48.75, 5, $sign_group[2]->fullname, 'LBR', 0, 'C');
 
-		$pdf->Ln(7);
+		$pdf->Ln(6);
 		$bg_ok = '';
 		$bg_ng = '';
 		$idc_result_confirm = $this->input->get('idc_result_confirm');
@@ -541,7 +542,7 @@ class ManageNbc extends CI_Controller
 		$pdf->Cell(1, 5, $eOther);
 
 		// Table Note/Comment
-		$pdf->Ln(7);
+		$pdf->Ln(6);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 12);
 		$pdf->SetFillColor(235, 235, 235);
@@ -549,9 +550,9 @@ class ManageNbc extends CI_Controller
 		$pdf->Ln();
 		$pdf->SetX($pdf->GetX() - 4);
 		$idc_note2 = $this->input->get('idc_note2');
-		$pdf->Cell(195, 15, iconv('UTF-8', 'TIS-620//IGNORE', $idc_note2), 'LBR', 1, 'L',);
+		$pdf->Cell(195, 7.5, iconv('UTF-8', 'TIS-620//IGNORE', $idc_note2), 'LBR', 1, 'L',);
 
-		$pdf->Ln(3);
+		$pdf->Ln(2);
 		$arrow = 'assets/images/logos/arrow-right-removebg-preview.png';
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 12);

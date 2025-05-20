@@ -263,6 +263,7 @@ class ViewPDF extends CI_Controller
 			if ($mde_all[$i]->mde_name == 'Other') {
 				if ($get_mde == $mde_all[$i]->mde_id) {
 					$enclosures_note = $this->input->get('idc_enclosures_note');
+					$enclosures_note = iconv('UTF-8', 'TIS-620//IGNORE', $enclosures_note);
 					$pdf->Cell(60, 5, $enclosures_note, 'B', 0, 'C');
 				} else {
 					$pdf->Cell(60, 5, $enclosures_note, 'B', 0, 'C');

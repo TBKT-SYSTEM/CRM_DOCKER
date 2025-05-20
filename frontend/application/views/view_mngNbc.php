@@ -266,10 +266,10 @@
 
                                             </div>
 
-                                            <!-------------------------- Closeing Date  ---------------------------->
+                                            <!-------------------------- Closing Date  ---------------------------->
                                             <div class="d-flex col-md-12 mb-3 align-items-center d-none">
                                                 <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Closeing Date :</h4>
+                                                    <h4 class="mb-2 fs-4 fw-semibold">Closing Date :</h4>
                                                 </div>
                                                 <div class="d-flex col-md-3 me-3 gap-5">
                                                     <input type="date" class="form-control" id="inpDuedateEdit" name="idc_closing_date" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>">
@@ -774,7 +774,7 @@
             type: 'get',
             url: 'http://192.168.161.106/etax_invoice_system/api/customers',
             success: function(result) {
-                var option_text = '<option value="" disabled selected>Choose Costomer Name</option>';
+                var option_text = '<option value="" disabled selected>Choose Customer Name</option>';
                 $.each(result, function(key, value) {
                     option_text += '<option value="' + value.MC_CUST_ANAME + '">' + value.MC_CUST_ANAME + '&nbsp( ' + value.MC_CUST_CD + ' )' + '</option>';
                 })

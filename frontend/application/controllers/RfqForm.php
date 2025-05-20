@@ -77,6 +77,7 @@ class RfqForm extends CI_Controller
 	{
 		$pdf = new FPDF();
 		$pdf->AddPage();
+		$pdf->SetAutoPageBreak(false);
 		$pdf->AddFont('THSarabunNew', '', 'THSarabunNew.php');
 		$pdf->AddFont('THSarabunNew', 'B', 'THSarabunNew-Bold.php');
 
@@ -202,14 +203,14 @@ class RfqForm extends CI_Controller
 			$boxOversea = '255, 255, 255';
 			$boxDomestic = '0, 0, 0';
 		}
-		$pdf->SetX($pdf->GetX() + 12.9);
+		$pdf->SetX($pdf->GetX() + 13.2);
 		$pdf->SetFillColor((int)$boxOversea);
 		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
 		$gdc_dept = 'Overseas';
 		$width_pu_dept = $pdf->GetStringWidth($gdc_dept) + 2;
 		$pdf->Cell($width_pu_dept, 5, $gdc_dept);
 
-		$pdf->SetX($pdf->GetX() + 11.7);
+		$pdf->SetX($pdf->GetX() + 11.4);
 		$pdf->SetFillColor((int)$boxDomestic);
 		$pdf->Cell(9, 5, '', 1, 0, 'C', true);
 		$gdc_dept = 'Domestic';
@@ -244,7 +245,11 @@ class RfqForm extends CI_Controller
 				$width_newp = $pdf->GetStringWidth($newp) + 2;
 				$pdf->Cell($width_newp, 5, $newp);
 			} else {
-				$pdf->SetX($pdf->GetX() + 2);
+				if($mds_all[$i]->mds_name == 'Other') {
+					$pdf->SetX($pdf->GetX() - 0.5);
+				} else {
+					$pdf->SetX($pdf->GetX() + 2);
+				}
 				$pdf->SetFillColor((int)$box_bg);
 				$pdf->Cell(9, 5, '', 1, 0, 'C', true);
 				$ecr = $mds_all[$i]->mds_name;
@@ -256,9 +261,9 @@ class RfqForm extends CI_Controller
 				if ($get_mds == $mds_all[$i]->mds_id) {
 					$subject_note = $this->input->get('idc_subject_note');
 					$subject_note = iconv('UTF-8', 'TIS-620//IGNORE', $subject_note);
-					$pdf->Cell(30, 5, $subject_note, 'B', 0, 'C');
+					$pdf->Cell(47, 5, $subject_note, 'B', 0, 'L');
 				} else {
-					$pdf->Cell(30, 5, $subject_note, 'B', 0, 'C');
+					$pdf->Cell(47, 5, $subject_note, 'B', 0, 'C');
 				}
 			}
 
@@ -305,6 +310,7 @@ class RfqForm extends CI_Controller
 			if ($mde_all[$i]->mde_name == 'Other') {
 				if ($get_mde == $mde_all[$i]->mde_id) {
 					$enclosures_note = $this->input->get('idc_enclosures_note');
+					$enclosures_note = iconv('UTF-8', 'TIS-620//IGNORE', $enclosures_note);
 					$pdf->Cell(60, 5, $enclosures_note, 'B', 0, 'C');
 				} else {
 					$pdf->Cell(60, 5, $enclosures_note, 'B', 0, 'C');
@@ -339,11 +345,11 @@ class RfqForm extends CI_Controller
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 14);
 		$pdf->SetFillColor(235, 235, 235);
-		$pdf->Cell(15, 5.5, 'No', 1, 0, 'C', true);
-		$pdf->Cell(35, 5.5, 'PART NUMBER', 1, 0, 'C', true);
-		$pdf->Cell(55, 5.5, 'PART NAME', 1, 0, 'C', true);
-		$pdf->Cell(40, 5.5, 'MODEL', 1, 0, 'C', true);
-		$pdf->Cell(50, 5.5, 'Remark', 1, 1, 'C', true);
+		$pdf->Cell(15, 8, 'No', 1, 0, 'C', true);
+		$pdf->Cell(35, 8, 'PART NUMBER', 1, 0, 'C', true);
+		$pdf->Cell(55, 8, 'PART NAME', 1, 0, 'C', true);
+		$pdf->Cell(40, 8, 'MODEL', 1, 0, 'C', true);
+		$pdf->Cell(50, 8, 'Remark', 1, 1, 'C', true);
 
 		$idc_id = $this->input->get('idc_id');
 		$consern = $this->db->select('idi_item_no, idi_item_name, idi_model, idi_remark')
@@ -355,29 +361,39 @@ class RfqForm extends CI_Controller
 		for ($i = 0; $i < 10; $i++) {
 			$pdf->SetX($pdf->GetX() - 4);
 			$pdf->SetFont('THSarabunNew', 'B', 13);
-			$pdf->Cell(15, 5.5, $i + 1, 1, 0, "C");
 
+			// ค่าตำแหน่งเริ่มต้น
+			$x = $pdf->GetX();
+			$y = $pdf->GetY();
+
+			// เตรียมข้อมูล
 			$part_no = isset($consern[$i]->idi_item_no) ? $consern[$i]->idi_item_no : '';
 			$part_name = isset($consern[$i]->idi_item_name) ? $consern[$i]->idi_item_name : '';
 			$model = isset($consern[$i]->idi_model) ? $consern[$i]->idi_model : '';
 			$remark = isset($consern[$i]->idi_remark) ? $consern[$i]->idi_remark : '';
 
+			// แปลง encoding
 			$part_no = iconv('UTF-8', 'TIS-620//IGNORE', $part_no);
 			$part_name = iconv('UTF-8', 'TIS-620//IGNORE', $part_name);
 			$model = iconv('UTF-8', 'TIS-620//IGNORE', $model);
 			$remark = iconv('UTF-8', 'TIS-620//IGNORE', $remark);
 
-			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_no) > 20) ? 9.5 : 13);
-			$pdf->Cell(35, 5.5, $part_no, 1, 0, 'C');
+			$pdf->SetFont('THSarabunNew', 'B', 11);
+			$pdf->MultiCell(15, 8, $i + 1, 1, 'C');    // ลำดับ
+			$pdf->SetXY($x + 15, $y);                           // ตำแหน่งถัดไป
 
-			$pdf->SetFont('THSarabunNew', 'B', (strlen($part_name) > 30) ? 9.5 : 13);
-			$pdf->Cell(55, 5.5, $part_name, 1, 0, 'C');
+			$pdf->MultiCell(35, 8, $part_no, 1, 'C');  // Part No
+			$pdf->SetXY($x + 15 + 35, $y);
 
-			$pdf->SetFont('THSarabunNew', 'B', (strlen($model) > 20) ? 9.5 : 13);
-			$pdf->Cell(40, 5.5, $model, 1, 0, 'C');
-			
-			$pdf->SetFont('THSarabunNew', 'B', (strlen($remark) > 30) ? 9.5 : 13);
-			$pdf->Cell(50, 5.5, iconv('UTF-8', 'TIS-620//IGNORE', $remark), 1, 1, 'C'); // 35 Characters
+			$pdf->MultiCell(55, (strlen($part_name) > 30) ? 4 : 8, $part_name, 1, 'C'); // Part Name
+			$pdf->SetXY($x + 15 + 35 + 55, $y);
+
+			$pdf->MultiCell(40, 8, $model, 1, 'C');     // Model
+			$pdf->SetXY($x + 15 + 35 + 55 + 40, $y);
+
+			$pdf->MultiCell(50, 8, $remark, 1, 'C');    // Remark
+
+			$pdf->SetY($y + 8);
 		}
 
 		// Table Volume

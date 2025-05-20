@@ -283,10 +283,10 @@
                                                 </div>
                                             </div>
 
-                                            <!-------------------------- Closeing Date  ---------------------------->
+                                            <!-------------------------- Closing Date  ---------------------------->
                                             <div class="d-flex col-md-12 mb-3 align-items-center">
                                                 <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Closeing Date :</h4>
+                                                    <h4 class="mb-2 fs-4 fw-semibold">Closing Date :</h4>
                                                 </div>
                                                 <div class="d-flex col-md-3 me-3 gap-5">
                                                     <input type="date" class="form-control" id="inpDuedateEdit" name="idc_closing_date" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>">
@@ -1035,7 +1035,7 @@
             type: 'get',
             url: 'http://192.168.161.106/etax_invoice_system/api/customers',
             success: function(result) {
-                var option_text = '<option value="" disabled selected>Choose Costomer Name</option>';
+                var option_text = '<option value="" disabled selected>Choose Customer Name</option>';
                 $.each(result, function(key, value) {
                     option_text += '<option value="' + value.MC_CUST_ANAME + '">' + value.MC_CUST_ANAME + '&nbsp( ' + value.MC_CUST_CD + ' )' + '</option>';
                 })
@@ -1163,7 +1163,7 @@
                 html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_no" onchange="checkPartNo(event)" maxlength="50" value="' + data[i].idi_item_no + '"><span class="invalid-feedback"></span></div></td>';
                 html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_item_name" maxlength="100" value="' + data[i].idi_item_name + '"><span class="invalid-feedback"></span></div></td>';
                 html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_model" maxlength="50" value="' + data[i].idi_model + '"><span class="invalid-feedback"></span></div></td>';
-                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_remark" maxlength="100" value="' + data[i].idi_remark + '"><span class="invalid-feedback"></span></div></td>';
+                html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" name="idi_remark" maxlength="80 " value="' + data[i].idi_remark + '"><span class="invalid-feedback"></span></div></td>';
                 html += '<td><div><button type="button" onclick="deleteRow(event)" class="btn mb-1 btn-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnDeletePartNo" name="btnDeletePartNo" data-id="' + data[i].idi_id + '"><i class="ti ti-trash-x fs-6"></i></button></td>';
                 html += '</tr>';
                 groupPartData.push({
@@ -1179,7 +1179,7 @@
             html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartNo" maxlength="50" placeholder="Part No"><span class="invalid-feedback"></span></div></td>';
             html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpPartName" maxlength="100" placeholder="Part Name"><span class="invalid-feedback"></span></div></td>';
             html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpModel" maxlength="50" placeholder="Model"><span class="invalid-feedback"></span></div></td>';
-            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpRemark" maxlength="100" placeholder="Remark"><span class="invalid-feedback"></span></div></td>';
+            html += '<td><div class="col"><input class="form-control text-center shadow-sm" type="text" id="inpRemark" maxlength="80" placeholder="Remark"><span class="invalid-feedback"></span></div></td>';
             html += '<td><button type="button" onclick="addPartNoByItem(event)" class="btn mb-1 btn-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center card-hover shadow-sm" id="btnAddPartNo" name="btnAddPartNo" data-id=""><i class="ti ti-plus fs-6"></i></button></td>';
             html += '</tr>';
             document.getElementById('tblEditBodyPartNo').innerHTML = html;

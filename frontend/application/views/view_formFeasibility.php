@@ -53,7 +53,7 @@
                                         <!-- start row -->
                                         <tr>
                                             <th>No.</th>
-                                            <th>Costomer</th>
+                                            <th>Customer</th>
                                             <th>Part No.</th>
                                             <th>Issue Date</th>
                                             <th>Issue By</th>

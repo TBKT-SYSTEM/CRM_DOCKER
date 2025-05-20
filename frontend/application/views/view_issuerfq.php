@@ -40,7 +40,7 @@
                                     </div>
                                     <div class="d-flex col-md-10 me-3 gap-5">
                                         <div class="col">
-                                            <select name="idc_refer_doc" id="inpRefRfq" class="select2 form-select">
+                                            <select name="idc_refer_doc" id="inpRefRfq" onchange="changeRefDoc()" class="select2 form-select">
                                                 <?php
                                                 $option_topic = $this->ManageBackend->list_option("option/list_doc_rfq");
                                                 echo '<option value="0">Choose Reference RFQ ...</option>';
@@ -151,10 +151,10 @@
                                         <span class="invalid-feedback"></span>
                                     </div>
                                 </div>
-                                <!-------------------------- Closeing Date  ---------------------------->
+                                <!-------------------------- Closing Date  ---------------------------->
                                 <div class="d-flex col-md-12 mb-3 align-items-center">
                                     <div class="col-md-2">
-                                        <h4 class="mb-2 fs-4 fw-semibold">Closeing Date :</h4>
+                                        <h4 class="mb-2 fs-4 fw-semibold">Closing Date :</h4>
                                     </div>
                                     <div class="d-flex col-md-3 me-5 gap-5">
                                         <input type="date" class="form-control" id="inpDuedate" name="idc_closing_date" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>">
@@ -217,7 +217,7 @@
                                     <div class="d-flex col-md-6 align-items-center">
                                         <label for="" class="col-md-2 form-label fw-semibold me-3">Remark :</label>
                                         <div class="col me-3">
-                                            <input type="text" class="form-control col-md-6" id="inpRemark" name="idi_remark" placeholder="Enter Remark ..." maxlength="100">
+                                            <input type="text" class="form-control col-md-6" id="inpRemark" name="idi_remark" placeholder="Enter Remark ..." maxlength="80">
                                             <span class="invalid-feedback"></span>
                                         </div>
                                         <button type="button" onclick="addPart()" class="btn bg-primary-subtle text-primary">Add</button>
@@ -372,6 +372,17 @@
             console.error('Invalid row index');
         }
     }
+
+    async function changeRefDoc() {
+        let idc_id = $('#inpRefRfq').val();
+        if (idc_id == 0) {
+            clearForm();
+            return;
+        } else {
+            return;
+        }
+    }
+
     async function getRfq() {
         groupPartData = [];
         let idc_id = $('#inpRefRfq').val();
@@ -736,7 +747,7 @@
             type: 'get',
             url: 'http://192.168.161.106/etax_invoice_system/api/customers',
             success: function(result) {
-                var option_text = '<option value="" disabled selected>Choose Costomer Name</option>';
+                var option_text = '<option value="" disabled selected>Choose Customer Name</option>';
                 $.each(result, function(key, value) {
                     option_text += '<option value="' + value.MC_CUST_ANAME + '">' + value.MC_CUST_ANAME + '&nbsp( ' + value.MC_CUST_CD + ' )' + '</option>';
                 })

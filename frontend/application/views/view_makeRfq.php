@@ -352,7 +352,7 @@
             type: 'get',
             url: 'http://192.168.161.106/etax_invoice_system/api/customers',
             success: function(result) {
-                var option_text = '<option value="" disabled selected>Choose Costomer</option>';
+                var option_text = '<option value="" disabled selected>Choose Customer</option>';
                 $.each(result, function(key, value) {
                     option_text += '<option value="' + value.MC_CUST_ANAME + '">' + value.MC_CUST_ANAME + '&nbsp( ' + value.MC_CUST_CD + ' )' + '</option>';
                 })

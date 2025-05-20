@@ -225,7 +225,7 @@
 
                     // ฟังก์ชันคำนวณความสว่าง
                     const getBrightness = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
-                    const brightnessThreshold = 70;
+                    const brightnessThreshold = 110;
 
                     // ลบ pixel ที่สว่างเกิน threshold (ถือว่าเป็นพื้นหลัง)
                     for (let i = 0; i < data.length; i += 4) {

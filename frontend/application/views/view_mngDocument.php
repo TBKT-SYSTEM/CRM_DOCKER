@@ -233,7 +233,7 @@
 </div>
 
 <!-- Modal for docuemt control -->
-<div class="modal fade" id="mdlEditDocControl" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal fade modal-lg" id="mdlEditDocControl" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -244,7 +244,7 @@
             </div>
             <div class="modal-body">
                 <form id="frmEditDocControl" name="frmEditDocControl">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtSelDoctype" class="form-label fw-semibold col-sm-3 col-form-label">Document Type</label>
                             <div class="col-sm-9">
@@ -276,7 +276,7 @@
 </div>
 
 <!-- Modal for edit document type -->
-<div class="modal fade" id="mdlEditDocType" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
+<div class="modal fade modal-lg" id="mdlEditDocType" tabindex="-1" aria-labelledby="scroll-long-inner-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header d-flex align-items-center">
@@ -287,7 +287,7 @@
             </div>
             <div class="modal-body">
                 <form id="frmEditDocType" name="frmEditDocType">
-                    <div class="container-fluid">
+                    <div class="p-4">
                         <div class="mb-3 row align-items-center">
                             <label for="edtDocName" class="form-label fw-semibold col-sm-3 col-form-label">Document Type Name</label>
                             <div class="col-sm-9">

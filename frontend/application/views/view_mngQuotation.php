@@ -425,10 +425,10 @@
                                                 </div>
                                             </div>
 
-                                            <!-------------------------- Closeing Date  ---------------------------->
+                                            <!-------------------------- Closing Date  ---------------------------->
                                             <div class="d-flex col-md-12 mb-3">
                                                 <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Closeing Date :</h4>
+                                                    <h4 class="mb-2 fs-4 fw-semibold">Closing Date :</h4>
                                                 </div>
                                                 <div class="d-flex col-md-3 me-3 gap-5">
                                                     <input type="date" class="form-control" id="inpDuedateView" name="ir_duedate" min="" value="">
@@ -726,10 +726,10 @@
                                                 </div>
                                             </div>
 
-                                            <!-------------------------- Closeing Date  ---------------------------->
+                                            <!-------------------------- Closing Date  ---------------------------->
                                             <div class="d-flex col-md-12 mb-3">
                                                 <div class="col-md-2">
-                                                    <h4 class="mb-2 fs-4 fw-semibold">Closeing Date :</h4>
+                                                    <h4 class="mb-2 fs-4 fw-semibold">Closing Date :</h4>
                                                 </div>
                                                 <div class="d-flex col-md-3 me-3 gap-5">
                                                     <input type="date" class="form-control" id="inpDuedateEdit" name="ir_duedate" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d', strtotime('+7 days')); ?>">

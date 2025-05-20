@@ -187,6 +187,7 @@
                             }).then(() => {
                                 var dataTable = $('#tblRemainTask').DataTable();
                                 dataTable.ajax.reload(null, false);
+                                $('#mdlApprove').modal('hide');
                             });
                         } else {
                             Swal.fire({
@@ -199,6 +200,7 @@
                             }).then(() => {
                                 var dataTable = $('#tblRemainTask').DataTable();
                                 dataTable.ajax.reload(null, false)
+                                $('#mdlApprove').modal('hide');
                             });
                         }
                     },
@@ -270,6 +272,7 @@
                         }).then(() => {
                             var dataTable = $('#tblRemainTask').DataTable();
                             dataTable.ajax.reload(null, false);
+                            $('#mdlApprove').modal('hide');
                         });
                     } else {
                         Swal.fire({
@@ -282,6 +285,7 @@
                         }).then(() => {
                             var dataTable = $('#tblRemainTask').DataTable();
                             dataTable.ajax.reload(null, false)
+                            $('#mdlApprove').modal('hide');
                         });
                     }
                 },
