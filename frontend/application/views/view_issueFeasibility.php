@@ -566,7 +566,7 @@
                         Swal.showLoading();
                     }
                 })
-                $('#add_form input, #add_form button, #add_form select').not('#inpOtherSubjectEdit').prop('disabled', false);
+                $('#add_form input, #add_form button, #add_form select').prop('disabled', false);
                 var add_form = {};
                 $('#add_form').serializeArray().forEach(function(item) {
                     if (item.name == 'idi_item_name' || item.name == 'idi_item_no' || item.name == 'idi_model' || item.name == 'idi_remark') {
@@ -584,10 +584,10 @@
                     }
                 });
 
-                if (is_empty(add_form['idc_subject_note'])) {
+                if (add_form['mds_id'] != 4) {
                     add_form['idc_subject_note'] = '';
-                }
-
+                } 
+                
                 add_form["idc_issue_seq_no"] = String(ir_doc_no['doc_cur_no_po2'] + 1);
                 add_form["mdt_id"] = ir_doc_no['mdt_id'];
 

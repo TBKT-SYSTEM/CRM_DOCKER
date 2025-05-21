@@ -203,7 +203,7 @@ class ViewPDF extends CI_Controller
 				$width_newp = $pdf->GetStringWidth($newp) + 2;
 				$pdf->Cell($width_newp, 5, $newp);
 			} else {
-				if($mds_all[$i]->mds_name == 'Other') {
+				if ($mds_all[$i]->mds_name == 'Other') {
 					$pdf->SetX($pdf->GetX() - 0.5);
 				} else {
 					$pdf->SetX($pdf->GetX() + 2);
@@ -343,7 +343,13 @@ class ViewPDF extends CI_Controller
 			$pdf->MultiCell(35, 8, $part_no, 1, 'C');  // Part No
 			$pdf->SetXY($x + 15 + 35, $y);
 
-			$pdf->MultiCell(55, (strlen($part_name) > 30) ? 4 : 8, $part_name, 1, 'C'); // Part Name
+			if ((strlen($part_name) > 34)) {
+				$pdf->MultiCell(55, 4, substr($part_name, 0, 34), 'T', 'C');
+				$pdf->SetXY($x + 15 + 35, $y + 4);
+				$pdf->MultiCell(55, 4, substr($part_name, 34), 'B', 'C');
+			} else {
+				$pdf->MultiCell(55, 8, $part_name, 1, 'C');
+			}
 			$pdf->SetXY($x + 15 + 35 + 55, $y);
 
 			$pdf->MultiCell(40, 8, $model, 1, 'C');     // Model
@@ -417,15 +423,15 @@ class ViewPDF extends CI_Controller
 			$pdf->Ln();
 		}
 		// Info
-		$pdf->Ln(3);
+		$pdf->Ln(2);
 		$pdf->SetX($pdf->GetX() - 5);
 		$pdf->SetFont('THSarabunNew', 'B', 12);
 		$info = 'Please be required to study the cost according above detail and be arranged necessary info upon below conditions.';
 		$width_val = $pdf->GetStringWidth($info);
-		$pdf->Cell($width_val, 5, $info);
+		$pdf->Cell($width_val, 4, $info);
 
 		// Table Note
-		$pdf->Ln(7);
+		$pdf->Ln(6);
 		$idc_note1 = $this->input->get('idc_note1');
 		$idc_note1 .= "\n ";
 		$pdf->SetX($pdf->GetX() - 4);
@@ -458,7 +464,7 @@ class ViewPDF extends CI_Controller
 		// }
 
 		// Table Sign
-		$pdf->Ln(8);
+		$pdf->Ln(6);
 		$pdf->SetX($pdf->GetX() - 4);
 		$pdf->SetFont('THSarabunNew', 'B', 11);
 		$pdf->SetFillColor(235, 235, 235);
@@ -703,7 +709,13 @@ class ViewPDF extends CI_Controller
 			$pdf->MultiCell(35, 8, $part_no, 1, 'C');  // Part No
 			$pdf->SetXY($x + 15 + 35, $y);
 
-			$pdf->MultiCell(55, (strlen($part_name) > 30) ? 4 : 8, $part_name, 1, 'C'); // Part Name
+			if ((strlen($part_name) > 34)) {
+				$pdf->MultiCell(55, 4, substr($part_name, 0, 34), 'T', 'C');
+				$pdf->SetXY($x + 15 + 35, $y + 4);
+				$pdf->MultiCell(55, 4, substr($part_name, 34), 'B', 'C');
+			} else {
+				$pdf->MultiCell(55, 8, $part_name, 1, 'C');
+			}
 			$pdf->SetXY($x + 15 + 35 + 55, $y);
 
 			$pdf->MultiCell(40, 8, $model, 1, 'C');     // Model
@@ -1128,6 +1140,7 @@ class ViewPDF extends CI_Controller
 			if ($mds_all[$i]->mds_name == 'Other') {
 				if ($get_mds == $mds_all[$i]->mds_id) {
 					$subject_note = $this->input->get('idc_subject_note');
+					$subject_note = iconv('UTF-8', 'TIS-620//IGNORE', $subject_note);
 					$pdf->Cell(41, 5, $subject_note, 'B', 0, 'L');
 				} else {
 					$pdf->Cell(41, 5, $subject_note, 'B', 0, 'C');
@@ -1181,7 +1194,13 @@ class ViewPDF extends CI_Controller
 			$pdf->MultiCell(35, 8, $part_no, 1, 'C');  // Part No
 			$pdf->SetXY($x + 15 + 35, $y);
 
-			$pdf->MultiCell(55, (strlen($part_name) > 30) ? 4 : 8, $part_name, 1, 'C'); // Part Name
+			if ((strlen($part_name) > 34)) {
+				$pdf->MultiCell(55, 4, substr($part_name, 0, 34), 'T', 'C');
+				$pdf->SetXY($x + 15 + 35, $y + 4);
+				$pdf->MultiCell(55, 4, substr($part_name, 34), 'B', 'C');
+			} else {
+				$pdf->MultiCell(55, 8, $part_name, 1, 'C');
+			}
 			$pdf->SetXY($x + 15 + 35 + 55, $y);
 
 			$pdf->MultiCell(40, 8, $model, 1, 'C');     // Model

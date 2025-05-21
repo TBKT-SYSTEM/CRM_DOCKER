@@ -887,7 +887,9 @@
         }
     }
 
-    function showbtnAction(status, id, ) {
+    function showbtnAction(status, id) {
+        const dept = <?php echo $this->session->userdata('sessDeptId') ?>;
+        const btnSubmit = dept == 22 ? '' : 'd-none';
         if (status == 1) {
             return `
             <div class="d-flex justify-content-evenly gap-1">
@@ -897,7 +899,7 @@
                 <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
                     <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
                 </button>
-                <button type="button" onclick="docCancel(${id})" class="btn bg-danger-subtle text-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel">
+                <button type="button" onclick="docCancel(${id})" class="btn bg-danger-subtle text-danger rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnSubmit}" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel">
                     <i class="ti ti-x" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
@@ -910,7 +912,7 @@
                 <button id="btnPDF" onclick="viewPDF(${id})" class="btn bg-secondary-subtle text-secondary rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview">
                     <i class="ti ti-file-search" style="font-size: 1.5rem !important;"></i>
                 </button>
-                <button type="button" onclick="nbcSubmit(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Submit">
+                <button type="button" onclick="nbcSubmit(${id})" class="btn bg-success-subtle text-success rounded-circle round-40 btn-sm d-inline-flex align-items-center justify-content-center shadow-sm ${btnSubmit}" data-bs-toggle="tooltip" data-bs-placement="top" title="Submit">
                     <i class="ti ti-check" style="font-size: 1.5rem !important;"></i>
                 </button>
             </div>`;
@@ -954,7 +956,7 @@
         let userID = '<?php echo $this->session->userdata('sessUsr'); ?>';
         Swal.fire({
             title: 'Are you sure?',
-            text: "Do you want to cancel RFQ?",
+            text: "Do you want to cancel NBC?",
             icon: 'warning',
             input: "text",
             inputPlaceholder: "Please fill reason for cancellation.",
@@ -1007,7 +1009,7 @@
         let userID = '<?php echo $this->session->userdata('sessUsr'); ?>';
         Swal.fire({
             title: 'Are you sure?',
-            text: "Do you want to reverse RFQ?",
+            text: "Do you want to reverse NBC?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -1506,7 +1508,7 @@
                     .then((data) => {
                         const filepond = FilePond.create(document.querySelector('#file_nbc'), {
                             server: {
-                                url: '/ManageNbc/UploadFile?idc_id=' + idc_id_edit,
+                                url: '<?php echo base_url(); ?>/ManageNbc/UploadFile?idc_id=' + idc_id_edit,
                                 process: {
                                     url: '/process',
                                     method: 'POST',

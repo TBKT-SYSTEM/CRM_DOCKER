@@ -1402,7 +1402,7 @@ func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail s
 		ReferenceDocument string
 		Customer          string
 		Subject           string
-		ProjectLife       int
+		ProjectLife       string
 		ProjectStart      string
 		TableDetail       template.HTML
 		detailReject      string
@@ -1474,9 +1474,10 @@ func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail s
 	var DatareferenceDocument string
 	var Datacustomer string
 	var Datasubject string
-	var DataprojectLife int
-	var DataprojectStart string
+	var DataprojectLife sql.NullInt64
+	var DataprojectStart sql.NullString
 	otherDetailQuery := "SELECT IFNULL(( SELECT tb2.idc_running_no FROM info_document_control tb2 WHERE tb2.idc_id = idc.idc_refer_doc ), '-') AS refer_doc, idc.idc_customer_name, CASE WHEN idc.mds_id = 4 THEN idc.idc_subject_note ELSE mds.mds_name END AS subject_name, idc.idc_project_life, idc.idc_project_start FROM info_document_control idc LEFT JOIN mst_document_subject mds ON mds.mds_id = idc.mds_id WHERE idc.idc_id = ?"
+
 	err = db.QueryRow(otherDetailQuery, docId).Scan(&DatareferenceDocument, &Datacustomer, &Datasubject, &DataprojectLife, &DataprojectStart)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -1571,6 +1572,20 @@ func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail s
 		tableBody = ``
 	}
 
+	var projectLife string
+	if DataprojectLife.Valid {
+		projectLife = fmt.Sprintf("%d", DataprojectLife.Int64)
+	} else {
+		projectLife = "-"
+	}
+
+	var projectStart string
+	if DataprojectStart.Valid {
+		projectStart = DataprojectStart.String
+	} else {
+		projectStart = "-"
+	}
+
 	data := EmailApprove{
 		DocId:             docId,
 		Username:          userName,
@@ -1578,8 +1593,8 @@ func SendMail(c *gin.Context, docId int, idaId int, userName string, userEmail s
 		ReferenceDocument: DatareferenceDocument,
 		Customer:          Datacustomer,
 		Subject:           Datasubject,
-		ProjectLife:       DataprojectLife,
-		ProjectStart:      DataprojectStart,
+		ProjectLife:       projectLife,
+		ProjectStart:      projectStart,
 		TableDetail:       template.HTML(tableBody),
 		detailReject:      detailReject,
 		LinkApporve:       approveURL,

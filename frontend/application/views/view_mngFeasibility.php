@@ -1844,6 +1844,7 @@
                                                         } else if (item.ifs_status == 9) {
                                                             btnNone = 'd-none';
                                                             bgTr = `style="background-color: #9aff713d;"`;
+                                                            allStatusValid = false;
                                                         }else if (item.ifs_status == 6) {
                                                             bgTr = `style="background-color:rgba(255, 113, 113, 0.24);"`;
                                                         }

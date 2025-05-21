@@ -1022,7 +1022,7 @@ func SubmitFeasibility(c *gin.Context) {
 	queryGetRefer := "SELECT * FROM info_document_control WHERE idc_id = ?"
 	err := db.QueryRow(queryGetRefer, iId).Scan(&objReferRfq.Idc_id, &objReferRfq.Mdt_id, &strReferDoc, &objReferRfq.Idc_running_no, &objReferRfq.Idc_issue_year, &objReferRfq.Idc_issue_month, &objReferRfq.Idc_issue_seq_no, &objReferRfq.Idc_customer_type, &objReferRfq.Idc_customer_name, &objReferRfq.Idc_plant_cd, &objReferRfq.Mds_id, &strSubjectNote, &objReferRfq.Mde_id, &strEnclosuresNote, &objReferRfq.Idc_project_life, &objReferRfq.Idc_project_start, &strIssueDate, &objReferRfq.Idc_closing_date, &strReplyDate, &objReferRfq.Idc_result_confirm, &objReferRfq.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objReferRfq.Idc_created_date, &objReferRfq.Idc_created_by, &objReferRfq.Idc_updated_date, &objReferRfq.Idc_updated_by)
 	if err == sql.ErrNoRows {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error1": err.Error()})
 		return
 	}
 
@@ -1079,7 +1079,7 @@ func SubmitFeasibility(c *gin.Context) {
 		_, err = db.Exec("UPDATE info_feasibility_score SET ifs_status = 2, ifs_updated_date = ?, ifs_updated_by = ? WHERE idc_id = ?", objData.Idc_created_date, objData.Idc_created_by, iId)
 
 		if err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			c.IndentedJSON(http.StatusOK, gin.H{"Error2": err.Error()})
 			return
 		}
 
@@ -1154,7 +1154,7 @@ func SubmitFeasibility(c *gin.Context) {
 
 		_, errIda := db.Exec(sqlIda)
 		if errIda != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error3": errIda.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errIda.Error()})
 			return
 		}
 
@@ -1204,7 +1204,7 @@ func SubmitFeasibility(c *gin.Context) {
 
 		_, errIda = db.Exec(sqlIda)
 		if errIda != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error3": errIda.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error4": errIda.Error()})
 			return
 		}
 		type notiActive struct {
@@ -1252,7 +1252,7 @@ func SubmitFeasibility(c *gin.Context) {
 
 			errMail := SendMail(c, objReferRfq.Idc_id, itemNoti.Ida_id, itemNoti.Su_firstname, itemNoti.Su_email, "waiting")
 			if errMail != nil {
-				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errMail.Error()})
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error5": errMail.Error()})
 				return
 			}
 		}
@@ -1272,7 +1272,7 @@ func SubmitFeasibility(c *gin.Context) {
 
 	_, err = db.Exec("UPDATE info_document_control SET idc_status = 2, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", objData.Idc_created_date, objData.Idc_created_by, iId)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error6": err.Error()})
 		return
 	}
 
@@ -1305,6 +1305,8 @@ func NewSubmitFeasibility(c *gin.Context) {
 	var strReferDoc sql.NullInt64
 	var strSubjectNote sql.NullString
 	var strEnclosuresNote sql.NullString
+	var strProlife sql.NullString
+	var strProstart sql.NullString
 	var strIssueDate sql.NullString
 	var strReplyDate sql.NullString
 	var strNote1 sql.NullString
@@ -1314,9 +1316,9 @@ func NewSubmitFeasibility(c *gin.Context) {
 	var strCancelReason sql.NullString
 
 	queryGetRefer := "SELECT * FROM info_document_control WHERE idc_id = ?"
-	err := db.QueryRow(queryGetRefer, iId).Scan(&objReferRfq.Idc_id, &objReferRfq.Mdt_id, &strReferDoc, &objReferRfq.Idc_running_no, &objReferRfq.Idc_issue_year, &objReferRfq.Idc_issue_month, &objReferRfq.Idc_issue_seq_no, &objReferRfq.Idc_customer_type, &objReferRfq.Idc_customer_name, &objReferRfq.Idc_plant_cd, &objReferRfq.Mds_id, &strSubjectNote, &objReferRfq.Mde_id, &strEnclosuresNote, &objReferRfq.Idc_project_life, &objReferRfq.Idc_project_start, &strIssueDate, &objReferRfq.Idc_closing_date, &strReplyDate, &objReferRfq.Idc_result_confirm, &objReferRfq.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objReferRfq.Idc_created_date, &objReferRfq.Idc_created_by, &objReferRfq.Idc_updated_date, &objReferRfq.Idc_updated_by)
+	err := db.QueryRow(queryGetRefer, iId).Scan(&objReferRfq.Idc_id, &objReferRfq.Mdt_id, &strReferDoc, &objReferRfq.Idc_running_no, &objReferRfq.Idc_issue_year, &objReferRfq.Idc_issue_month, &objReferRfq.Idc_issue_seq_no, &objReferRfq.Idc_customer_type, &objReferRfq.Idc_customer_name, &objReferRfq.Idc_plant_cd, &objReferRfq.Mds_id, &strSubjectNote, &objReferRfq.Mde_id, &strEnclosuresNote, &strProlife, &strProstart, &strIssueDate, &objReferRfq.Idc_closing_date, &strReplyDate, &objReferRfq.Idc_result_confirm, &objReferRfq.Idc_status, &strNote1, &strNote2, &strFilePath, &strPhysicalPath, &strCancelReason, &objReferRfq.Idc_created_date, &objReferRfq.Idc_created_by, &objReferRfq.Idc_updated_date, &objReferRfq.Idc_updated_by)
 	if err == sql.ErrNoRows {
-		c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusOK, gin.H{"Error1.1": err.Error()})
 		return
 	}
 
@@ -1328,6 +1330,12 @@ func NewSubmitFeasibility(c *gin.Context) {
 	}
 	if strEnclosuresNote.Valid {
 		objReferRfq.Idc_enclosures_note = strEnclosuresNote.String
+	}
+	if strProlife.Valid {
+		objReferRfq.Idc_issue_date = strProlife.String
+	}
+	if strProstart.Valid {
+		objReferRfq.Idc_issue_date = strProstart.String
 	}
 	if strIssueDate.Valid {
 		objReferRfq.Idc_issue_date = strIssueDate.String
@@ -1359,7 +1367,7 @@ func NewSubmitFeasibility(c *gin.Context) {
 		_, err = db.Exec("UPDATE info_feasibility_score AS ifs JOIN mst_consideration_item_pic AS mcip ON mcip.mcip_id = ifs.mcip_id JOIN sys_department AS sd ON sd.sd_id = mcip.sd_id SET ifs.ifs_status = 2, ifs.ifs_updated_date = ?, ifs.ifs_updated_by = ? WHERE ifs.idc_id = ? AND mcip.sd_id = ?", objData.Idc_created_date, objData.Idc_created_by, iId, objData.Sd_id)
 
 		if err != nil {
-			c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+			c.IndentedJSON(http.StatusOK, gin.H{"Error1": err.Error()})
 			return
 		}
 
@@ -1415,7 +1423,7 @@ func NewSubmitFeasibility(c *gin.Context) {
 			updateIdaBy := "UPDATE info_document_approval SET ida_status = 1, ida_action = 0, ida_route = 0, ida_reject_reason = ?, ida_updated_date = ?, ida_updated_by = ? WHERE idc_id = ? AND su_id = ?"
 			_, err = db.Exec(updateIdaBy, "", objData.Idc_created_date, objData.Idc_created_by, convertedId, results.UserID)
 			if err != nil {
-				c.IndentedJSON(http.StatusOK, gin.H{"Error": err.Error()})
+				c.IndentedJSON(http.StatusOK, gin.H{"Error2": err.Error()})
 				return
 			}
 		} else {
@@ -1448,7 +1456,7 @@ func NewSubmitFeasibility(c *gin.Context) {
 
 			_, errIda := db.Exec(sqlIda)
 			if errIda != nil {
-				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error3": errIda.Error()})
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error3.3": errIda.Error()})
 				return
 			}
 		}
@@ -1460,9 +1468,9 @@ func NewSubmitFeasibility(c *gin.Context) {
 			Su_email     string `json:"su_email"`
 		}
 		strShowUsers := "You have a new document"
-		query := `SELECT ida.ida_id, ida.su_id, CONCAT(su.su_firstname, ' ', su.su_lastname) AS su_firstname, su.su_email FROM info_document_approval ida LEFT JOIN sys_users su ON su.su_id = ida.su_id WHERE ida.idc_id = ? AND ida.ida_action = 0 GROUP BY su_id`
+		query := `SELECT ida.ida_id, ida.su_id, CONCAT(su.su_firstname, ' ', su.su_lastname) AS su_firstname, su.su_email FROM info_document_approval ida LEFT JOIN sys_users su ON su.su_id = ida.su_id WHERE ida.idc_id = ? AND ida.ida_action = 0 AND su.sd_id = ? GROUP BY su_id`
 
-		rowsUserApp, err := db.Query(query, iId)
+		rowsUserApp, err := db.Query(query, iId, objData.Sd_id)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute query"})
 			return
@@ -1497,7 +1505,7 @@ func NewSubmitFeasibility(c *gin.Context) {
 
 			errMail := SendMail(c, objReferRfq.Idc_id, itemNoti.Ida_id, itemNoti.Su_firstname, itemNoti.Su_email, "waiting")
 			if errMail != nil {
-				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": errMail.Error()})
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error4": errMail.Error()})
 				return
 			}
 		}
@@ -1517,7 +1525,7 @@ func NewSubmitFeasibility(c *gin.Context) {
 
 	_, err = db.Exec("UPDATE info_document_control SET idc_status = 2, idc_updated_date = ?, idc_updated_by = ? WHERE idc_id = ?", objData.Idc_created_date, objData.Idc_created_by, iId)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Error5": err.Error()})
 		return
 	}
 

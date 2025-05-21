@@ -173,6 +173,7 @@ class ManageFeasibility extends CI_Controller
 			if ($mds_all[$i]->mds_name == 'Other') {
 				if ($get_mds == $mds_all[$i]->mds_id) {
 					$subject_note = $this->input->get('idc_subject_note');
+					$subject_note = iconv('UTF-8', 'TIS-620//IGNORE', $subject_note);
 					$pdf->Cell(41, 5, $subject_note, 'B', 0, 'L');
 				} else {
 					$pdf->Cell(41, 5, $subject_note, 'B', 0, 'C');
@@ -226,7 +227,13 @@ class ManageFeasibility extends CI_Controller
 			$pdf->MultiCell(35, 8, $part_no, 1, 'C');  // Part No
 			$pdf->SetXY($x + 15 + 35, $y);
 
-			$pdf->MultiCell(55, (strlen($part_name) > 30) ? 4 : 8, $part_name, 1, 'C'); // Part Name
+			if ((strlen($part_name) > 34)) {
+				$pdf->MultiCell(55, 4, substr($part_name, 0, 34), 'T', 'C');
+				$pdf->SetXY($x + 15 + 35, $y + 4);
+				$pdf->MultiCell(55, 4, substr($part_name, 34), 'B', 'C');
+			} else {
+				$pdf->MultiCell(55, 8, $part_name, 1, 'C');
+			}
 			$pdf->SetXY($x + 15 + 35 + 55, $y);
 
 			$pdf->MultiCell(40, 8, $model, 1, 'C');     // Model

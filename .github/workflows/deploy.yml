@@ -24,7 +24,7 @@ jobs:
         shell: cmd
         run: |
           set SOURCE=%GITHUB_WORKSPACE%
-          set TARGET=C:\inetpub\wwwroot\CRM_DOCKER
+          set TARGET=D:\inetpub\wwwroot\CRM_DOCKER
 
           echo Cleaning files inside target folder but skipping 'frontend\assets\images\uploaded'...
 
